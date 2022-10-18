@@ -2,7 +2,7 @@
 
 This is an experimental approach to bring the macOS [Stage Manager](https://9to5mac.com/2022/07/26/stage-manager-on-mac/) to Microsoft Windows.
 
-![Stage Manager](StageManager.jpg)
+![Stage Manager](media/StageManager.jpg)
 
 This prototype groups applications by their process. By switching between so called "scenes" on the left, Stage Manager hides other windows and the desktop icons, helping you to focus.
 
