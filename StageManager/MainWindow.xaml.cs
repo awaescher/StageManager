@@ -4,22 +4,13 @@ using Microsoft.Xaml.Behaviors.Core;
 using SharpHook;
 using StageManager.Model;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using workspacer;
-using WpfScreenHelper;
 
 namespace StageManager
 {
@@ -44,15 +35,11 @@ namespace StageManager
 		{
 			base.OnInitialized(e);
 
-
-
 			_thisHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
-
-
 
 			_hook = new TaskPoolGlobalHook();
 			_hook.MouseReleased += OnMouseReleased;
-			//hook.MouseMoved += Hook_MouseMoved;
+
 			Task.Run(() => _hook.Run());
 		}
 
@@ -62,7 +49,9 @@ namespace StageManager
 			_hook.Dispose();
 
 			base.OnClosed(e);
-			SceneManager.Reset().SafeFireAndForget();
+
+			PoorMansAsync.Wait(SceneManager.Reset, TimeSpan.FromSeconds(3));
+			Environment.Exit(0);
 		}
 
 		protected override void OnContentRendered(EventArgs e)
