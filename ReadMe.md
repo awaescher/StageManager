@@ -12,21 +12,29 @@ Windows can be moved from one scene to another by dragging them onto scenes on t
 
 This is an experimental fun project. I don't have any idea whether or not this is going to be a final product one day. 
 
-- Experimental phase
-  - auto hide scenes for maximized content
-  - place screenshots in relative size of the desktop
-  - place app icons over 3D window adorners
-  - rounded corners for the window thumbnails
-  - limit maximum scenes (like 6 for macOS?)
-  - limit window count per scene (like newest 5)
-  - adjust the 3d angle according to screen position
-- Product phase
-  - virtual desktop support (pin window)
-  - multimonitor support
-  - feature parity with macOS Stage Manager
-- Polishing phase
-  - window animations
-  - live dwm thumbnails
+|Topic|State|
+|-|-|
+|**Experimental stage**||
+|initial windows grouping by process|✅|
+|3D display of opened windows (static)|✅|
+|hide/show windows of given scenes|✅|
+|hide/show desktop icons|✅|
+|scene management with drag&drop|✅|
+|restore windows on quit/restart|✅|
+|place screenshots in relative size of the desktop|⬜|
+|place app icons over 3D window adorners|⬜|
+|rounded corners for the window thumbnails|⬜|
+|limit maximum scenes (like 6 for macOS?)|⬜|
+|limit window count per scene (like newest 5)|⬜|
+|auto hide & fly-in scenes for maximized windows|⬜|
+|**Product stage**||
+|virtual desktop support (pin window)|⬜|
+|multi-monitor support|⬜|
+|feature parity with macOS Stage Manager|⬜|
+|**Polishing stage**||
+|window animations|⬜|
+|live dwm thumbnails|⬜|
+|adjust 3D angle according to screen position|⬜|
 
 Contributions very welcome :heart:
 
