@@ -9,6 +9,7 @@ namespace StageManager.Model
 	public class SceneModel : INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
+		private Scene _scene;
 
 		public static SceneModel FromScene(Scene scene)
 		{
@@ -72,27 +73,12 @@ namespace StageManager.Model
 				if (value?.Id == _scene?.Id)
 					return;
 
-				if (_scene is object)
-					_scene.SelectedChanged -= _scene_SelectedChanged;
-
 				_scene = value;
-
-				_scene.SelectedChanged += _scene_SelectedChanged;
 			}
 		}
 
-		private void _scene_SelectedChanged(object sender, EventArgs e)
-		{
-			RaisePropertyChanged(nameof(Opacity));
-		}
 
 		public string Title => _scene.Title;
-
-		public double Opacity => _scene.IsSelected ? 1.0 : 0.5;
-
-		private Scene _scene;
-
-		public string Image => @"C:\Users\awaes_000\Desktop\devenv_1jJwlwtOR8.png";
 
 		private void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string memberName = "")
 		{

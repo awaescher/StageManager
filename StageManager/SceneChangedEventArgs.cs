@@ -4,9 +4,9 @@ using IWindow = workspacer.IWindow;
 
 namespace StageManager
 {
-	public class SceneChangeEventArgs : EventArgs
+	public class SceneChangedEventArgs : EventArgs
 	{
-		public SceneChangeEventArgs(Scene scene, IWindow window, ChangeType change)
+		public SceneChangedEventArgs(Scene scene, IWindow window, ChangeType change)
 		{
 			Scene = scene;
 			Window = window;

@@ -6,7 +6,6 @@ using StageManager.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +13,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using Windows.UI.Composition;
 using workspacer;
 
 namespace StageManager
@@ -32,6 +30,7 @@ namespace StageManager
 		private double _lastWidth;
 		private Timer _overlapCheckTimer;
 		private Point _mouse = new Point(0, 0);
+		private SceneModel _removedCurrentScene;
 
 		public MainWindow()
 		{
@@ -81,6 +80,7 @@ namespace StageManager
 			SceneManager.Start().ConfigureAwait(true);
 
 			SceneManager.SceneChanged += SceneManager_SceneChanged;
+			SceneManager.CurrentSceneSelectionChanged += SceneManager_CurrentSceneSelectionChanged;
 			SceneManager.RequestWindowPreviewUpdate += SceneManager_RequestWindowPreviewUpdate;
 
 			foreach (var scene in SceneManager.GetScenes())
@@ -90,17 +90,30 @@ namespace StageManager
 			}
 		}
 
+		private void SceneManager_CurrentSceneSelectionChanged(object? sender, CurrentSceneSelectionChangedEventArgs args)
+		{
+			var currentModel = Scenes.FirstOrDefault(m => m.Id == args.Current.Id);
 
+			if (currentModel is object)
+			{
+				var currentIndex = Scenes.IndexOf(currentModel);
+				Scenes.RemoveAt(currentIndex);
+
+				if (_removedCurrentScene is object)
+					Scenes.Insert(currentIndex, _removedCurrentScene);
+
+				_removedCurrentScene = currentModel;
+			}
+		}
 
 		private void SceneManager_RequestWindowPreviewUpdate(object? sender, IWindow window)
 		{
-			var toUpdate = Scenes
-				.Select(s => s.Windows.FirstOrDefault(w => w.Handle == window.Handle))
+			var toUpdate = Scenes.Union(new[]{ _removedCurrentScene })
+				.Select(s => s?.Windows.FirstOrDefault(w => w.Handle == window.Handle))
 				.Where(w => w is object)
 				.FirstOrDefault();
 
-			if (toUpdate is object)
-				toUpdate.UpdatePreview();
+			toUpdate?.UpdatePreview();
 		}
 
 		protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
@@ -113,7 +126,7 @@ namespace StageManager
 			this.Height = area.Height;
 		}
 
-		private void SceneManager_SceneChanged(object sender, SceneChangeEventArgs e)
+		private void SceneManager_SceneChanged(object sender, SceneChangedEventArgs e)
 		{
 			this.Dispatcher.Invoke(() =>
 			{
@@ -235,7 +248,7 @@ namespace StageManager
 			if (e.Key == Key.Delete)
 				Mode = Mode == WindowMode.OffScreen ? WindowMode.OnScreen : WindowMode.OffScreen;
 		}
-		
+
 		private void _hook_MouseMoved(object? sender, MouseHookEventArgs e)
 		{
 			_mouse.X = e.Data.X;

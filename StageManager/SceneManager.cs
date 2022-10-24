@@ -22,7 +22,8 @@ namespace StageManager
 		private List<Scene> _scenes;
 		private Scene _current;
 
-		public event EventHandler<SceneChangeEventArgs> SceneChanged;
+		public event EventHandler<SceneChangedEventArgs> SceneChanged;
+		public event EventHandler<CurrentSceneSelectionChangedEventArgs> CurrentSceneSelectionChanged;
 		public event EventHandler<IWindow> RequestWindowPreviewUpdate;
 
 		public WindowsManager WindowsManager { get; }
@@ -64,12 +65,12 @@ namespace StageManager
 
 				if (scene.Windows.Any())
 				{
-					SceneChanged?.Invoke(this, new SceneChangeEventArgs(scene, window, ChangeType.Updated));
+					SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Updated));
 				}
 				else
 				{
 					_scenes.Remove(scene);
-					SceneChanged?.Invoke(this, new SceneChangeEventArgs(scene, window, ChangeType.Removed));
+					SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Removed));
 				}
 			}
 		}
@@ -86,12 +87,12 @@ namespace StageManager
 			if (existentScene is null)
 			{
 				_scenes.Add(scene);
-				SceneChanged?.Invoke(this, new SceneChangeEventArgs(scene, window, ChangeType.Created));
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Created));
 			}
 			else
 			{
 				scene.Add(window);
-				SceneChanged?.Invoke(this, new SceneChangeEventArgs(scene, window, ChangeType.Updated));
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Updated));
 			}
 		}
 
@@ -105,6 +106,7 @@ namespace StageManager
 		{
 			var otherWindows = GetSceneableWindows().Except(scene.Windows).ToArray();
 
+			var prior = _current;
 			_current = scene;
 
 			foreach (var s in _scenes)
@@ -115,6 +117,8 @@ namespace StageManager
 
 			foreach (var o in otherWindows)
 				o.Hide();
+
+			CurrentSceneSelectionChanged?.Invoke(this, new CurrentSceneSelectionChangedEventArgs(prior, _current));
 
 			await Dump(otherWindows.Select(w => w.Handle));
 
@@ -129,13 +133,13 @@ namespace StageManager
 			sourceScene.Remove(window);
 			targetScene.Add(window);
 
-			SceneChanged?.Invoke(this, new SceneChangeEventArgs(sourceScene, window, ChangeType.Updated));
-			SceneChanged?.Invoke(this, new SceneChangeEventArgs(targetScene, window, ChangeType.Updated));
+			SceneChanged?.Invoke(this, new SceneChangedEventArgs(sourceScene, window, ChangeType.Updated));
+			SceneChanged?.Invoke(this, new SceneChangedEventArgs(targetScene, window, ChangeType.Updated));
 
 			if (!sourceScene.Windows.Any())
 			{
 				_scenes.Remove(sourceScene);
-				SceneChanged?.Invoke(this, new SceneChangeEventArgs(sourceScene, window, ChangeType.Removed));
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(sourceScene, window, ChangeType.Removed));
 			}
 
 			if (targetScene.Equals(_current))
