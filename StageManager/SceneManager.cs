@@ -55,7 +55,7 @@ namespace StageManager
 
 		private void WindowsManager_WindowDestroyed(IWindow window)
 		{
-			var existentScene = _scenes.FirstOrDefault(s => s.Windows.Any(w => w.Handle == window.Handle));
+			var existentScene = FindSceneForWindow(window);
 			var scene = existentScene ?? new Scene(window.ProcessName, window);
 
 			if (existentScene is not null)
@@ -73,6 +73,10 @@ namespace StageManager
 				}
 			}
 		}
+
+		public Scene FindSceneForWindow(IWindow window) => FindSceneForWindow(window.Handle);
+
+		public Scene FindSceneForWindow(IntPtr handle) => _scenes?.FirstOrDefault(s => s.Windows.Any(w => w.Handle == handle));
 
 		private void WindowsManager_WindowCreated(IWindow window, bool firstCreate)
 		{
@@ -152,7 +156,7 @@ namespace StageManager
 
 		public async Task MoveWindow(IntPtr handle, Scene targetScene)
 		{
-			var source = _scenes.FirstOrDefault(s => s.Windows.Any(w => w.Handle == handle));
+			var source = FindSceneForWindow(handle);
 
 			if (source is null || source.Equals(targetScene))
 				return;
@@ -195,11 +199,7 @@ namespace StageManager
 			_desktop.ShowIcons();
 		}
 
-		public IEnumerable<IWindow> GetSceneableWindows()
-		{
-			return WindowsManager.Windows
-				.Where(w => !w.IsMinimized && !string.IsNullOrEmpty(w.Title));
-		}
+		private IEnumerable<IWindow> GetSceneableWindows() => WindowsManager.Windows.Where(w => !w.IsMinimized && !string.IsNullOrEmpty(w.Title));
 
 		public IEnumerable<Scene> GetScenes()
 		{
@@ -213,5 +213,7 @@ namespace StageManager
 
 			return _scenes;
 		}
+
+		public IEnumerable<IWindow> GetCurrentWindows() => _current?.Windows ?? GetSceneableWindows();
 	}
 }

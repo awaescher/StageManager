@@ -4,12 +4,17 @@ using Microsoft.Xaml.Behaviors.Core;
 using SharpHook;
 using StageManager.Model;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
+using Windows.UI.Composition;
 using workspacer;
 
 namespace StageManager
@@ -21,6 +26,9 @@ namespace StageManager
 	{
 		private IntPtr _thisHandle;
 		private TaskPoolGlobalHook _hook;
+		private WindowMode _mode;
+		private double _lastWidth;
+		private Timer _overlapCheckTimer;
 
 		public MainWindow()
 		{
@@ -28,6 +36,7 @@ namespace StageManager
 
 			this.DataContext = this;
 
+			_overlapCheckTimer = new Timer(OverlapCheck, null, TimeSpan.FromSeconds(2.5), TimeSpan.FromSeconds(0.5));
 			SwitchSceneCommand = new ActionCommand(async model => await SceneManager!.SwitchTo(((SceneModel)model).Scene));
 		}
 
@@ -36,12 +45,16 @@ namespace StageManager
 			base.OnInitialized(e);
 
 			_thisHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+			_lastWidth = Width;
 
 			_hook = new TaskPoolGlobalHook();
 			_hook.MouseReleased += OnMouseReleased;
+			_hook.MouseMoved += _hook_MouseMoved;
 
 			Task.Run(() => _hook.Run());
 		}
+
+
 
 		protected override void OnClosed(EventArgs e)
 		{
@@ -73,6 +86,8 @@ namespace StageManager
 				Scenes.Add(model);
 			}
 		}
+
+
 
 		private void SceneManager_RequestWindowPreviewUpdate(object? sender, IWindow window)
 		{
@@ -135,7 +150,7 @@ namespace StageManager
 
 				pointOnWindow.X /= dpi.DpiScaleX;
 				pointOnWindow.Y /= dpi.DpiScaleY;
-				
+
 				SceneModel model = null;
 
 				var element = VisualTreeHelper.HitTest(this, pointOnWindow)?.VisualHit;
@@ -165,5 +180,91 @@ namespace StageManager
 		public SceneManager SceneManager { get; private set; }
 
 		public IntPtr Handle => _thisHandle;
+
+		public WindowMode Mode
+		{
+			get => _mode;
+			set
+			{
+				if (value == _mode)
+					return;
+
+				var needsFocus = value == WindowMode.Flyover && _mode == WindowMode.OffScreen;
+
+				_mode = value;
+
+				if (needsFocus)
+					Activate();
+
+				ApplyWindowMode();
+			}
+		}
+
+		private void ApplyWindowMode()
+		{
+			var newLeft = Mode == StageManager.WindowMode.OffScreen ? (-1 * Width) : 0.0;
+			if (Left == newLeft)
+				return;
+
+			var isIncoming = newLeft > Left;
+			var easingMode = isIncoming ? EasingMode.EaseOut : EasingMode.EaseIn;
+
+			var animation = new DoubleAnimationUsingKeyFrames();
+			animation.Duration = new Duration(TimeSpan.FromSeconds(0.5));
+			var easingFunction = new PowerEase { EasingMode = easingMode };
+			animation.KeyFrames.Add(new EasingDoubleKeyFrame(Left, KeyTime.FromPercent(0)));
+			animation.KeyFrames.Add(new EasingDoubleKeyFrame(newLeft, KeyTime.FromPercent(1.0), easingFunction));
+
+			BeginAnimation(LeftProperty, animation);
+		}
+
+		protected override void OnKeyDown(KeyEventArgs e)
+		{
+			base.OnKeyDown(e);
+
+			if (e.Key == Key.Delete)
+				Mode = Mode == WindowMode.OffScreen ? WindowMode.OnScreen : WindowMode.OffScreen;
+		}
+
+		private void _hook_MouseMoved(object? sender, MouseHookEventArgs e)
+		{
+			if (Mode == WindowMode.OffScreen && e.Data.X <= 44)
+			{
+				Dispatcher.Invoke(() => Mode = WindowMode.Flyover);
+			}
+			else if (Mode == WindowMode.Flyover && e.Data.X > (short)_lastWidth)
+			{
+				// if the flyout is still shown and the mouse is moved away from it
+				Dispatcher.Invoke(() => Mode = WindowMode.OffScreen);
+			}
+		}
+
+		private void OverlapCheck(object? _)
+		{
+			var currentWindows = SceneManager.GetCurrentWindows().ToArray(); // in case the enumeration changes
+			UpdateModeByWindows(currentWindows);
+		}
+
+		private void UpdateModeByWindows(IEnumerable<IWindow> windows)
+		{
+			bool doesOverlap(IWindowLocation loc) => loc.State == workspacer.WindowState.Maximized || (loc.State == workspacer.WindowState.Normal && (loc.X * 2) < _lastWidth);
+
+			var anyOverlappingWindows = windows.Any(w => doesOverlap(w.Location));
+
+			Dispatcher.Invoke(() =>
+			{
+				if (Mode == WindowMode.OnScreen)
+					Mode = anyOverlappingWindows ? WindowMode.OffScreen : WindowMode.OnScreen;
+				else if (Mode == WindowMode.OffScreen)
+					Mode = anyOverlappingWindows ? WindowMode.OffScreen : WindowMode.OnScreen;
+			});
+		}
+	}
+
+	public enum WindowMode
+	{
+		OnScreen,
+		OffScreen,
+		Flyover
 	}
 }
