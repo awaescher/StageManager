@@ -24,11 +24,14 @@ namespace StageManager
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		private const int TIMERINTERVAL_MILLISECONDS = 500;
+
 		private IntPtr _thisHandle;
 		private TaskPoolGlobalHook _hook;
 		private WindowMode _mode;
 		private double _lastWidth;
 		private Timer _overlapCheckTimer;
+		private Point _mouse = new Point(0, 0);
 
 		public MainWindow()
 		{
@@ -36,7 +39,7 @@ namespace StageManager
 
 			this.DataContext = this;
 
-			_overlapCheckTimer = new Timer(OverlapCheck, null, TimeSpan.FromSeconds(2.5), TimeSpan.FromSeconds(0.5));
+			_overlapCheckTimer = new Timer(OverlapCheck, null, 2500, TIMERINTERVAL_MILLISECONDS);
 			SwitchSceneCommand = new ActionCommand(async model => await SceneManager!.SwitchTo(((SceneModel)model).Scene));
 		}
 
@@ -48,13 +51,13 @@ namespace StageManager
 			_lastWidth = Width;
 
 			_hook = new TaskPoolGlobalHook();
+
+			_hook.MousePressed += OnMousePressed;
 			_hook.MouseReleased += OnMouseReleased;
 			_hook.MouseMoved += _hook_MouseMoved;
 
 			Task.Run(() => _hook.Run());
 		}
-
-
 
 		protected override void OnClosed(EventArgs e)
 		{
@@ -133,8 +136,15 @@ namespace StageManager
 			});
 		}
 
+		private void OnMousePressed(object? sender, MouseHookEventArgs e)
+		{
+			_overlapCheckTimer.Change(TimeSpan.Zero, TimeSpan.Zero);
+		}
+
 		private void OnMouseReleased(object? sender, MouseHookEventArgs e)
 		{
+			_overlapCheckTimer.Change(0, TIMERINTERVAL_MILLISECONDS);
+
 			var foregroundWindow = workspacer.Win32.GetForegroundWindow();
 
 			if (foregroundWindow == _thisHandle)
@@ -225,17 +235,15 @@ namespace StageManager
 			if (e.Key == Key.Delete)
 				Mode = Mode == WindowMode.OffScreen ? WindowMode.OnScreen : WindowMode.OffScreen;
 		}
-
+		
 		private void _hook_MouseMoved(object? sender, MouseHookEventArgs e)
 		{
+			_mouse.X = e.Data.X;
+			_mouse.Y = e.Data.Y;
+
 			if (Mode == WindowMode.OffScreen && e.Data.X <= 44)
 			{
 				Dispatcher.Invoke(() => Mode = WindowMode.Flyover);
-			}
-			else if (Mode == WindowMode.Flyover && e.Data.X > (short)_lastWidth)
-			{
-				// if the flyout is still shown and the mouse is moved away from it
-				Dispatcher.Invoke(() => Mode = WindowMode.OffScreen);
 			}
 		}
 
@@ -251,13 +259,18 @@ namespace StageManager
 
 			var anyOverlappingWindows = windows.Any(w => doesOverlap(w.Location));
 
-			Dispatcher.Invoke(() =>
+			var containsMouse = _mouse.X <= _lastWidth;
+			var setMode = Mode == WindowMode.OnScreen && !containsMouse
+							|| Mode == WindowMode.OffScreen
+							|| (Mode == WindowMode.Flyover && !containsMouse);
+
+			if (setMode)
 			{
-				if (Mode == WindowMode.OnScreen)
+				Dispatcher.Invoke(() =>
+				{
 					Mode = anyOverlappingWindows ? WindowMode.OffScreen : WindowMode.OnScreen;
-				else if (Mode == WindowMode.OffScreen)
-					Mode = anyOverlappingWindows ? WindowMode.OffScreen : WindowMode.OnScreen;
-			});
+				});
+			}
 		}
 	}
 

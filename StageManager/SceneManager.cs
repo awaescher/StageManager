@@ -199,7 +199,7 @@ namespace StageManager
 			_desktop.ShowIcons();
 		}
 
-		private IEnumerable<IWindow> GetSceneableWindows() => WindowsManager.Windows.Where(w => !w.IsMinimized && !string.IsNullOrEmpty(w.Title));
+		private IEnumerable<IWindow> GetSceneableWindows() => WindowsManager?.Windows?.Where(w => !w.IsMinimized && !string.IsNullOrEmpty(w.Title)) ?? Array.Empty<IWindow>();
 
 		public IEnumerable<Scene> GetScenes()
 		{
