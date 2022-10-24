@@ -26,8 +26,7 @@ namespace StageManager.Model
 
 		private workspacer.IWindow _window;
 		private ImageSource _iconSource;
-		private DateTime _lastUpdate = DateTime.MinValue;
-		private ImageSource _imageSource;
+		private ImageSource _image;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -45,17 +44,11 @@ namespace StageManager.Model
 
 		public ImageSource Image
 		{
-			get
+			get => _image;
+			set
 			{
-				var canUseCache = _imageSource is object && DateTime.UtcNow < _lastUpdate.AddSeconds(3);
-				if (!canUseCache)
-				{
-					_imageSource = ImageSourceFromBitmap(Screenshot3.CaptureWindow(Handle));
-					_lastUpdate = DateTime.UtcNow;
-
-				}
-
-				return _imageSource;
+				_image = value;
+				RaisePropertyChanged();
 			}
 		}
 
@@ -116,15 +109,13 @@ namespace StageManager.Model
 				RaisePropertyChanged(nameof(Title));
 				RaisePropertyChanged(nameof(Handle));
 
-				UpdatePreview();
+				ForceUpdatePreview();
 			}
 		}
 
-
-
-		internal void UpdatePreview()
+		internal void ForceUpdatePreview()
 		{
-			RaisePropertyChanged(nameof(Image));
+			Image = ImageSourceFromBitmap(Screenshot3.CaptureWindow(Handle));
 		}
 
 		public IntPtr Handle => _window?.Handle ?? IntPtr.Zero;

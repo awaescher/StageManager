@@ -41,7 +41,6 @@ namespace StageManager
 				throw new NotSupportedException("Start has to be called on the main thread, otherwise events won't be fired.");
 
 			WindowsManager.WindowCreated += WindowsManager_WindowCreated;
-			WindowsManager.WindowUpdated += WindowsManager_WindowUpdated;
 			WindowsManager.WindowDestroyed += WindowsManager_WindowDestroyed;
 			WindowsManager.UntrackedFocus += WindowsManager_UntrackedFocus;
 
@@ -96,18 +95,19 @@ namespace StageManager
 			}
 		}
 
-		private void WindowsManager_WindowUpdated(IWindow window, WindowUpdateType type)
-		{
-			if (type == WindowUpdateType.Show || type == WindowUpdateType.Foreground)
-				RequestWindowPreviewUpdate?.Invoke(this, window);
-		}
-
 		public async Task SwitchTo(Scene scene)
 		{
 			var otherWindows = GetSceneableWindows().Except(scene.Windows).ToArray();
 
 			var prior = _current;
 			_current = scene;
+
+			if (prior is object)
+			{
+				// screenshot the windows before hiding them
+				foreach (var w in prior.Windows)
+					RequestWindowPreviewUpdate?.Invoke(this, w);
+			}
 
 			foreach (var s in _scenes)
 				s.IsSelected = s.Equals(scene);

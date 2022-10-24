@@ -15,5 +15,6 @@ namespace StageManager
 		public Scene Prior { get; }
 
 		public Scene Current { get; }
+
 	}
 }

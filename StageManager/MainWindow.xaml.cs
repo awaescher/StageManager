@@ -113,7 +113,7 @@ namespace StageManager
 				.Where(w => w is object)
 				.FirstOrDefault();
 
-			toUpdate?.UpdatePreview();
+			toUpdate?.ForceUpdatePreview();
 		}
 
 		protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
