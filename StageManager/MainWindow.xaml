@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:StageManager"
     xmlns:pl="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     mc:Ignorable="d"
     AllowsTransparency="True"
     ShowInTaskbar="False"
@@ -16,19 +17,46 @@
     Width="280"
     Background="Transparent"
     Name="thisWindow">
+    <Window.Resources>
+        <Style
+            x:Key="Opacity1"
+            TargetType="{x:Type Grid}">
+            <Setter
+                Property="Opacity" Value="0.8" />
+            <Style.Triggers>
+                <Trigger
+                    Property="IsMouseOver"
+                    Value="true">
+                    <Setter
+                        Property="Opacity"
+                        Value="1" />
+                </Trigger>
+                <Trigger
+                    Property="IsMouseOver"
+                    Value="false">
+                    <Setter
+                        Property="Opacity"
+                        Value="0.8" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <ItemsControl
         Name="scenesControl"
         VerticalAlignment="Center"
         ItemsSource="{Binding Scenes}">
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <Grid>
-                    <Grid.InputBindings>
-                        <MouseBinding
-                            Gesture="LeftClick"
-                            Command="{Binding SwitchSceneCommand, Mode=OneTime, Source={x:Reference thisWindow}}"
-                            CommandParameter="{Binding .}" />
-                    </Grid.InputBindings>
+                <Grid Style="{StaticResource Opacity1}"
+                      MouseLeftButtonUp="Grid_MouseLeftButtonUp">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger
+                            EventName="MouseLeftButtonUp">
+                            <i:InvokeCommandAction
+                                Command="{Binding SwitchSceneCommand, Mode=OneTime, Source={x:Reference thisWindow}}"
+                                CommandParameter="{Binding .}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                     <ItemsControl
                         ItemsSource="{Binding Windows}">
                         <ItemsControl.ItemsPanel>

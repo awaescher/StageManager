@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StageManager", "StageManage
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D133873F-8F26-4492-9E48-F31F4EB89B67}"
 	ProjectSection(SolutionItems) = preProject
-		TODO.txt = TODO.txt
+		ReadMe.md = ReadMe.md
 	EndProjectSection
 EndProject
 Global

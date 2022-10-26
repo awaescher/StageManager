@@ -21,12 +21,12 @@ This is an experimental fun project. I don't have any idea whether or not this i
 |hide/show desktop icons|✅|
 |scene management with drag&drop|✅|
 |restore windows on quit/restart|✅|
+|auto hide & fly-in scenes for maximized windows|✅|
 |place screenshots in relative size of the desktop|⬜|
 |place app icons over 3D window adorners|⬜|
 |rounded corners for the window thumbnails|⬜|
 |limit maximum scenes (like 6 for macOS?)|⬜|
 |limit window count per scene (like newest 5)|⬜|
-|auto hide & fly-in scenes for maximized windows|⬜|
 |**Product stage**||
 |virtual desktop support (pin window)|⬜|
 |multi-monitor support|⬜|
@@ -35,6 +35,7 @@ This is an experimental fun project. I don't have any idea whether or not this i
 |window animations|⬜|
 |live dwm thumbnails|⬜|
 |adjust 3D angle according to screen position|⬜|
+|flyover sidebar in desktop view mode if icons are close to the left|⬜|
 
 Contributions very welcome :heart:
 

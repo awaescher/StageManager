@@ -47,7 +47,6 @@ public class Panel3D : Panel
 			adorner.IsHitTestVisible = false;
 
 			adornerLayer.Add(adorner);
-			
 		};
 	}
 
@@ -55,6 +54,14 @@ public class Panel3D : Panel
 	{
 		base.OnInitialized(e);
 		_viewport.DataContext = this.DataContext;
+	}
+
+	protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+	{
+		base.OnPropertyChanged(e);
+
+		if (e.Property.Name == nameof(IsMouseOver))
+			_viewport.Opacity = ((bool)e.NewValue) ? 1.0 : 0.8;
 	}
 
 	#endregion // Constructor
