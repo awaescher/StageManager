@@ -15,11 +15,12 @@
     Title="MainWindow"
     Height="450"
     Width="280"
+    ShowActivated="False"
     Background="Transparent"
     Name="thisWindow">
     <Window.Resources>
         <Style
-            x:Key="Opacity1"
+            x:Key="GridOpacity"
             TargetType="{x:Type Grid}">
             <Setter
                 Property="Opacity" Value="0.8" />
@@ -47,8 +48,8 @@
         ItemsSource="{Binding Scenes}">
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <Grid Style="{StaticResource Opacity1}"
-                      MouseLeftButtonUp="Grid_MouseLeftButtonUp">
+                <Grid
+                    Style="{StaticResource GridOpacity}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger
                             EventName="MouseLeftButtonUp">

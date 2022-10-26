@@ -68,7 +68,6 @@ namespace StageManager
 
 			base.OnClosed(e);
 
-			PoorMansAsync.Wait(SceneManager.Reset, TimeSpan.FromSeconds(3));
 			Environment.Exit(0);
 		}
 
@@ -79,7 +78,6 @@ namespace StageManager
 
 			var windowsManager = new WindowsManager();
 			SceneManager = new SceneManager(windowsManager);
-			await SceneManager.Reset().ConfigureAwait(true);
 			await SceneManager.Start().ConfigureAwait(true);
 
 			SceneManager.SceneChanged += SceneManager_SceneChanged;
@@ -121,7 +119,7 @@ namespace StageManager
 
 		private void SceneManager_RequestWindowPreviewUpdate(object? sender, IWindow window)
 		{
-			var toUpdate = Scenes.Union(new[]{ _removedCurrentScene })
+			var toUpdate = AllScenes
 				.Select(s => s?.Windows.FirstOrDefault(w => w.Handle == window.Handle))
 				.Where(w => w is object)
 				.FirstOrDefault();
@@ -149,12 +147,17 @@ namespace StageManager
 						Scenes.Add(SceneModel.FromScene(e.Scene));
 						break;
 					case ChangeType.Updated:
-						if (Scenes.FirstOrDefault(s => s.Id == e.Scene.Id) is SceneModel toUpdate)
+						if (AllScenes.FirstOrDefault(s => s.Id == e.Scene.Id) is SceneModel toUpdate)
 							toUpdate.UpdateFromScene(e.Scene);
 						break;
 					case ChangeType.Removed:
-						if (Scenes.FirstOrDefault(s => s.Id == e.Scene.Id) is SceneModel toRemove)
-							Scenes.Remove(toRemove);
+						if (AllScenes.FirstOrDefault(s => s.Id == e.Scene.Id) is SceneModel toRemove)
+						{
+							if (toRemove.Equals(_removedCurrentScene))
+								_removedCurrentScene = null;
+							else
+								Scenes.Remove(toRemove);
+						}
 						break;
 					default:
 						break;
@@ -245,6 +248,8 @@ namespace StageManager
 		}
 
 		public ObservableCollection<SceneModel> Scenes { get; } = new ObservableCollection<SceneModel>();
+
+		public IEnumerable<SceneModel> AllScenes => Scenes.Union(new[] { _removedCurrentScene });
 
 		public ICommand SwitchSceneCommand { get; }
 

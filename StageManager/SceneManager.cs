@@ -1,15 +1,9 @@
 ﻿using AsyncAwaitBestPractices;
-using NLog.Filters;
-using NLog.LayoutRenderers;
 using StageManager.Strategies;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
-using System.Security.Policy;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using workspacer;
@@ -103,10 +97,9 @@ namespace StageManager
 
 		private void WindowsManager_WindowDestroyed(IWindow window)
 		{
-			var existentScene = FindSceneForWindow(window);
-			var scene = existentScene ?? new Scene(window.ProcessName, window);
+			var scene = FindSceneForWindow(window);
 
-			if (existentScene is not null)
+			if (scene is not null)
 			{
 				scene.Remove(window);
 
@@ -126,22 +119,13 @@ namespace StageManager
 
 		public Scene FindSceneForWindow(IntPtr handle) => _scenes?.FirstOrDefault(s => s.Windows.Any(w => w.Handle == handle));
 
-		private void WindowsManager_WindowCreated(IWindow window, bool firstCreate)
-		{
-			var existentScene = FindSceneForWindow(window);
-			var scene = existentScene ?? new Scene(window.ProcessName, window);
+		private Scene FindSceneForProcess(string processName) => _scenes.FirstOrDefault(s => string.Equals(s.Key, processName, StringComparison.OrdinalIgnoreCase));
 
-			if (existentScene is null)
-			{
-				_scenes.Add(scene);
-				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Created));
-			}
-			else
-			{
-				scene.Add(window);
-				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Updated));
-			}
+		private async void WindowsManager_WindowCreated(IWindow window, bool firstCreate)
+		{
+			SwitchToSceneByNewWindow(window).SafeFireAndForget();
 		}
+
 
 		private async Task SwitchToSceneByWindow(IWindow window)
 		{
@@ -154,6 +138,25 @@ namespace StageManager
 			}
 
 			await SwitchTo(scene);
+		}
+
+		private async Task SwitchToSceneByNewWindow(IWindow window)
+		{
+			var existentScene = FindSceneForProcess(window.ProcessName);
+			var scene = existentScene ?? new Scene(window.ProcessName, window);
+
+			if (existentScene is null)
+			{
+				_scenes.Add(scene);
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Created));
+			}
+			else
+			{
+				scene.Add(window);
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Updated));
+			}
+
+			await SwitchTo(scene).ConfigureAwait(true);
 		}
 
 		private bool _suspend = false;
@@ -192,8 +195,6 @@ namespace StageManager
 					HideStrategy.Invoke(o);
 
 				CurrentSceneSelectionChanged?.Invoke(this, new CurrentSceneSelectionChangedEventArgs(prior, _current));
-
-				await Dump(otherWindows.Select(w => w.Handle));
 
 				if (scene is null)
 					_desktop.ShowIcons();
@@ -271,30 +272,7 @@ namespace StageManager
 				await MoveWindow(sourceScene, window, _current).ConfigureAwait(false);
 		}
 
-		public async Task Dump(IEnumerable<IntPtr> hiddenHandles)
-		{
-			await File.WriteAllTextAsync(@"C:\temp\stager.hidden", string.Join(',', hiddenHandles));
-		}
-
-		public async Task Reset()
-		{
-			var raw = await File.ReadAllTextAsync(@"C:\temp\stager.hidden");
-			if (!string.IsNullOrEmpty(raw))
-			{
-				var hiddenWindows = raw.Split(',', StringSplitOptions.RemoveEmptyEntries)
-					.Select(i => new WindowsWindow(IntPtr.Parse(i)))
-					.ToArray();
-
-				foreach (var w in hiddenWindows)
-					w.ShowInCurrentState();
-
-				await File.WriteAllTextAsync(@"C:\temp\stager.hidden", "");
-			}
-
-			_desktop.ShowIcons();
-		}
-
-		private IEnumerable<IWindow> GetSceneableWindows() => WindowsManager?.Windows?.Where(w => !w.IsMinimized && !string.IsNullOrEmpty(w.Title));
+		private IEnumerable<IWindow> GetSceneableWindows() => WindowsManager?.Windows?.Where(w => !string.IsNullOrEmpty(w.Title));
 
 		public IEnumerable<Scene> GetScenes()
 		{

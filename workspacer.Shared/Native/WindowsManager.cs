@@ -256,8 +256,6 @@ namespace workspacer
 
                 if (window.IsCandidate())
                 {
-                    Debug.WriteLine(window.Title);
-
                     window.WindowFocused += (sender) => HandleWindowFocused(sender);
                     window.WindowUpdated += (sender) => HandleWindowUpdated(sender);
                     window.WindowClosed += (sender) => HandleWindowClosed(sender);
@@ -354,7 +352,6 @@ namespace workspacer
 
         private void HandleWindowFocused(IWindow window)
         {
-            Debug.WriteLine(window.Title);
             WindowFocused?.Invoke(window);
         }
 

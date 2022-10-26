@@ -115,7 +115,7 @@ namespace StageManager.Model
 
 		internal void ForceUpdatePreview()
 		{
-			Image = ImageSourceFromBitmap(Screenshot3.CaptureWindow(Handle));
+			Image = ImageSourceFromBitmap(Screenshot.CaptureWindow(Handle));
 		}
 
 		public IntPtr Handle => _window?.Handle ?? IntPtr.Zero;
