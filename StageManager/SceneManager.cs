@@ -1,5 +1,7 @@
-﻿using NLog.Filters;
+﻿using AsyncAwaitBestPractices;
+using NLog.Filters;
 using NLog.LayoutRenderers;
+using StageManager.Strategies;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,10 +23,14 @@ namespace StageManager
 		private readonly Desktop _desktop;
 		private List<Scene> _scenes;
 		private Scene _current;
+		private IntPtr _desktopHandle;
 
 		public event EventHandler<SceneChangedEventArgs> SceneChanged;
 		public event EventHandler<CurrentSceneSelectionChangedEventArgs> CurrentSceneSelectionChanged;
 		public event EventHandler<IWindow> RequestWindowPreviewUpdate;
+
+		private IWindowStrategy ShowStrategy { get; } = new WindowNormalizeStrategy();
+		private IWindowStrategy HideStrategy { get; } = new WindowMinimizeStrategy();
 
 		public WindowsManager WindowsManager { get; }
 
@@ -32,8 +38,11 @@ namespace StageManager
 		{
 			WindowsManager = windowsManager ?? throw new ArgumentNullException(nameof(windowsManager));
 
+
 			_desktop = new Desktop();
 		}
+
+
 
 		public async Task Start()
 		{
@@ -41,16 +50,55 @@ namespace StageManager
 				throw new NotSupportedException("Start has to be called on the main thread, otherwise events won't be fired.");
 
 			WindowsManager.WindowCreated += WindowsManager_WindowCreated;
+			WindowsManager.WindowUpdated += WindowsManager_WindowUpdated;
 			WindowsManager.WindowDestroyed += WindowsManager_WindowDestroyed;
 			WindowsManager.UntrackedFocus += WindowsManager_UntrackedFocus;
 
 			await WindowsManager.Start();
+
+
 		}
 
-		private void WindowsManager_UntrackedFocus(object? sender, IntPtr e)
+		private void WindowsManager_WindowUpdated(IWindow window, WindowUpdateType type)
 		{
-			//if (e == Desktop.GetDesktopSHELLDLL_DefView())
-			//	_desktop.ShowIcons();
+			if (_suspend)
+				return;
+
+			if (type == WindowUpdateType.Foreground)
+			{
+				_desktop.HideIcons();
+
+				SwitchToSceneByWindow(window).SafeFireAndForget();
+				//var scene = FindSceneForWindow(window);
+
+				//if (scene is null)
+				//	_scenes.Add(new Scene(window.ProcessName, window));
+
+				//SwitchTo(scene).SafeFireAndForget();
+			}
+		}
+
+		private async void WindowsManager_UntrackedFocus(object? sender, IntPtr e)
+		{
+			// TODO BETTER
+
+			if (_desktopHandle == IntPtr.Zero)
+			{
+				Win32.GetWindowThreadProcessId(e, out var processId);
+				if (processId != 0)
+				{
+					var process = System.Diagnostics.Process.GetProcessById((int)processId);
+					if (process.ProcessName.Equals("explorer", StringComparison.OrdinalIgnoreCase))
+					{
+						_desktopHandle = e;
+					}
+				}
+			}
+
+			if (e == _desktopHandle)
+			{
+				await SwitchTo(null);
+			}
 		}
 
 		private void WindowsManager_WindowDestroyed(IWindow window)
@@ -80,7 +128,7 @@ namespace StageManager
 
 		private void WindowsManager_WindowCreated(IWindow window, bool firstCreate)
 		{
-			var existentScene = _current ?? _scenes.FirstOrDefault(s => s.Key == window.ProcessName);
+			var existentScene = FindSceneForWindow(window);
 			var scene = existentScene ?? new Scene(window.ProcessName, window);
 
 			if (existentScene is null)
@@ -95,67 +143,110 @@ namespace StageManager
 			}
 		}
 
-		public async Task SwitchTo(Scene scene)
+		private async Task SwitchToSceneByWindow(IWindow window)
 		{
-			var otherWindows = GetSceneableWindows().Except(scene.Windows).ToArray();
-
-			var prior = _current;
-			_current = scene;
-
-			if (prior is object)
+			var scene = FindSceneForWindow(window);
+			if (scene is null)
 			{
-				// screenshot the windows before hiding them
-				foreach (var w in prior.Windows)
-					RequestWindowPreviewUpdate?.Invoke(this, w);
+				scene = new Scene(window.ProcessName, window);
+				_scenes.Add(scene);
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Created));
 			}
 
-			foreach (var s in _scenes)
-				s.IsSelected = s.Equals(scene);
+			await SwitchTo(scene);
+		}
 
-			foreach (var w in scene.Windows)
-				w.ShowInCurrentState();
+		private bool _suspend = false;
 
-			foreach (var o in otherWindows)
-				o.Hide();
+		public async Task SwitchTo(Scene? scene)
+		{
+			if (object.Equals(scene, _current))
+				return;
 
-			CurrentSceneSelectionChanged?.Invoke(this, new CurrentSceneSelectionChangedEventArgs(prior, _current));
+			try
+			{
+				_suspend = true;
 
-			await Dump(otherWindows.Select(w => w.Handle));
+				var otherWindows = GetSceneableWindows().Except(scene?.Windows ?? Array.Empty<IWindow>()).ToArray();
 
-			_desktop.HideIcons();
+				var prior = _current;
+				_current = scene;
+
+				if (prior is object)
+				{
+					// screenshot the windows before hiding them
+					foreach (var w in prior.Windows)
+						RequestWindowPreviewUpdate?.Invoke(this, w);
+				}
+
+				foreach (var s in _scenes)
+					s.IsSelected = s.Equals(scene);
+
+				if (scene is object)
+				{
+					foreach (var w in scene.Windows)
+						ShowStrategy.Invoke(w);
+				}
+
+				foreach (var o in otherWindows)
+					HideStrategy.Invoke(o);
+
+				CurrentSceneSelectionChanged?.Invoke(this, new CurrentSceneSelectionChangedEventArgs(prior, _current));
+
+				await Dump(otherWindows.Select(w => w.Handle));
+
+				if (scene is null)
+					_desktop.ShowIcons();
+				else
+					_desktop.HideIcons();
+			}
+			finally
+			{
+				_suspend = false;
+			}
 		}
 
 		public Task MoveWindow(Scene sourceScene, IWindow window, Scene targetScene)
 		{
-			if (sourceScene is null || sourceScene.Equals(targetScene))
+			try
+			{
+				_suspend = true;
+
+				if (sourceScene is null || sourceScene.Equals(targetScene))
+					return Task.CompletedTask;
+
+				sourceScene.Remove(window);
+				targetScene.Add(window);
+
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(sourceScene, window, ChangeType.Updated));
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(targetScene, window, ChangeType.Updated));
+
+				if (!sourceScene.Windows.Any())
+				{
+					_scenes.Remove(sourceScene);
+					SceneChanged?.Invoke(this, new SceneChangedEventArgs(sourceScene, window, ChangeType.Removed));
+				}
+
+				if (targetScene.Equals(_current))
+				{
+					ShowStrategy.Invoke(window);
+					window.Focus();
+				}
+				else
+				{
+					HideStrategy.Invoke(window);
+
+					// reset window position after move so that the window is back at the starting position on the new scene
+					if (window is WindowsWindow w && w.PopLastLocation() is IWindowLocation l)
+						workspacer.Win32.SetWindowPos(window.Handle, IntPtr.Zero, l.X, l.Y, 0, 0, workspacer.Win32.SetWindowPosFlags.IgnoreResize);
+				}
+
 				return Task.CompletedTask;
-
-			sourceScene.Remove(window);
-			targetScene.Add(window);
-
-			SceneChanged?.Invoke(this, new SceneChangedEventArgs(sourceScene, window, ChangeType.Updated));
-			SceneChanged?.Invoke(this, new SceneChangedEventArgs(targetScene, window, ChangeType.Updated));
-
-			if (!sourceScene.Windows.Any())
-			{
-				_scenes.Remove(sourceScene);
-				SceneChanged?.Invoke(this, new SceneChangedEventArgs(sourceScene, window, ChangeType.Removed));
 			}
-
-			if (targetScene.Equals(_current))
+			finally
 			{
-				window.Focus();
+				_suspend = false;
 			}
-			else
-			{
-				window.Hide();
-
-				// reset window position after move so that the window is back at the starting position on the new scene
-				if (window is WindowsWindow w && w.PopLastLocation() is IWindowLocation l)
-					workspacer.Win32.SetWindowPos(window.Handle, IntPtr.Zero, l.X, l.Y, 0, 0, workspacer.Win32.SetWindowPosFlags.IgnoreResize);
-			}
-
-			return Task.CompletedTask;
 		}
 
 		public async Task MoveWindow(IntPtr handle, Scene targetScene)
@@ -203,7 +294,7 @@ namespace StageManager
 			_desktop.ShowIcons();
 		}
 
-		private IEnumerable<IWindow> GetSceneableWindows() => WindowsManager?.Windows?.Where(w => !w.IsMinimized && !string.IsNullOrEmpty(w.Title)) ?? Array.Empty<IWindow>();
+		private IEnumerable<IWindow> GetSceneableWindows() => WindowsManager?.Windows?.Where(w => !w.IsMinimized && !string.IsNullOrEmpty(w.Title));
 
 		public IEnumerable<Scene> GetScenes()
 		{

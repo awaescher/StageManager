@@ -31,6 +31,7 @@ namespace StageManager
 		private Timer _overlapCheckTimer;
 		private Point _mouse = new Point(0, 0);
 		private SceneModel _removedCurrentScene;
+		private SceneModel _mouseDownScene;
 
 		public MainWindow()
 		{
@@ -60,7 +61,9 @@ namespace StageManager
 
 		protected override void OnClosed(EventArgs e)
 		{
+			_hook.MousePressed -= OnMousePressed;
 			_hook.MouseReleased -= OnMouseReleased;
+			_hook.MouseMoved -= _hook_MouseMoved;
 			_hook.Dispose();
 
 			base.OnClosed(e);
@@ -69,15 +72,15 @@ namespace StageManager
 			Environment.Exit(0);
 		}
 
-		protected override void OnContentRendered(EventArgs e)
+		protected override async void OnContentRendered(EventArgs e)
 		{
 			base.OnContentRendered(e);
 			_thisHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
 
 			var windowsManager = new WindowsManager();
 			SceneManager = new SceneManager(windowsManager);
-			SceneManager.Reset().ConfigureAwait(true);
-			SceneManager.Start().ConfigureAwait(true);
+			await SceneManager.Reset().ConfigureAwait(true);
+			await SceneManager.Start().ConfigureAwait(true);
 
 			SceneManager.SceneChanged += SceneManager_SceneChanged;
 			SceneManager.CurrentSceneSelectionChanged += SceneManager_CurrentSceneSelectionChanged;
@@ -88,11 +91,16 @@ namespace StageManager
 				var model = SceneModel.FromScene(scene);
 				Scenes.Add(model);
 			}
+
+			var foreground = Win32.GetForegroundWindow();
+			var foregroundScene = SceneManager.FindSceneForWindow(foreground);
+			if (foregroundScene is object)
+				await SceneManager.SwitchTo(foregroundScene).ConfigureAwait(true);
 		}
 
 		private void SceneManager_CurrentSceneSelectionChanged(object? sender, CurrentSceneSelectionChangedEventArgs args)
 		{
-			var currentModel = Scenes.FirstOrDefault(m => m.Id == args.Current.Id);
+			var currentModel = args.Current is null ? null : Scenes.FirstOrDefault(m => m.Id == args.Current.Id);
 
 			if (currentModel is object)
 			{
@@ -101,9 +109,14 @@ namespace StageManager
 
 				if (_removedCurrentScene is object)
 					Scenes.Insert(currentIndex, _removedCurrentScene);
-
-				_removedCurrentScene = currentModel;
 			}
+			else
+			{
+				if (_removedCurrentScene is object)
+					Scenes.Add(_removedCurrentScene);
+			}
+
+			_removedCurrentScene = currentModel;
 		}
 
 		private void SceneManager_RequestWindowPreviewUpdate(object? sender, IWindow window)
@@ -151,49 +164,84 @@ namespace StageManager
 
 		private void OnMousePressed(object? sender, MouseHookEventArgs e)
 		{
-			_overlapCheckTimer.Change(TimeSpan.Zero, TimeSpan.Zero);
+			// if it's allowed to drag windows into scenes, we cannot hide the scenes
+			if (EnableWindowDropToScene)
+				_overlapCheckTimer.Change(TimeSpan.Zero, TimeSpan.Zero);
+
+			var foregroundWindow = workspacer.Win32.GetForegroundWindow();
+			if (foregroundWindow != _thisHandle)
+				return;
+
+			if (EnableWindowPullToScene)
+			{
+				var screenPoint = new Point(e.Data.X, e.Data.Y);
+				this.Dispatcher.Invoke(() =>
+				{
+					_mouseDownScene = FindSceneByPoint(screenPoint);
+				});
+			}
 		}
 
 		private void OnMouseReleased(object? sender, MouseHookEventArgs e)
 		{
-			_overlapCheckTimer.Change(0, TIMERINTERVAL_MILLISECONDS);
-
-			var foregroundWindow = workspacer.Win32.GetForegroundWindow();
-
-			if (foregroundWindow == _thisHandle)
-				return;
-
-			var screenPoint = new Point(e.Data.X, e.Data.Y);
-			this.Dispatcher.Invoke(() =>
+			// if it's allowed to drag windows into scenes, we cannot hide the scenes
+			if (EnableWindowDropToScene)
 			{
-				var thisWindow = new WindowsWindow(_thisHandle);
-				var pointOnWindow = new Point(screenPoint.X - thisWindow.Location.X, screenPoint.Y - thisWindow.Location.Y);
+				_overlapCheckTimer.Change(0, TIMERINTERVAL_MILLISECONDS);
 
-				var dpi = VisualTreeHelper.GetDpi(this);
+				var foregroundWindow = workspacer.Win32.GetForegroundWindow();
 
-				pointOnWindow.X /= dpi.DpiScaleX;
-				pointOnWindow.Y /= dpi.DpiScaleY;
+				if (foregroundWindow == _thisHandle)
+					return;
 
-				SceneModel model = null;
-
-				var element = VisualTreeHelper.HitTest(this, pointOnWindow)?.VisualHit;
-
-				while (element is object)
+				var screenPoint = new Point(e.Data.X, e.Data.Y);
+				this.Dispatcher.Invoke(() =>
 				{
-					if ((element as FrameworkElement)?.DataContext is SceneModel m)
+					var sceneModel = FindSceneByPoint(screenPoint);
+
+					if (sceneModel is object)
+						SceneManager.MoveWindow(foregroundWindow, sceneModel.Scene).SafeFireAndForget();
+				});
+			}
+
+			if (EnableWindowPullToScene)
+			{
+				if (e.Data.X > _lastWidth && _mouseDownScene is object)
+				{
+					this.Dispatcher.Invoke(() =>
 					{
-						model = m;
-						break;
-					}
-
-					element = element.GetParentObject();
+						SceneManager.PopWindowFrom(_mouseDownScene.Scene).SafeFireAndForget();
+					});
 				}
+			}
+		}
 
-				if (model is object)
+		private SceneModel FindSceneByPoint(Point p)
+		{
+			var thisWindow = new WindowsWindow(_thisHandle);
+			var pointOnWindow = new Point(p.X - thisWindow.Location.X, p.Y - thisWindow.Location.Y);
+
+			var dpi = VisualTreeHelper.GetDpi(this);
+
+			pointOnWindow.X /= dpi.DpiScaleX;
+			pointOnWindow.Y /= dpi.DpiScaleY;
+
+			SceneModel model = null;
+
+			var element = VisualTreeHelper.HitTest(this, pointOnWindow)?.VisualHit;
+
+			while (element is object)
+			{
+				if ((element as FrameworkElement)?.DataContext is SceneModel m)
 				{
-					SceneManager.MoveWindow(foregroundWindow, model.Scene).SafeFireAndForget();
+					model = m;
+					break;
 				}
-			});
+
+				element = element.GetParentObject();
+			}
+
+			return model;
 		}
 
 		public ObservableCollection<SceneModel> Scenes { get; } = new ObservableCollection<SceneModel>();
@@ -212,12 +260,9 @@ namespace StageManager
 				if (value == _mode)
 					return;
 
-				var needsFocus = value == WindowMode.Flyover && _mode == WindowMode.OffScreen;
-
 				_mode = value;
 
-				if (needsFocus)
-					Activate();
+				this.Topmost = value == WindowMode.Flyover;
 
 				ApplyWindowMode();
 			}
@@ -239,14 +284,6 @@ namespace StageManager
 			animation.KeyFrames.Add(new EasingDoubleKeyFrame(newLeft, KeyTime.FromPercent(1.0), easingFunction));
 
 			BeginAnimation(LeftProperty, animation);
-		}
-
-		protected override void OnKeyDown(KeyEventArgs e)
-		{
-			base.OnKeyDown(e);
-
-			if (e.Key == Key.Delete)
-				Mode = Mode == WindowMode.OffScreen ? WindowMode.OnScreen : WindowMode.OffScreen;
 		}
 
 		private void _hook_MouseMoved(object? sender, MouseHookEventArgs e)
@@ -285,6 +322,10 @@ namespace StageManager
 				});
 			}
 		}
+
+		public bool EnableWindowDropToScene = false;
+
+		public bool EnableWindowPullToScene = true;
 	}
 
 	public enum WindowMode
