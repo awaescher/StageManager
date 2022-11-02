@@ -251,7 +251,7 @@ namespace workspacer
             {
                 var window = new WindowsWindow(handle);
 
-                if (window.ProcessId == _currentProcessId)
+                if (window.ProcessId < 0 || window.ProcessId == _currentProcessId)
                     return;
 
                 if (window.IsCandidate())
