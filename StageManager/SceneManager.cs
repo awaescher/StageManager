@@ -297,7 +297,7 @@ namespace StageManager
 				await MoveWindow(sourceScene, window, _current).ConfigureAwait(false);
 		}
 
-		private IEnumerable<IWindow> GetSceneableWindows() => WindowsManager?.Windows?.Where(w => !string.IsNullOrEmpty(w.Title));
+		private IEnumerable<IWindow> GetSceneableWindows() => WindowsManager?.Windows?.Where(w => !string.IsNullOrEmpty(w.ProcessFileName) && !string.IsNullOrEmpty(w.Title));
 
 		public IEnumerable<Scene> GetScenes()
 		{
