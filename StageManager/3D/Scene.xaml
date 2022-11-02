@@ -5,7 +5,7 @@
 		<PerspectiveCamera
 			FieldOfView="48"
 			LookDirection="1.6,0,-3.1"
-            Position="-1.1,0,3.7" FarPlaneDistance="5555"
+            Position="-1.1,0,3.7"
             UpDirection="0,1,0" />
 	</Viewport3D.Camera>
 	<ModelVisual3D>
