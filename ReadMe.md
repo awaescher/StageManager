@@ -25,7 +25,7 @@ This is an experimental fun project. I don't have any idea whether or not this i
 |place screenshots in relative size of the desktop|⬜|
 |place app icons over 3D window adorners|⬜|
 |rounded corners for the window thumbnails|⬜|
-|limit maximum scenes (like 6 for macOS?)|⬜|
+|limit maximum scenes (like 6 for macOS?)|✅|
 |limit window count per scene (like newest 5)|⬜|
 |**Product stage**||
 |virtual desktop support (pin window)|⬜|
