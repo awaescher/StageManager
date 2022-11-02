@@ -96,8 +96,8 @@
                                             BlurRadius="20" />
                                     </Border.Effect>
                                     <Image
-                                        Margin="4, 0, 0, 0"
-                                        Height="40"
+                                        Margin="2, 0, 0, 0"
+                                        Height="36"
                                         Source="{Binding Icon}" />
                                 </Border>
                             </DataTemplate>
