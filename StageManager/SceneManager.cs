@@ -18,6 +18,8 @@ namespace StageManager
 		private List<Scene> _scenes;
 		private Scene _current;
 		private IntPtr _desktopHandle;
+		private bool _suspend = false;
+		private Guid? _reentrancyLockSceneId;
 
 		public event EventHandler<SceneChangedEventArgs> SceneChanged;
 		public event EventHandler<CurrentSceneSelectionChangedEventArgs> CurrentSceneSelectionChanged;
@@ -31,12 +33,8 @@ namespace StageManager
 		public SceneManager(WindowsManager windowsManager)
 		{
 			WindowsManager = windowsManager ?? throw new ArgumentNullException(nameof(windowsManager));
-
-
 			_desktop = new Desktop();
 		}
-
-
 
 		public async Task Start()
 		{
@@ -159,11 +157,38 @@ namespace StageManager
 			await SwitchTo(scene).ConfigureAwait(true);
 		}
 
-		private bool _suspend = false;
+		/// <summary>
+		/// Determines if a scene is switched back to shortly after it has been hidden.
+		/// This can happen if an app activates one of it's windows after being hidde,
+		/// like Microsoft Teams does if there's a small floating window for a current call.
+		/// </summary>
+		/// <param name="scene"></param>
+		/// <returns></returns>
+		private bool IsReentrancy(Scene? scene)
+		{
+			if (Guid.Equals(scene?.Id, _reentrancyLockSceneId))
+				return true;
+
+			if (_current is object)
+			{
+				_reentrancyLockSceneId = _current.Id;
+
+				Task.Run(async () =>
+				{
+					await Task.Delay(1000).ConfigureAwait(false);
+					_reentrancyLockSceneId = null;
+				}).SafeFireAndForget();
+			}
+
+			return false;
+		}
 
 		public async Task SwitchTo(Scene? scene)
 		{
 			if (object.Equals(scene, _current))
+				return;
+
+			if (IsReentrancy(scene))
 				return;
 
 			try
