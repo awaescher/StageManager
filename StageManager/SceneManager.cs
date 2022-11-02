@@ -58,8 +58,6 @@ namespace StageManager
 
 			if (type == WindowUpdateType.Foreground)
 			{
-				_desktop.HideIcons();
-
 				SwitchToSceneByWindow(window).SafeFireAndForget();
 				//var scene = FindSceneForWindow(window);
 
@@ -72,25 +70,31 @@ namespace StageManager
 
 		private async void WindowsManager_UntrackedFocus(object? sender, IntPtr e)
 		{
-			// TODO BETTER
+			//// TODO BETTER
 
-			if (_desktopHandle == IntPtr.Zero)
-			{
-				Win32.GetWindowThreadProcessId(e, out var processId);
-				if (processId != 0)
-				{
-					var process = System.Diagnostics.Process.GetProcessById((int)processId);
-					if (process.ProcessName.Equals("explorer", StringComparison.OrdinalIgnoreCase))
-					{
-						_desktopHandle = e;
-					}
-				}
-			}
+			// Attention, recognizing the desktop handle to show/hide desktop icons
+			// might interfere with situations when windows are picked from the taskbar
+			// when there are more than one window to choose from.
+			// in this case, it might be that untracked focus is fired which sets the 
+			// scene to null and causes two scene changes forth and back to the prior scene
 
-			if (e == _desktopHandle)
-			{
-				await SwitchTo(null);
-			}
+			//if (_desktopHandle == IntPtr.Zero)
+			//{
+			//	Win32.GetWindowThreadProcessId(e, out var processId);
+			//	if (processId != 0)
+			//	{
+			//		var process = System.Diagnostics.Process.GetProcessById((int)processId);
+			//		if (process.ProcessName.Equals("explorer", StringComparison.OrdinalIgnoreCase))
+			//		{
+			//			_desktopHandle = e;
+			//		}
+			//	}
+			//}
+
+			//if (e == _desktopHandle)
+			//{
+			//	await SwitchTo(null);
+			//}
 		}
 
 		private void WindowsManager_WindowDestroyed(IWindow window)

@@ -9,6 +9,7 @@ namespace StageManager.Model
 	public class SceneModel : INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
+		private bool _isVisible;
 		private Scene _scene;
 
 		public static SceneModel FromScene(Scene scene)
@@ -18,6 +19,11 @@ namespace StageManager.Model
 			model.Windows = new ObservableCollection<WindowModel>(scene.Windows.Select(w => new WindowModel(w)));
 			model.Scene = scene;
 			return model;
+		}
+
+		public SceneModel()
+		{
+			Updated = DateTime.UtcNow;
 		}
 
 		public void UpdateFromScene(Scene updatedScene)
@@ -61,6 +67,13 @@ namespace StageManager.Model
 						Windows.RemoveAt(i);
 				}
 			}
+
+			Updated = DateTime.UtcNow;
+		}
+
+		private void Scene_SelectedChanged(object? sender, EventArgs e)
+		{
+			Updated = DateTime.UtcNow;
 		}
 
 		public Guid Id { get; set; }
@@ -70,20 +83,40 @@ namespace StageManager.Model
 			get => _scene;
 			private set
 			{
-				if (value?.Id == _scene?.Id)
-					return;
+				if (_scene is object)
+					_scene.SelectedChanged -= Scene_SelectedChanged;
 
 				_scene = value;
+
+				if (_scene is object)
+					_scene.SelectedChanged += Scene_SelectedChanged;
 			}
 		}
 
+		public string Title => Scene?.Title ?? "";
 
-		public string Title => _scene.Title;
+		public bool IsVisible
+		{
+			get => _isVisible;
+			set
+			{
+				if (_isVisible != value)
+				{
+					_isVisible = value;
+					RaisePropertyChanged();
+					RaisePropertyChanged(nameof(Visibility));
+				}
+			}
+		}
+
+		public DateTime Updated { get; private set; }
 
 		private void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string memberName = "")
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName));
 		}
+
+		public System.Windows.Visibility Visibility => IsVisible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
 
 		public ObservableCollection<WindowModel> Windows { get; set; } = new ObservableCollection<WindowModel>();
 	}

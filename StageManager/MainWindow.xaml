@@ -49,6 +49,7 @@
         <ItemsControl.ItemTemplate>
             <DataTemplate>
                 <Grid
+					Visibility="{Binding Visibility}"
                     Style="{StaticResource GridOpacity}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger

@@ -23,6 +23,7 @@ namespace StageManager
 	public partial class MainWindow : Window
 	{
 		private const int TIMERINTERVAL_MILLISECONDS = 500;
+		private const int MAX_SCENES = 6;
 
 		private IntPtr _thisHandle;
 		private TaskPoolGlobalHook _hook;
@@ -84,16 +85,23 @@ namespace StageManager
 			SceneManager.CurrentSceneSelectionChanged += SceneManager_CurrentSceneSelectionChanged;
 			SceneManager.RequestWindowPreviewUpdate += SceneManager_RequestWindowPreviewUpdate;
 
-			foreach (var scene in SceneManager.GetScenes())
-			{
-				var model = SceneModel.FromScene(scene);
-				Scenes.Add(model);
-			}
+			AddInitialScenes();
 
 			var foreground = Win32.GetForegroundWindow();
 			var foregroundScene = SceneManager.FindSceneForWindow(foreground);
 			if (foregroundScene is object)
 				await SceneManager.SwitchTo(foregroundScene).ConfigureAwait(true);
+		}
+
+		private void AddInitialScenes()
+		{
+			var initialScenes = SceneManager.GetScenes().ToArray();
+			for (int i = 0; i < initialScenes.Length; i++)
+			{
+				var model = SceneModel.FromScene(initialScenes[i]);
+				model.IsVisible = i <= MAX_SCENES; // i is zero based, so it should be i+1 but one scene gets selected (and removed from the sidebar) that makes i+0 again
+				Scenes.Add(model);
+			}
 		}
 
 		private void SceneManager_CurrentSceneSelectionChanged(object? sender, CurrentSceneSelectionChangedEventArgs args)
@@ -115,6 +123,8 @@ namespace StageManager
 			}
 
 			_removedCurrentScene = currentModel;
+
+			SyncVisibilityByUpdatedTimeStamp();
 		}
 
 		private void SceneManager_RequestWindowPreviewUpdate(object? sender, IWindow window)
@@ -145,6 +155,7 @@ namespace StageManager
 				{
 					case ChangeType.Created:
 						Scenes.Add(SceneModel.FromScene(e.Scene));
+						SyncVisibilityByUpdatedTimeStamp();
 						break;
 					case ChangeType.Updated:
 						if (AllScenes.FirstOrDefault(s => s.Id == e.Scene.Id) is SceneModel toUpdate)
@@ -158,8 +169,7 @@ namespace StageManager
 							else
 								Scenes.Remove(toRemove);
 						}
-						break;
-					default:
+						SyncVisibilityByUpdatedTimeStamp();
 						break;
 				}
 			});
@@ -245,6 +255,12 @@ namespace StageManager
 			}
 
 			return model;
+		}
+		private void SyncVisibilityByUpdatedTimeStamp()
+		{
+			var scenes = Scenes.OrderByDescending(s => s.Updated).ToArray();
+			for (int i = 0; i < scenes.Length; i++)
+				scenes[i].IsVisible = i < MAX_SCENES;
 		}
 
 		public ObservableCollection<SceneModel> Scenes { get; } = new ObservableCollection<SceneModel>();

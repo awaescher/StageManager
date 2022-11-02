@@ -62,6 +62,8 @@ public class Panel3D : Panel
 
 		if (e.Property.Name == nameof(IsMouseOver))
 			_viewport.Opacity = ((bool)e.NewValue) ? 1.0 : 0.8;
+		else if (e.Property.Name == nameof(IsVisible))
+			_viewport.Visibility = ((bool)e.NewValue) ? Visibility.Visible : Visibility.Hidden;
 	}
 
 	#endregion // Constructor
