@@ -17,7 +17,6 @@ namespace StageManager
 		private readonly Desktop _desktop;
 		private List<Scene> _scenes;
 		private Scene _current;
-		private IntPtr _desktopHandle;
 		private bool _suspend = false;
 		private Guid? _reentrancyLockSceneId;
 
@@ -34,6 +33,7 @@ namespace StageManager
 		{
 			WindowsManager = windowsManager ?? throw new ArgumentNullException(nameof(windowsManager));
 			_desktop = new Desktop();
+			_desktop.HideIcons();
 		}
 
 		public async Task Start()
@@ -47,8 +47,11 @@ namespace StageManager
 			WindowsManager.UntrackedFocus += WindowsManager_UntrackedFocus;
 
 			await WindowsManager.Start();
+		}
 
-
+		internal void Stop()
+		{
+			_desktop.ShowIcons();
 		}
 
 		private void WindowsManager_WindowUpdated(IWindow window, WindowUpdateType type)
@@ -57,44 +60,19 @@ namespace StageManager
 				return;
 
 			if (type == WindowUpdateType.Foreground)
-			{
 				SwitchToSceneByWindow(window).SafeFireAndForget();
-				//var scene = FindSceneForWindow(window);
-
-				//if (scene is null)
-				//	_scenes.Add(new Scene(window.ProcessName, window));
-
-				//SwitchTo(scene).SafeFireAndForget();
-			}
 		}
 
-		private async void WindowsManager_UntrackedFocus(object? sender, IntPtr e)
+		private void WindowsManager_UntrackedFocus(object? sender, IntPtr e)
 		{
-			//// TODO BETTER
+			if (_suspend)
+				return;
 
-			// Attention, recognizing the desktop handle to show/hide desktop icons
-			// might interfere with situations when windows are picked from the taskbar
-			// when there are more than one window to choose from.
-			// in this case, it might be that untracked focus is fired which sets the 
-			// scene to null and causes two scene changes forth and back to the prior scene
+			if (!_desktop.HasDesktopView)
+				_desktop.TrySetDesktopView(e);
 
-			//if (_desktopHandle == IntPtr.Zero)
-			//{
-			//	Win32.GetWindowThreadProcessId(e, out var processId);
-			//	if (processId != 0)
-			//	{
-			//		var process = System.Diagnostics.Process.GetProcessById((int)processId);
-			//		if (process.ProcessName.Equals("explorer", StringComparison.OrdinalIgnoreCase))
-			//		{
-			//			_desktopHandle = e;
-			//		}
-			//	}
-			//}
-
-			//if (e == _desktopHandle)
-			//{
-			//	await SwitchTo(null);
-			//}
+			if (_desktop.HasDesktopView && _desktop.DesktopViewHandle == e)
+				SwitchTo(null).SafeFireAndForget();
 		}
 
 		private void WindowsManager_WindowDestroyed(IWindow window)
@@ -170,7 +148,10 @@ namespace StageManager
 		/// <returns></returns>
 		private bool IsReentrancy(Scene? scene)
 		{
-			if (Guid.Equals(scene?.Id, _reentrancyLockSceneId))
+			if (scene is null)
+				return false;
+
+			if (Guid.Equals(scene.Id, _reentrancyLockSceneId))
 				return true;
 
 			if (_current is object)

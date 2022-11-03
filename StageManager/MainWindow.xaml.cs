@@ -67,6 +67,8 @@ namespace StageManager
 			_hook.MouseMoved -= _hook_MouseMoved;
 			_hook.Dispose();
 
+			SceneManager.Stop();
+
 			base.OnClosed(e);
 
 			Environment.Exit(0);
