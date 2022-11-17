@@ -8,6 +8,18 @@ This prototype groups applications by their process. By switching between so cal
 
 Windows can be moved from one scene to another by dragging them onto scenes on the left.
 
+## Usage
+
+ - clone this repository
+ - cd into the repository directory
+ - run `dotnet run --project StageManager`
+
+To quit, click on a scene on the left so that StageManager has the mouse focus and hit Alt+F4.
+ 
+### Requirements
+ - Windows 10 version 2004 or newer
+ - [.NET 6 SDK](https://dotnet.microsoft.com/en-us/download)
+
 ## To do
 
 This is an experimental fun project. I don't have any idea whether or not this is going to be a final product one day. 
