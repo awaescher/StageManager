@@ -1,4 +1,4 @@
-﻿namespace workspacer
+﻿namespace StageManager.Native.Window
 {
     public enum WindowUpdateType
     {

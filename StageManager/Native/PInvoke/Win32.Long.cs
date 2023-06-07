@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace workspacer
+namespace StageManager.Native.PInvoke
 {
     public static partial class Win32
     {

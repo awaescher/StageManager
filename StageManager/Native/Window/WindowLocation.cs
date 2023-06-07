@@ -1,4 +1,4 @@
-﻿namespace workspacer
+﻿namespace StageManager.Native.Window
 {
     public class WindowLocation : IWindowLocation
     {
@@ -11,15 +11,15 @@
             State = state;
         }
 
-        public int X { get; private set;}
-        public int Y { get; private set;}
-        public int Width { get; private set;}
-        public int Height { get; private set;}
-        public WindowState State { get; private set;}
+        public int X { get; private set; }
+        public int Y { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+        public WindowState State { get; private set; }
 
         public bool IsPointInside(int x, int y)
         {
-            return this.X <= x && x <= (this.X + this.Width) && this.Y <= y && y <= (this.Y + this.Height);
+            return X <= x && x <= X + Width && Y <= y && y <= Y + Height;
         }
 
         public override string ToString()

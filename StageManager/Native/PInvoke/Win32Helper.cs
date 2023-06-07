@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace workspacer
+namespace StageManager.Native.PInvoke
 {
     public static class Win32Helper
     {
@@ -18,7 +18,7 @@ namespace workspacer
             return isCloaked;
         }
 
-        public static  bool IsAppWindow(IntPtr hwnd)
+        public static bool IsAppWindow(IntPtr hwnd)
         {
             return (Win32.IsWindowVisible(hwnd) || Win32.IsIconic(hwnd)) &&
                    !Win32.GetWindowExStyleLongPtr(hwnd).HasFlag(Win32.WS_EX.WS_EX_NOACTIVATE) &&
@@ -28,24 +28,24 @@ namespace workspacer
         // http://blogs.msdn.com/b/oldnewthing/archive/2007/10/08/5351207.aspx
         // http://stackoverflow.com/questions/210504/enumerate-windows-like-alt-tab-does
         public static bool IsAltTabWindow(IntPtr hWnd)
-		{
-			var exStyle = Win32.GetWindowExStyleLongPtr(hWnd);
-			if (exStyle.HasFlag(Win32.WS_EX.WS_EX_TOOLWINDOW) ||
-				Win32.GetWindow(hWnd, Win32.GW.GW_OWNER) != IntPtr.Zero)
-			{
-				return false;
-			}
-			if (exStyle.HasFlag(Win32.WS_EX.WS_EX_APPWINDOW))
-			{
-				return true;
-			}
+        {
+            var exStyle = Win32.GetWindowExStyleLongPtr(hWnd);
+            if (exStyle.HasFlag(Win32.WS_EX.WS_EX_TOOLWINDOW) ||
+                Win32.GetWindow(hWnd, Win32.GW.GW_OWNER) != IntPtr.Zero)
+            {
+                return false;
+            }
+            if (exStyle.HasFlag(Win32.WS_EX.WS_EX_APPWINDOW))
+            {
+                return true;
+            }
 
-		    return true;
+            return true;
             // I am leaving this code here for testing purposes, but I don't think I need it.
             // the old-school alt-tab implementation clearly doesn't 100% line up with the aforementioned
             // blog post, or the below implementation in C# is wrong, because some windows are hidden when 
             // popups are created. For my purposes, I want to layout them anyway, so always return true;
-		    /*
+            /*
             // Start at the root owner
             var hWndTry = Win32.GetAncestor(hWnd, Win32.GA.GA_ROOTOWNER);
             IntPtr oldHWnd;
@@ -60,7 +60,7 @@ namespace workspacer
 
             return hWndTry == hWnd;
             */
-		}
+        }
 
         public static void ForceForegroundWindow(IntPtr hWnd)
         {

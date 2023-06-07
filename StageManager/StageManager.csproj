@@ -5,7 +5,8 @@
     <TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
 	<RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
     <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>StageManager.ico</ApplicationIcon>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
   </PropertyGroup>
@@ -19,10 +20,6 @@
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="SharpHook" Version="3.1.1" />
     <PackageReference Include="WpfScreenHelper" Version="2.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\workspacer.Shared\workspacer.Shared.csproj" />
   </ItemGroup>
 
 </Project>

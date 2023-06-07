@@ -1,12 +1,12 @@
-﻿using System;
+﻿using StageManager.Native.Window;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using IWindow = workspacer.IWindow;
 
 namespace StageManager
 {
-	[System.Diagnostics.DebuggerDisplay("{Title}")]
+    [System.Diagnostics.DebuggerDisplay("{Title}")]
 	public class Scene
 	{
 		public event EventHandler SelectedChanged;

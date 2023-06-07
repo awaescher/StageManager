@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using StageManager.Native;
+using StageManager.Native.Window;
+using System;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using workspacer;
 
 namespace StageManager.Model
 {
@@ -24,13 +18,13 @@ namespace StageManager.Model
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool DeleteObject([In] IntPtr hObject);
 
-		private workspacer.IWindow _window;
+		private IWindow _window;
 		private ImageSource _iconSource;
 		private ImageSource _image;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		public WindowModel(workspacer.IWindow window)
+		public WindowModel(IWindow window)
 		{
 			Window = window ?? throw new ArgumentNullException(nameof(window));
 		}
@@ -98,7 +92,7 @@ namespace StageManager.Model
 
 		public ImageSource Icon => _iconSource ??= IconToImageSource((Window as WindowsWindow).ExtractIcon());
 
-		public workspacer.IWindow Window
+		public IWindow Window
 		{
 			get => _window;
 			set

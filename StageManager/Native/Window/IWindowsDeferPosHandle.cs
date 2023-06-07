@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace workspacer
+namespace StageManager.Native.Window
 {
     public interface IWindowsDeferPosHandle : IDisposable
     {

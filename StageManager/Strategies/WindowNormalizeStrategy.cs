@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using workspacer;
+﻿using StageManager.Native.PInvoke;
+using StageManager.Native.Window;
 
 namespace StageManager.Strategies
 {
-	internal class WindowNormalizeStrategy : IWindowStrategy
+    internal class WindowNormalizeStrategy : IWindowStrategy
 	{
 		public void Invoke(IWindow window)
 		{

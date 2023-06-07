@@ -1,4 +1,6 @@
-﻿using System;
+﻿using StageManager.Native.PInvoke;
+using StageManager.Native.Window;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -7,12 +9,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace workspacer
+namespace StageManager.Native
 {
-	public class WindowsWindow : IWindow
+    public class WindowsWindow : IWindow
 	{
-		private static Logger Logger = Logger.Create();
-
 		private IntPtr _handle;
 		private bool _didManualHide;
 
@@ -210,7 +210,6 @@ namespace workspacer
 		{
 			if (!IsFocused)
 			{
-				Logger.Debug("[{0}] :: Focus", this);
 				Win32Helper.ForceForegroundWindow(_handle);
 				WindowFocused?.Invoke(this);
 			}
@@ -218,7 +217,6 @@ namespace workspacer
 
 		public void Hide()
 		{
-			Logger.Trace("[{0}] :: Hide", this);
 			if (CanLayout)
 			{
 				_didManualHide = true;
@@ -229,38 +227,29 @@ namespace workspacer
 		public void ShowNormal()
 		{
 			_didManualHide = false;
-			Logger.Trace("[{0}] :: ShowNormal", this);
 			Win32.ShowWindow(_handle, Win32.SW.SW_SHOWNOACTIVATE);
 		}
 
 		public void ShowMaximized()
 		{
 			_didManualHide = false;
-			Logger.Trace("[{0}] :: ShowMaximized", this);
 			Win32.ShowWindow(_handle, Win32.SW.SW_SHOWMAXIMIZED);
 		}
 
 		public void ShowMinimized()
 		{
 			_didManualHide = false;
-			Logger.Trace("[{0}] :: ShowMinimized", this);
 			Win32.ShowWindow(_handle, Win32.SW.SW_SHOWMINIMIZED);
 		}
 
 		public void ShowInCurrentState()
 		{
 			if (IsMinimized)
-			{
 				ShowMinimized();
-			}
 			else if (IsMaximized)
-			{
 				ShowMaximized();
-			}
 			else
-			{
 				ShowNormal();
-			}
 
 			WindowUpdated?.Invoke(this);
 		}
@@ -273,7 +262,6 @@ namespace workspacer
 
 		public void Close()
 		{
-			Logger.Debug("[{0}] :: Close", this);
 			Win32Helper.QuitApplication(_handle);
 			WindowClosed?.Invoke(this);
 		}
@@ -287,7 +275,6 @@ namespace workspacer
 		{
 			return $"[{Handle}][{Title}][{Class}][{ProcessName}]";
 		}
-
 
 		public Icon ExtractIcon()
 		{
