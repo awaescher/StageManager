@@ -18,7 +18,7 @@ To quit, click on a scene on the left so that StageManager has the mouse focus a
  
 ### Requirements
  - Windows 10 version 2004 or newer
- - [.NET 6 SDK](https://dotnet.microsoft.com/en-us/download)
+ - [.NET 7 SDK](https://dotnet.microsoft.com/en-us/download)
 
 ## To do
 
