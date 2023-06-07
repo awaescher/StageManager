@@ -1,6 +1,6 @@
 # Stage Manager for Windows
 
-This is an experimental approach to bring the macOS [Stage Manager](https://9to5mac.com/2022/07/26/stage-manager-on-mac/) to Microsoft Windows.
+This is an experimental approach to bring the macOS [Stage Manager](https://support.apple.com/en-us/HT213315) to Microsoft Windows.
 
 ![Stage Manager](media/StageManager%20Basics.gif)
 
@@ -34,6 +34,7 @@ This is an experimental fun project. I don't have any idea whether or not this i
 |scene management with drag&drop|✅|
 |restore windows on quit/restart|✅|
 |auto hide & fly-in scenes for maximized windows|✅|
+|Tray icon to start & stop|⬜|
 |place screenshots in relative size of the desktop|⬜|
 |place app icons over 3D window adorners|⬜|
 |rounded corners for the window thumbnails|⬜|
