@@ -1,18 +1,17 @@
 ﻿using AsyncAwaitBestPractices;
+using StageManager.Native;
+using StageManager.Native.PInvoke;
+using StageManager.Native.Window;
 using StageManager.Strategies;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using workspacer;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using IWindow = workspacer.IWindow;
 
 namespace StageManager
 {
-	public class SceneManager
+    public class SceneManager
 	{
 		private readonly Desktop _desktop;
 		private List<Scene> _scenes;
@@ -249,7 +248,7 @@ namespace StageManager
 
 					// reset window position after move so that the window is back at the starting position on the new scene
 					if (window is WindowsWindow w && w.PopLastLocation() is IWindowLocation l)
-						workspacer.Win32.SetWindowPos(window.Handle, IntPtr.Zero, l.X, l.Y, 0, 0, workspacer.Win32.SetWindowPosFlags.IgnoreResize);
+						Win32.SetWindowPos(window.Handle, IntPtr.Zero, l.X, l.Y, 0, 0, Win32.SetWindowPosFlags.IgnoreResize);
 				}
 
 				return Task.CompletedTask;

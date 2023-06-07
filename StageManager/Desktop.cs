@@ -1,8 +1,8 @@
 ﻿using Microsoft.Win32;
+using StageManager.Native.PInvoke;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using workspacer;
 
 namespace StageManager
 {

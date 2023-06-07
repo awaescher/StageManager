@@ -6,8 +6,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using StageManager.Native.PInvoke;
+using StageManager.Native.Window;
 
-namespace workspacer
+namespace StageManager.Native
 {
     public delegate void WindowDelegate(IWindow window);
     public delegate void WindowCreateDelegate(IWindow window, bool firstCreate);
@@ -15,8 +17,6 @@ namespace workspacer
 
     public class WindowsManager : IWindowsManager
     {
-        private Logger Logger = Logger.Create();
-
         private IDictionary<IntPtr, WindowsWindow> _windows;
         private WinEventDelegate _hookDelegate;
 
@@ -55,12 +55,12 @@ namespace workspacer
         /// Notifies when a window updated itself
         /// This is used to externally notify when an update was applied to a window
         /// </summary>
-        public event WindowDelegate WorkspacerExternalWindowUpdate;
+        public event WindowDelegate ExternalWindowUpdate;
         /// <summary>
         /// Notifies when a window closes itself
         /// This is used to externally notify when a window was closed
         /// </summary>
-        public event WindowDelegate WorkspacerExternalWindowClosed;
+        public event WindowDelegate ExternalWindowClosed;
 
         public IEnumerable<IWindow> Windows => _windows.Values;
 
@@ -111,41 +111,7 @@ namespace workspacer
             var info = Win32.BeginDeferWindowPos(count);
             return new WindowsDeferPosHandle(info);
         }
-
-        public void DumpWindowDebugOutput()
-        {
-            var output = "";
-            foreach (var window in Windows)
-            {
-                output += GenerateWindowDebugOutput(window) + "\r\n\r\n";
-            }
-            OpenDebugOutput(output);
-        }
-
-        public void DumpWindowDebugOutputForFocusedWindow()
-        {
-            var focusedWindow = Windows.Where(win => win.IsFocused)
-                .Select(win => win).FirstOrDefault();
-
-            if (focusedWindow != null)
-            {
-                var output = GenerateWindowDebugOutput(focusedWindow);
-                OpenDebugOutput(output);
-            }
-        }
-
-        public void DumpWindowUnderCursorDebugOutput()
-        {
-            var location = Control.MousePosition;
-            var handle = Win32.WindowFromPoint(location);
-            if (_windows.ContainsKey(handle))
-            {
-                var window = _windows[handle];
-                var output = GenerateWindowDebugOutput(window);
-                OpenDebugOutput(output);
-            }
-        }
-
+        
         public void ToggleFocusedWindowTiling()
         {
             var window = _windows.Values.FirstOrDefault(w => w.IsFocused);
@@ -169,32 +135,10 @@ namespace workspacer
 
         private IntPtr MouseHook(int nCode, UIntPtr wParam, IntPtr lParam)
         {
-            if (nCode == 0 && (uint)wParam == Win32.WM_LBUTTONUP) {
-                Logger.Debug("MouseHook - WM_LBUTTONUP");
+            if (nCode == 0 && (uint)wParam == Win32.WM_LBUTTONUP)
                 HandleWindowMoveEnd();
-            }
+            
             return Win32.CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
-        }
-
-        private void OpenDebugOutput(string output)
-        {
-            Logger.Debug(output);
-        }
-
-        private string GenerateWindowDebugOutput(IWindow window)
-        {
-            var builder = new StringBuilder();
-
-            builder.AppendLine("#############################");
-            builder.AppendLine($"window.Handle                    = {window.Handle}");
-            builder.AppendLine($"window.Title                     = \"{window.Title}\"");
-            builder.AppendLine($"window.Class                     = \"{window.Class}\"");
-            builder.AppendLine($"window.ProcessId                 = {window.ProcessId}");
-            builder.AppendLine($"window.ProcessName               = \"{window.ProcessName}\"");
-            builder.AppendLine($"window.ProcessFileName           = \"{window.ProcessFileName}\"");
-            builder.AppendLine("#############################");
-
-            return builder.ToString();
         }
 
         private void WindowHook(IntPtr hWinEventHook, Win32.EVENT_CONSTANTS eventType, IntPtr hwnd, Win32.OBJID idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
@@ -319,7 +263,6 @@ namespace workspacer
             {
                 var window = _windows[handle];
                 window.StoreLastLocation();
-                Logger.Debug("StartWindowMove[{0}]", window);
 
                 HandleWindowMoveStart(window);
                 WindowUpdated?.Invoke(window, WindowUpdateType.MoveStart);
@@ -331,7 +274,6 @@ namespace workspacer
             if (_windows.ContainsKey(handle))
             {
                 var window = _windows[handle];
-				Logger.Debug("EndWindowMove[{0}]", window);
 
                 HandleWindowMoveEnd();
                 WindowUpdated?.Invoke(window, WindowUpdateType.MoveEnd);
@@ -344,9 +286,7 @@ namespace workspacer
             {
                 var window = _windows[handle];
                 if (_mouseMoveWindow == window)
-                {
                     WindowUpdated?.Invoke(window, WindowUpdateType.Move);
-                }
             }
         }
 
@@ -357,12 +297,12 @@ namespace workspacer
 
         private void HandleWindowUpdated(IWindow window)
         {
-            WorkspacerExternalWindowUpdate?.Invoke(window);
+            ExternalWindowUpdate?.Invoke(window);
         }
 
         private void HandleWindowClosed(IWindow window)
         {
-            WorkspacerExternalWindowClosed?.Invoke(window);
+            ExternalWindowClosed?.Invoke(window);
         }
 
         private void HandleWindowMoveStart(WindowsWindow window)

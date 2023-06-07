@@ -1,10 +1,9 @@
-﻿using System;
-using workspacer;
-using IWindow = workspacer.IWindow;
+﻿using StageManager.Native.Window;
+using System;
 
 namespace StageManager
 {
-	public class SceneChangedEventArgs : EventArgs
+    public class SceneChangedEventArgs : EventArgs
 	{
 		public SceneChangedEventArgs(Scene scene, IWindow window, ChangeType change)
 		{

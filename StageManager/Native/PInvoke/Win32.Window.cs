@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace workspacer
+namespace StageManager.Native.PInvoke
 {
     public static partial class Win32
     {

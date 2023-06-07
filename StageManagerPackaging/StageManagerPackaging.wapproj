@@ -57,7 +57,7 @@
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <NoWarn>$(NoWarn);NU1702</NoWarn>
     <EntryPointProjectUniqueName>..\StageManager\StageManager.csproj</EntryPointProjectUniqueName>
-    <PackageCertificateThumbprint>6D08843B1AF3991D0F0F25B0C1A068DE4370AFCB</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>6C4ADFD413786B8F46C3FE7C769C537E08F89B08</PackageCertificateThumbprint>
   </PropertyGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

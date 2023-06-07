@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using workspacer;
+﻿using StageManager.Native.Window;
 
 namespace StageManager.Strategies
 {
-	internal class WindowShowStrategy : IWindowStrategy
+    internal class WindowShowStrategy : IWindowStrategy
 	{
 		public void Invoke(IWindow window)
 		{

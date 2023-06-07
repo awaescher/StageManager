@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 
-namespace workspacer
+namespace StageManager.Native.Window
 {
     public delegate void IWindowDelegate(IWindow sender);
 

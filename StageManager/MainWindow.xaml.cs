@@ -3,6 +3,9 @@ using MahApps.Metro.Controls;
 using Microsoft.Xaml.Behaviors.Core;
 using SharpHook;
 using StageManager.Model;
+using StageManager.Native;
+using StageManager.Native.PInvoke;
+using StageManager.Native.Window;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,14 +16,13 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using workspacer;
 
 namespace StageManager
 {
-	/// <summary>
-	/// Interaction logic for MainWindow.xaml
-	/// </summary>
-	public partial class MainWindow : Window
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
 	{
 		private const int TIMERINTERVAL_MILLISECONDS = 500;
 		private const int MAX_SCENES = 6;
@@ -183,7 +185,7 @@ namespace StageManager
 			if (EnableWindowDropToScene)
 				_overlapCheckTimer.Change(TimeSpan.Zero, TimeSpan.Zero);
 
-			var foregroundWindow = workspacer.Win32.GetForegroundWindow();
+			var foregroundWindow = Win32.GetForegroundWindow();
 			if (foregroundWindow != _thisHandle)
 				return;
 
@@ -204,7 +206,7 @@ namespace StageManager
 			{
 				_overlapCheckTimer.Change(0, TIMERINTERVAL_MILLISECONDS);
 
-				var foregroundWindow = workspacer.Win32.GetForegroundWindow();
+				var foregroundWindow = Win32.GetForegroundWindow();
 
 				if (foregroundWindow == _thisHandle)
 					return;
@@ -328,7 +330,7 @@ namespace StageManager
 
 		private void UpdateModeByWindows(IEnumerable<IWindow> windows)
 		{
-			bool doesOverlap(IWindowLocation loc) => loc.State == workspacer.WindowState.Maximized || (loc.State == workspacer.WindowState.Normal && (loc.X * 2) < _lastWidth);
+			bool doesOverlap(IWindowLocation loc) => loc.State == Native.Window.WindowState.Maximized || (loc.State == Native.Window.WindowState.Normal && (loc.X * 2) < _lastWidth);
 
 			var anyOverlappingWindows = windows.Any(w => doesOverlap(w.Location));
 

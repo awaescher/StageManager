@@ -1,6 +1,4 @@
 ﻿using System;
-using workspacer;
-using IWindow = workspacer.IWindow;
 
 namespace StageManager
 {

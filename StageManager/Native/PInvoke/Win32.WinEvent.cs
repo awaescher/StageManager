@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace workspacer
+namespace StageManager.Native.PInvoke
 {
-    public static partial class Win32
+	public static partial class Win32
     {
         public enum EVENT_CONSTANTS : uint
         {

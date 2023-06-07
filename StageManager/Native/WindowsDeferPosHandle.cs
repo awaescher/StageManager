@@ -1,7 +1,9 @@
-﻿using System;
+﻿using StageManager.Native.PInvoke;
+using StageManager.Native.Window;
+using System;
 using System.Collections.Generic;
 
-namespace workspacer
+namespace StageManager.Native
 {
     public class WindowsDeferPosHandle : IWindowsDeferPosHandle
     {
