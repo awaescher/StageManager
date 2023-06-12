@@ -117,6 +117,9 @@ jobs:
     - name: List directory contents 2
       run: ls ${{ env.Wap_Project_Directory }}/AppPackages   
 
+    - name: List directory contents 3
+      run: ls ${{ env.Wap_Project_Directory }}/AppPackages/StageManager
+
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
