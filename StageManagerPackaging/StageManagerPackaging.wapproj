@@ -50,6 +50,7 @@
   </PropertyGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.props" />
   <PropertyGroup>
+    <OutputPath>\AppPackages</OutputPath>
     <ProjectGuid>573809b8-dafc-45b2-ae26-645ef14aa43e</ProjectGuid>
     <TargetPlatformVersion>10.0.22000.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
@@ -58,6 +59,7 @@
     <NoWarn>$(NoWarn);NU1702</NoWarn>
     <EntryPointProjectUniqueName>..\StageManager\StageManager.csproj</EntryPointProjectUniqueName>
     <PackageCertificateThumbprint>6D08843B1AF3991D0F0F25B0C1A068DE4370AFCB</PackageCertificateThumbprint>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
   </PropertyGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
