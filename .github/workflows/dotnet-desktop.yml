@@ -102,22 +102,14 @@ jobs:
     - name: Remove the pfx
       run: Remove-Item -path $env:Wap_Project_Directory\GitHubActionsWorkflow.pfx
 
-    - name: Semantic Release
-      uses: cycjimmy/semantic-release-action@v3
-      with:
-        semantic_version: 19.0.5  # It is recommended to specify a version range
-                                  # for semantic-release when using
-                                  # semantic-release-action lower than @v3
-        branches: |
-          [
-            '+([0-9])?(.{+([0-9]),x}).x',
-            'master',
-            'main',
-            {
-              name: 'preview',
-              prerelease: true
-            }
-          ]
+    - name: Bump version and push tag
+      id: tag_version
+      uses: anothrNick/github-tag-action@1.34.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: false
+        DEFAULT_BUMP: patch #default version bump if not specified in commit message
+        DRY_RUN: false
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
