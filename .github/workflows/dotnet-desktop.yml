@@ -57,8 +57,6 @@ jobs:
 
     env:
       Solution_Name: StageManager.sln
-      Wap_Project_Directory: StageManagerPackaging                              # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
-      Wap_Project_Path: StageManagerPackaging\StageManagerPackaging.wapproj     # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
 
     steps:
     - name: Checkout
@@ -91,33 +89,19 @@ jobs:
       env:
         Configuration: ${{ matrix.configuration }}
 
-    # Decode the base 64 encoded pfx and save the Signing_Certificate
-    - name: Decode the pfx
-      run: |
-        $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
-        $certificatePath = Join-Path -Path $env:Wap_Project_Directory -ChildPath GitHubActionsWorkflow.pfx
-        [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
-
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the app package
-      run: dotnet publish --configuration ${{ matrix.configuration }} --output ${{ env.Appx_Package_Dir }}
+      run: dotnet publish --configuration ${{ matrix.configuration }} --output ${{ env.OutputDir }} --self-contained -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
       env:
-        Appx_Package_Dir: ${{ env.Wap_Project_Directory }}\AppPackages
+        OutputDir: ./Artifacts
         Configuration: ${{ matrix.configuration }}
-
-    # Remove the pfx
-    - name: Remove the pfx
-      run: Remove-Item -path $env:Wap_Project_Directory\GitHubActionsWorkflow.pfx
-
-    - name: List directory contents
-      run: tree /F ${{ env.Wap_Project_Directory }}
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: MSIX Package
-        path: ${{ env.Wap_Project_Directory }}\AppPackages
+        path: ./Artifacts
 
     # Create the release:  https://github.com/actions/create-release
     - name: Create release
