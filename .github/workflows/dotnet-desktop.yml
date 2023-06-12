@@ -100,25 +100,21 @@ jobs:
 
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the app package
-      run: msbuild $env:Wap_Project_Path /p:ApplicationVersion=${{ steps.tag_version.outputs.new_version }} /p:OutputPath=AppPackages /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
+      run: msbuild $env:Wap_Project_Path /p:AppxBundlePlatforms="$env:Appx_Bundle_Platforms" /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:AppxPackageDir="$env:Appx_Package_Dir" /p:GenerateAppInstallerFile="$env:GenerateAppInstallerFile" /p:GenerateAppxPackageOnBuild=true
       env:
-        AppxBundle: Always
-        BuildMode: SideloadOnly
-        Configuration: ${{ matrix.Configuration }}
+        Appx_Bundle: Always
+        Appx_Bundle_Platforms: x64
+        Appx_Package_Build_Mode: SideloadOnly
+        Appx_Package_Dir: Packages\
+        Configuration: ${{ matrix.configuration }}
         GenerateAppInstallerFile: True
 
     # Remove the pfx
     - name: Remove the pfx
       run: Remove-Item -path $env:Wap_Project_Directory\GitHubActionsWorkflow.pfx
 
-    - name: List directory contents 1
-      run: ls ${{ env.Wap_Project_Directory }}
-
-    - name: List directory contents 2
-      run: ls ${{ env.Wap_Project_Directory }}/AppPackages   
-
-    - name: List directory contents 3
-      run: ls ${{ env.Wap_Project_Directory }}/AppPackages/StageManager
+    - name: List directory contents
+      run: tree /F ${{ env.Wap_Project_Directory }}
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
