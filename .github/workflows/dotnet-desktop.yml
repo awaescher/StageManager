@@ -101,7 +101,7 @@ jobs:
     # Remove the pfx
     - name: Remove the pfx
       run: Remove-Item -path $env:Wap_Project_Directory\GitHubActionsWorkflow.pfx
-
+      
     - name: Bump version and push tag
       id: tag_version
       uses: anothrNick/github-tag-action@1.34.0
