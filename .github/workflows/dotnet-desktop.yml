@@ -104,6 +104,6 @@ jobs:
       with:
         tag_name: ${{ steps.tag_version.outputs.new_tag }}
         name: Release ${{ steps.tag_version.outputs.new_version }}
-        file: ./Artifacts/StageManager.exe
+        files: ./Artifacts/StageManager.exe
         draft: false
         prerelease: false
