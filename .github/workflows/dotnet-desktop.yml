@@ -111,6 +111,12 @@ jobs:
     - name: Remove the pfx
       run: Remove-Item -path $env:Wap_Project_Directory\GitHubActionsWorkflow.pfx
 
+    - name: List directory contents 1
+      run: ls ${{ env.Wap_Project_Directory }}
+
+    - name: List directory contents 2
+      run: ls ${{ env.Wap_Project_Directory }}/AppPackages   
+
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
