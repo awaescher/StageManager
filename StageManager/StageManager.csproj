@@ -2,13 +2,11 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows10.0.22000.0</TargetFramework>
-	<RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>StageManager.ico</ApplicationIcon>
-    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
   <ItemGroup>

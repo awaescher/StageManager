@@ -59,6 +59,12 @@
     <EntryPointProjectUniqueName>..\StageManager\StageManager.csproj</EntryPointProjectUniqueName>
     <PackageCertificateThumbprint>6D08843B1AF3991D0F0F25B0C1A068DE4370AFCB</PackageCertificateThumbprint>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+    <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
+    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+    <GenerateTestArtifacts>True</GenerateTestArtifacts>
+    <AppxBundle>Always</AppxBundle>
+    <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
+    <HoursBetweenUpdateChecks>168</HoursBetweenUpdateChecks>
   </PropertyGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
