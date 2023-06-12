@@ -73,6 +73,7 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         default_bump: patch
+        tag_prefix: "" # prefer 0.1 and 0.2 etc over v0.1 and v0.2
 
     # Install the .NET Core workload
     - name: Install .NET Core
@@ -99,7 +100,7 @@ jobs:
 
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the app package
-      run: msbuild $env:Wap_Project_Path /p:ApplicationVersion=${{ steps.tag_version.outputs.new_version }} /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
+      run: msbuild $env:Wap_Project_Path /p:ApplicationVersion=${{ steps.tag_version.outputs.new_version }} /p:OutputPath=${{ env.Wap_Project_Directory }}\AppPackages /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
       env:
         AppxBundle: Always
         BuildMode: SideloadOnly
