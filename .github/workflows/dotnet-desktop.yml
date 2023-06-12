@@ -57,8 +57,6 @@ jobs:
 
     env:
       Solution_Name: StageManager.sln
-      Wap_Project_Directory: StageManagerPackaging                              # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
-      Wap_Project_Path: StageManagerPackaging\StageManagerPackaging.wapproj     # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
 
     steps:
     - name: Checkout
@@ -66,70 +64,46 @@ jobs:
       with:
         fetch-depth: 0
 
+    # Semantic Versioning
+    - name: Bump version and push tag
+      id: tag_version
+      uses: mathieudutour/github-tag-action@v5.6
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        default_bump: patch
+        tag_prefix: "" # prefer 0.1 and 0.2 etc over v0.1 and v0.2
+
     # Install the .NET Core workload
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
-
-    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
+        dotnet-version: 7.0.x
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
-    - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
-
-    # Decode the base 64 encoded pfx and save the Signing_Certificate
-    - name: Decode the pfx
-      run: |
-        $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
-        $certificatePath = Join-Path -Path $env:Wap_Project_Directory -ChildPath GitHubActionsWorkflow.pfx
-        [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
+    - name: Restore the solution
+      run: dotnet restore $env:Solution_Name
 
     # Create the app package by building and packaging the Windows Application Packaging project
-    - name: Create the app package
-      run: msbuild $env:Wap_Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
+    - name: Build and publish
+      run: dotnet publish --configuration ${{ matrix.configuration }} --output ${{ env.OutputDir }} --self-contained -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
       env:
-        AppxBundle: Always
-        BuildMode: SideloadOnly
-        Configuration: ${{ matrix.Configuration }}
-        GenerateAppInstallerFile: True
-
-    # Remove the pfx
-    - name: Remove the pfx
-      run: Remove-Item -path $env:Wap_Project_Directory\GitHubActionsWorkflow.pfx
-
-    - name: Semantic Release
-      uses: cycjimmy/semantic-release-action@v3
-      with:
-        semantic_version: 19.0.5  # It is recommended to specify a version range
-                                  # for semantic-release when using
-                                  # semantic-release-action lower than @v3
-        branches: |
-          [
-            '+([0-9])?(.{+([0-9]),x}).x',
-            'master',
-            'main',
-            {
-              name: 'preview',
-              prerelease: true
-            }
-          ]
+        OutputDir: ./Artifacts
+        Configuration: ${{ matrix.configuration }}
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: MSIX Package
-        path: ${{ env.Wap_Project_Directory }}\AppPackages
+        name: StageManager
+        path: ./Artifacts/StageManager.exe
 
     # Create the release:  https://github.com/actions/create-release
     - name: Create release
       id: create_release
       uses: softprops/action-gh-release@v1
       with:
+        tag_name: ${{ steps.tag_version.outputs.new_tag }}
+        name: Release ${{ steps.tag_version.outputs.new_version }}
+        file: ./Artifacts/StageManager.exe
         draft: false
         prerelease: false
