@@ -77,20 +77,14 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
-
-    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
+        dotnet-version: 7.0.x
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
-    - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
+    - name: Restore the solution
+      run: dotnet restore $env:Solution_Name
 
     # Create the app package by building and packaging the Windows Application Packaging project
-    - name: Create the app package
+    - name: Build and publish
       run: dotnet publish --configuration ${{ matrix.configuration }} --output ${{ env.OutputDir }} --self-contained -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
       env:
         OutputDir: ./Artifacts
@@ -100,8 +94,8 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: MSIX Package
-        path: ./Artifacts
+        name: StageManager
+        path: ./Artifacts/StageManager.exe
 
     # Create the release:  https://github.com/actions/create-release
     - name: Create release
@@ -110,5 +104,6 @@ jobs:
       with:
         tag_name: ${{ steps.tag_version.outputs.new_tag }}
         name: Release ${{ steps.tag_version.outputs.new_version }}
+        file: ./Artifacts/StageManager.exe
         draft: false
         prerelease: false
