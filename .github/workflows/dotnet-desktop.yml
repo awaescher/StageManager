@@ -93,7 +93,7 @@ jobs:
     - name: Create the app package
       run: msbuild $env:Wap_Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
       env:
-        AppxBundle: Never
+        AppxBundle: Always
         BuildMode: SideloadOnly
         Configuration: ${{ matrix.Configuration }}
         GenerateAppInstallerFile: True
@@ -101,6 +101,23 @@ jobs:
     # Remove the pfx
     - name: Remove the pfx
       run: Remove-Item -path $env:Wap_Project_Directory\GitHubActionsWorkflow.pfx
+
+    - name: Semantic Release
+      uses: cycjimmy/semantic-release-action@v3
+      with:
+        semantic_version: 19.0.5  # It is recommended to specify a version range
+                                  # for semantic-release when using
+                                  # semantic-release-action lower than @v3
+        branches: |
+          [
+            '+([0-9])?(.{+([0-9]),x}).x',
+            'master',
+            'main',
+            {
+              name: 'preview',
+              prerelease: true
+            }
+          ]
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
