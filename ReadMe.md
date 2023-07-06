@@ -15,7 +15,7 @@ Download and run the executable from the [Releases tab](https://github.com/awaes
  - cd into the repository directory
  - run `dotnet run --project StageManager`
 
-To quit, find the app's tray icon (Windows might have moved this in the overflow menu) and use its context menu to close the app.
+To quit, find the app's tray icon (Windows might move it into the overflow menu) and use its context menu to close the app.
  
 ### Requirements
  - Windows 10 version 2004 or newer
@@ -35,6 +35,8 @@ This is an experimental fun project. I don't have any idea whether or not this i
 |scene management with drag&drop|✅|
 |restore windows on quit/restart|✅|
 |auto hide & fly-in scenes for maximized windows|✅|
+|full screenshots for windows that were minimized on startup|⬜|
+|drag windows from other scenes into the current one|✅|
 |place screenshots in relative size of the desktop|⬜|
 |place app icons over 3D window adorners|⬜|
 |rounded corners for the window thumbnails|⬜|
@@ -45,6 +47,7 @@ This is an experimental fun project. I don't have any idea whether or not this i
 |**Product stage**||
 |virtual desktop support (pin window)|⬜|
 |multi-monitor support|⬜|
+|visual feedback when dragging windows from other scenes|⬜|
 |feature parity with macOS Stage Manager|⬜|
 |**Polishing stage**||
 |window animations|⬜|

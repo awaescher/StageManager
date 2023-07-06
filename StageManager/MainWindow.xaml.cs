@@ -1,5 +1,4 @@
 ﻿using AsyncAwaitBestPractices;
-using MahApps.Metro.Controls;
 using Microsoft.Xaml.Behaviors.Core;
 using SharpHook;
 using StageManager.Model;
@@ -64,7 +63,7 @@ namespace StageManager
 			_hook.MouseReleased += OnMouseReleased;
 			_hook.MouseMoved += _hook_MouseMoved;
 
-			Task.Run(() => _hook.Run());
+			Task.Run(_hook.Run);
 		}
 
 		protected override void OnClosed(EventArgs e)
