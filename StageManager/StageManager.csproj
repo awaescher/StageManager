@@ -1,23 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-	<UseWPF>true</UseWPF>
-	<UseWindowsForms>true</UseWindowsForms>
-    <ApplicationIcon>StageManager.ico</ApplicationIcon>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net7.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ApplicationIcon>StageManager.ico</ApplicationIcon>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="StageManager.ico" />
-  </ItemGroup>
+	<ItemGroup>
+		<Resource Include="StageManager.ico" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AsyncAwaitBestPractices" Version="6.0.5" />
-    <PackageReference Include="MahApps.Metro" Version="2.4.9" />
-    <PackageReference Include="SharpHook" Version="3.1.1" />
-    <PackageReference Include="WpfScreenHelper" Version="2.1.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AsyncAwaitBestPractices" Version="6.0.6" />
+		<PackageReference Include="ControlzEx" Version="4.4.0" />
+		<PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
+		<PackageReference Include="SharpHook" Version="4.2.1" />
+		<PackageReference Include="WpfScreenHelper" Version="2.1.0" />
+	</ItemGroup>
 
 </Project>

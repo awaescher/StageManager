@@ -1,5 +1,4 @@
 ﻿using AsyncAwaitBestPractices;
-using MahApps.Metro.Controls;
 using Microsoft.Xaml.Behaviors.Core;
 using SharpHook;
 using StageManager.Model;
@@ -9,6 +8,7 @@ using StageManager.Native.Window;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,14 +19,14 @@ using System.Windows.Media.Animation;
 
 namespace StageManager
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+	/// <summary>
+	/// Interaction logic for MainWindow.xaml
+	/// </summary>
+	public partial class MainWindow : Window
 	{
 		private const int TIMERINTERVAL_MILLISECONDS = 500;
 		private const int MAX_SCENES = 6;
-
+		private const string APP_NAME = "StageManager";
 		private IntPtr _thisHandle;
 		private TaskPoolGlobalHook _hook;
 		private WindowMode _mode;
@@ -36,13 +36,17 @@ namespace StageManager
 		private SceneModel _removedCurrentScene;
 		private SceneModel _mouseDownScene;
 
+		public bool EnableWindowDropToScene = false;
+		public bool EnableWindowPullToScene = true;
+
 		public MainWindow()
 		{
 			InitializeComponent();
 
-			this.DataContext = this;
+			DataContext = this;
 
 			_overlapCheckTimer = new Timer(OverlapCheck, null, 2500, TIMERINTERVAL_MILLISECONDS);
+
 			SwitchSceneCommand = new ActionCommand(async model => await SceneManager!.SwitchTo(((SceneModel)model).Scene));
 		}
 
@@ -59,7 +63,7 @@ namespace StageManager
 			_hook.MouseReleased += OnMouseReleased;
 			_hook.MouseMoved += _hook_MouseMoved;
 
-			Task.Run(() => _hook.Run());
+			Task.Run(_hook.Run);
 		}
 
 		protected override void OnClosed(EventArgs e)
@@ -68,6 +72,8 @@ namespace StageManager
 			_hook.MouseReleased -= OnMouseReleased;
 			_hook.MouseMoved -= _hook_MouseMoved;
 			_hook.Dispose();
+
+			trayIcon.Dispose();
 
 			SceneManager.Stop();
 
@@ -79,6 +85,7 @@ namespace StageManager
 		protected override async void OnContentRendered(EventArgs e)
 		{
 			base.OnContentRendered(e);
+
 			_thisHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
 
 			var windowsManager = new WindowsManager();
@@ -247,9 +254,9 @@ namespace StageManager
 
 			var element = VisualTreeHelper.HitTest(this, pointOnWindow)?.VisualHit;
 
-			while (element is object)
+			while (element is not null)
 			{
-				if ((element as FrameworkElement)?.DataContext is SceneModel m)
+				if (element is FrameworkElement { DataContext: SceneModel m })
 				{
 					model = m;
 					break;
@@ -348,9 +355,29 @@ namespace StageManager
 			}
 		}
 
-		public bool EnableWindowDropToScene = false;
+		private void NavigateToProjectPage()
+		{
+			Process.Start(new ProcessStartInfo("https://github.com/awaescher/StageManager")
+			{
+				UseShellExecute = true
+			});
+		}
 
-		public bool EnableWindowPullToScene = true;
+		public static bool StartsWithWindows
+		{ 
+			get => AutoStart.IsStartup(APP_NAME);
+			set => AutoStart.SetStartup(APP_NAME, value);
+		}
+
+		private void MenuItem_ProjectPage_Click(object sender, RoutedEventArgs e)
+		{
+			NavigateToProjectPage();
+		}
+
+		private void MenuItem_Quit_Click(object sender, RoutedEventArgs e)
+		{
+			Close();
+		}
 	}
 
 	public enum WindowMode

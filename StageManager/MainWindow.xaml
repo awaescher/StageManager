@@ -5,8 +5,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:StageManager"
-    xmlns:pl="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:tb="http://www.hardcodet.net/taskbar"
     mc:Ignorable="d"
     AllowsTransparency="True"
     ShowInTaskbar="False"
@@ -23,7 +23,8 @@
             x:Key="GridOpacity"
             TargetType="{x:Type Grid}">
             <Setter
-                Property="Opacity" Value="0.8" />
+                Property="Opacity"
+                Value="0.8" />
             <Style.Triggers>
                 <Trigger
                     Property="IsMouseOver"
@@ -42,69 +43,94 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
-    <ItemsControl
-        Name="scenesControl"
-        VerticalAlignment="Center"
-        ItemsSource="{Binding Scenes}">
-        <ItemsControl.ItemTemplate>
-            <DataTemplate>
-                <Grid
-					Visibility="{Binding Visibility}"
-                    Style="{StaticResource GridOpacity}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger
-                            EventName="MouseLeftButtonUp">
-                            <i:InvokeCommandAction
-                                Command="{Binding SwitchSceneCommand, Mode=OneTime, Source={x:Reference thisWindow}}"
-                                CommandParameter="{Binding .}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <ItemsControl
-                        ItemsSource="{Binding Windows}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <local:Panel3D
-                                    Margin="4"
-                                    ElementHeight="200"
-                                    ElementWidth="200"
-                                    Opacity="0"></local:Panel3D>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Image
-                                    Source="{Binding Image}" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <ItemsControl
-                        VerticalAlignment="Bottom"
-                        HorizontalAlignment="Left"
-                        Margin="30,0,0,00"
-                        ItemsSource="{Binding Windows}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel
-                                    Orientation="Horizontal" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border>
-                                    <Border.Effect>
-                                        <DropShadowEffect
-                                            BlurRadius="20" />
-                                    </Border.Effect>
+    <StackPanel
+        VerticalAlignment="Center">
+        <ItemsControl
+            Name="scenesControl"
+            VerticalAlignment="Center"
+            ItemsSource="{Binding Scenes}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid
+                        Visibility="{Binding Visibility}"
+                        Style="{StaticResource GridOpacity}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="MouseLeftButtonUp">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SwitchSceneCommand, Mode=OneTime, Source={x:Reference thisWindow}}"
+                                    CommandParameter="{Binding .}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <ItemsControl
+                            ItemsSource="{Binding Windows}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <local:Panel3D
+                                        Margin="4"
+                                        ElementHeight="200"
+                                        ElementWidth="200"
+                                        Opacity="0"></local:Panel3D>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
                                     <Image
-                                        Margin="2, 0, 0, 0"
-                                        Height="36"
-                                        Source="{Binding Icon}" />
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Grid>
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
+                                        Source="{Binding Image}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <ItemsControl
+                            VerticalAlignment="Bottom"
+                            HorizontalAlignment="Left"
+                            Margin="30,0,0,00"
+                            ItemsSource="{Binding Windows}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel
+                                        Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border>
+                                        <Border.Effect>
+                                            <DropShadowEffect
+                                                BlurRadius="20" />
+                                        </Border.Effect>
+                                        <Image
+                                            Margin="2, 0, 0, 0"
+                                            Height="36"
+                                            Source="{Binding Icon}" />
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <tb:TaskbarIcon
+            x:Name="trayIcon"
+            Visibility="Visible"
+            ToolTipText="Stage Manager"
+            IconSource="StageManager.ico"
+            MenuActivation="LeftOrRightClick">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem
+                        Header="Start with Windows"
+                        IsCheckable="True"
+                        IsChecked="{Binding StartsWithWindows}" />
+                    <MenuItem
+                        Header="Project page"
+                        Click="MenuItem_ProjectPage_Click" />
+                    <Separator />
+                    <MenuItem
+                        Header="Quit"
+                        Click="MenuItem_Quit_Click" />
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
+    </StackPanel>
 </Window>
