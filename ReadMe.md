@@ -10,6 +10,7 @@ Windows can be moved from one scene to another by dragging them onto scenes on t
 
 ## Usage
 
+Download and run the executable from the [Releases tab](https://github.com/awaescher/StageManager/releases/) or 
  - clone this repository
  - cd into the repository directory
  - run `dotnet run --project StageManager`
