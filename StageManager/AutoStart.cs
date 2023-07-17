@@ -24,6 +24,6 @@ namespace StageManager
 
 		private static string GetValueAsString(RegistryKey key, string appName) => key.GetValue(appName)?.ToString() ?? "";
 
-		private static string GetAppPath() => $"\"{Assembly.GetEntryAssembly().Location}\"";
+		private static string GetAppPath() => $@"""{Environment.ProcessPath}""";
 	}
 }
