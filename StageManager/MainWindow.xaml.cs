@@ -57,21 +57,12 @@ namespace StageManager
 			_thisHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
 			_lastWidth = Width;
 
-			_hook = new TaskPoolGlobalHook();
-
-			_hook.MousePressed += OnMousePressed;
-			_hook.MouseReleased += OnMouseReleased;
-			_hook.MouseMoved += _hook_MouseMoved;
-
-			Task.Run(_hook.Run);
+			StartHook();
 		}
 
 		protected override void OnClosed(EventArgs e)
 		{
-			_hook.MousePressed -= OnMousePressed;
-			_hook.MouseReleased -= OnMouseReleased;
-			_hook.MouseMoved -= _hook_MouseMoved;
-			_hook.Dispose();
+			StopHook();
 
 			trayIcon.Dispose();
 
@@ -318,6 +309,32 @@ namespace StageManager
 			BeginAnimation(LeftProperty, animation);
 		}
 
+		private void StartHook()
+		{
+			_hook = new TaskPoolGlobalHook();
+
+			_hook.MousePressed += OnMousePressed;
+			_hook.MouseReleased += OnMouseReleased;
+			_hook.MouseMoved += _hook_MouseMoved;
+
+			Task.Run(_hook.Run);
+		}
+
+		private void StopHook()
+		{
+			_hook.MousePressed -= OnMousePressed;
+			_hook.MouseReleased -= OnMouseReleased;
+			_hook.MouseMoved -= _hook_MouseMoved;
+
+			try
+			{
+				_hook.Dispose();
+			}
+			catch (HookException)
+			{
+			}
+		}
+
 		private void _hook_MouseMoved(object? sender, MouseHookEventArgs e)
 		{
 			_mouse.X = e.Data.X;
@@ -377,6 +394,16 @@ namespace StageManager
 		private void MenuItem_Quit_Click(object sender, RoutedEventArgs e)
 		{
 			Close();
+		}
+
+		private void ContextMenu_Closed(object sender, RoutedEventArgs e)
+		{
+			StartHook();
+		}
+
+		private void ContextMenu_Opened(object sender, RoutedEventArgs e)
+		{
+			StopHook();
 		}
 	}
 

@@ -117,7 +117,9 @@
             IconSource="StageManager.ico"
             MenuActivation="LeftOrRightClick">
             <tb:TaskbarIcon.ContextMenu>
-                <ContextMenu>
+                <ContextMenu
+                    Opened="ContextMenu_Opened"
+                    Closed="ContextMenu_Closed">
                     <MenuItem
                         Header="Start with Windows"
                         IsCheckable="True"
