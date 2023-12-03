@@ -50,6 +50,14 @@ namespace StageManager
 
 		internal void Stop()
 		{
+			WindowsManager.Stop();
+
+			foreach (var scene in _scenes)
+			{
+				foreach (var w in scene.Windows)
+					WindowStrategy.Show(w);
+			}
+
 			_desktop.ShowIcons();
 		}
 
