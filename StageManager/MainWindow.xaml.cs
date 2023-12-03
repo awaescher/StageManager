@@ -4,6 +4,7 @@ using SharpHook;
 using StageManager.Model;
 using StageManager.Native;
 using StageManager.Native.PInvoke;
+using StageManager.Native.Interop;
 using StageManager.Native.Window;
 using System;
 using System.Collections.Generic;
@@ -57,7 +58,7 @@ namespace StageManager
 			_thisHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
 			_lastWidth = Width;
 
-			StartHook();
+			StartHook();	
 		}
 
 		protected override void OnClosed(EventArgs e)
