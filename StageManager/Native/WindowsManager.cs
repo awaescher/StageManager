@@ -17,6 +17,7 @@ namespace StageManager.Native
 
     public class WindowsManager : IWindowsManager
     {
+        private bool _active;
         private IDictionary<IntPtr, WindowsWindow> _windows;
         private WinEventDelegate _hookDelegate;
 
@@ -73,7 +74,9 @@ namespace StageManager.Native
 
         public Task Start()
         {
-            var currentProcess = Process.GetCurrentProcess();
+			_active = true;
+
+			var currentProcess = Process.GetCurrentProcess();
             _currentProcessId = currentProcess.Id;
             _currentProcessWindowHandle = currentProcess.MainWindowHandle;
 
@@ -100,21 +103,30 @@ namespace StageManager.Native
                 Win32.SetWindowsHookEx(Win32.WH_MOUSE_LL, _mouseHook, currentProcess.MainModule.BaseAddress, 0);
                 Application.Run();
             });
+
             thread.Name = "WindowsManager";
             thread.Start();
 
             return Task.CompletedTask;
         }
 
-        public IWindowsDeferPosHandle DeferWindowsPos(int count)
+		public void Stop()
+		{
+			_active = false;
+		}
+
+		public IWindowsDeferPosHandle DeferWindowsPos(int count)
         {
-            var info = Win32.BeginDeferWindowPos(count);
+			var info = Win32.BeginDeferWindowPos(count);
             return new WindowsDeferPosHandle(info);
         }
         
         public void ToggleFocusedWindowTiling()
         {
-            var window = _windows.Values.FirstOrDefault(w => w.IsFocused);
+			if (!_active)
+				return;
+
+			var window = _windows.Values.FirstOrDefault(w => w.IsFocused);
 
             if (window != null)
             {
@@ -135,7 +147,7 @@ namespace StageManager.Native
 
         private IntPtr MouseHook(int nCode, UIntPtr wParam, IntPtr lParam)
         {
-            if (nCode == 0 && (uint)wParam == Win32.WM_LBUTTONUP)
+			if (nCode == 0 && (uint)wParam == Win32.WM_LBUTTONUP)
                 HandleWindowMoveEnd();
             
             return Win32.CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
@@ -143,6 +155,9 @@ namespace StageManager.Native
 
         private void WindowHook(IntPtr hWinEventHook, Win32.EVENT_CONSTANTS eventType, IntPtr hwnd, Win32.OBJID idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
+            if (!_active)
+                return;
+
             if (EventWindowIsValid(idChild, idObject, hwnd))
             {
                 switch (eventType)
@@ -188,7 +203,10 @@ namespace StageManager.Native
 
         private void RegisterWindow(IntPtr handle, bool emitEvent = true)
         {
-            if (handle == _currentProcessWindowHandle)
+			if (!_active)
+				return;
+
+			if (handle == _currentProcessWindowHandle)
                 return;
 
             if (!_windows.ContainsKey(handle))
@@ -216,7 +234,10 @@ namespace StageManager.Native
 
         private void UnregisterWindow(IntPtr handle)
         {
-            if (_windows.ContainsKey(handle))
+			if (!_active)
+				return;
+
+			if (_windows.ContainsKey(handle))
             {
                 var window = _windows[handle];
                 _windows.Remove(handle);
@@ -226,7 +247,10 @@ namespace StageManager.Native
 
         private void UpdateWindow(IntPtr handle, WindowUpdateType type)
         {
-            if (type == WindowUpdateType.Show  && _windows.ContainsKey(handle))
+			if (!_active)
+				return;
+
+			if (type == WindowUpdateType.Show  && _windows.ContainsKey(handle))
             {
                 var window = _windows[handle];
                 WindowUpdated?.Invoke(window, type);
@@ -259,7 +283,10 @@ namespace StageManager.Native
 
         private void StartWindowMove(IntPtr handle)
         {
-            if (_windows.ContainsKey(handle))
+			if (!_active)
+				return;
+
+			if (_windows.ContainsKey(handle))
             {
                 var window = _windows[handle];
                 window.StoreLastLocation();
@@ -271,7 +298,10 @@ namespace StageManager.Native
 
         private void EndWindowMove(IntPtr handle)
         {
-            if (_windows.ContainsKey(handle))
+			if (!_active)
+				return;
+
+			if (_windows.ContainsKey(handle))
             {
                 var window = _windows[handle];
 
@@ -282,7 +312,10 @@ namespace StageManager.Native
 
         private void WindowMove(IntPtr handle)
         {
-            if (_mouseMoveWindow != null && _windows.ContainsKey(handle))
+			if (!_active)
+				return;
+
+			if (_mouseMoveWindow != null && _windows.ContainsKey(handle))
             {
                 var window = _windows[handle];
                 if (_mouseMoveWindow == window)
@@ -292,25 +325,35 @@ namespace StageManager.Native
 
         private void HandleWindowFocused(IWindow window)
         {
-            WindowFocused?.Invoke(window);
+			if (!_active)
+				return;
+
+			WindowFocused?.Invoke(window);
         }
 
         private void HandleWindowUpdated(IWindow window)
         {
-            ExternalWindowUpdate?.Invoke(window);
+			if (!_active)
+				return;
+
+			ExternalWindowUpdate?.Invoke(window);
         }
 
         private void HandleWindowClosed(IWindow window)
         {
-            ExternalWindowClosed?.Invoke(window);
+			if (!_active)
+				return;
+
+			ExternalWindowClosed?.Invoke(window);
         }
 
         private void HandleWindowMoveStart(WindowsWindow window)
         {
-            if (_mouseMoveWindow != null)
-            {
+			if (!_active)
+				return;
+
+			if (_mouseMoveWindow != null)
                 _mouseMoveWindow.IsMouseMoving = false;
-            }
 
             _mouseMoveWindow = window;
             window.IsMouseMoving = true;
@@ -318,7 +361,10 @@ namespace StageManager.Native
 
         private void HandleWindowMoveEnd()
         {
-            lock (_mouseMoveLock)
+			if (!_active)
+				return;
+
+			lock (_mouseMoveLock)
             {
                 if (_mouseMoveWindow != null)
                 {
@@ -333,12 +379,18 @@ namespace StageManager.Native
 
         private void HandleWindowAdd(IWindow window, bool firstCreate)
         {
-            WindowCreated?.Invoke(window, firstCreate);
+			if (!_active)
+				return;
+
+			WindowCreated?.Invoke(window, firstCreate);
         }
 
         private void HandleWindowRemove(IWindow window)
         {
-            WindowDestroyed?.Invoke(window);
+			if (!_active)
+				return;
+
+			WindowDestroyed?.Invoke(window);
         }
     }
 }
