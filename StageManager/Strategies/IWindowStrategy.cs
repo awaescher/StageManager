@@ -4,6 +4,8 @@ namespace StageManager.Strategies
 {
     internal interface IWindowStrategy
 	{
-		void Invoke(IWindow window);
+		void Show(IWindow window);
+
+		void Hide(IWindow window);
 	}
 }

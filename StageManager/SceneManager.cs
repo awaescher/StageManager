@@ -23,8 +23,7 @@ namespace StageManager
 		public event EventHandler<CurrentSceneSelectionChangedEventArgs> CurrentSceneSelectionChanged;
 		public event EventHandler<IWindow> RequestWindowPreviewUpdate;
 
-		private IWindowStrategy ShowStrategy { get; } = new WindowNormalizeStrategy();
-		private IWindowStrategy HideStrategy { get; } = new WindowMinimizeStrategy();
+		private IWindowStrategy WindowStrategy { get; } = new NormalizeAndMinimizeWindowStrategy(); // new WindowNormalizeStrategy/OpacityWindowStrategy/ShowAndHideWindowStrategy
 
 		public WindowsManager WindowsManager { get; }
 
@@ -112,7 +111,6 @@ namespace StageManager
 		{
 			SwitchToSceneByNewWindow(window).SafeFireAndForget();
 		}
-
 
 		private async Task SwitchToSceneByWindow(IWindow window)
 		{
@@ -205,11 +203,11 @@ namespace StageManager
 				if (scene is object)
 				{
 					foreach (var w in scene.Windows)
-						ShowStrategy.Invoke(w);
+						WindowStrategy.Show(w);
 				}
 
 				foreach (var o in otherWindows)
-					HideStrategy.Invoke(o);
+					WindowStrategy.Hide(o);
 
 				CurrentSceneSelectionChanged?.Invoke(this, new CurrentSceneSelectionChangedEventArgs(prior, _current));
 
@@ -247,12 +245,12 @@ namespace StageManager
 
 				if (targetScene.Equals(_current))
 				{
-					ShowStrategy.Invoke(window);
+					WindowStrategy.Show(window);
 					window.Focus();
 				}
 				else
 				{
-					HideStrategy.Invoke(window);
+					WindowStrategy.Hide(window);
 
 					// reset window position after move so that the window is back at the starting position on the new scene
 					if (window is WindowsWindow w && w.PopLastLocation() is IWindowLocation l)
