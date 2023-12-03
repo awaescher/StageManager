@@ -47,6 +47,7 @@
         VerticalAlignment="Center">
         <ItemsControl
             Name="scenesControl"
+            HorizontalAlignment="Left"
             VerticalAlignment="Center"
             ItemsSource="{Binding Scenes}">
             <ItemsControl.ItemTemplate>
@@ -63,32 +64,43 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         <ItemsControl
-                            ItemsSource="{Binding Windows}">
+                            ItemsSource="{Binding Windows}"
+                            >
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <local:Panel3D
-                                        Margin="4"
-                                        ElementHeight="200"
-                                        ElementWidth="200"
-                                        Opacity="0"></local:Panel3D>
+                                    <StackPanel
+                                        Orientation="Horizontal"
+                                        Margin="50,0,0,0" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Image
-                                        Source="{Binding Image}" />
+                                    <Grid
+                                        Height="150"
+                                        Width="150">
+                                        <local:DwmThumbnail
+                                            PreviewHandle="{Binding Handle}" />
+                                        <Border>
+                                            <Border.Effect>
+                                                <DropShadowEffect
+                                                    BlurRadius="20" />
+                                            </Border.Effect>
+                                            <Rectangle
+                                                Fill="White" />
+                                        </Border>
+                                    </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                         <ItemsControl
-                            VerticalAlignment="Bottom"
+                            VerticalAlignment="Center"
                             HorizontalAlignment="Left"
-                            Margin="30,0,0,00"
+                            Margin="5,0,0,0"
                             ItemsSource="{Binding Windows}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel
-                                        Orientation="Horizontal" />
+                                        Orientation="Vertical" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
