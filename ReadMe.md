@@ -35,11 +35,9 @@ This is an experimental fun project. I don't have any idea whether or not this i
 |scene management with drag&drop|✅|
 |restore windows on quit/restart|✅|
 |auto hide & fly-in scenes for maximized windows|✅|
-|full screenshots for windows that were minimized on startup|⬜|
+|full screenshots for windows that were minimized on startup|✅|
 |drag windows from other scenes into the current one|✅|
 |place screenshots in relative size of the desktop|⬜|
-|place app icons over 3D window adorners|⬜|
-|rounded corners for the window thumbnails|⬜|
 |limit maximum scenes (like 6 for macOS?)|✅|
 |limit window count per scene (like newest 5)|⬜|
 |tray icon to start & stop|✅|
@@ -51,7 +49,7 @@ This is an experimental fun project. I don't have any idea whether or not this i
 |feature parity with macOS Stage Manager|⬜|
 |**Polishing stage**||
 |window animations|⬜|
-|live dwm thumbnails|⬜|
+|live dwm thumbnails|✅|
 |adjust 3D angle according to screen position|⬜|
 |flyover sidebar in desktop view mode if icons are close to the left|⬜|
 
