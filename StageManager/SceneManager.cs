@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace StageManager
 {
-    public class SceneManager
+	public class SceneManager
 	{
 		private readonly Desktop _desktop;
 		private List<Scene> _scenes;
@@ -21,10 +21,8 @@ namespace StageManager
 
 		public event EventHandler<SceneChangedEventArgs> SceneChanged;
 		public event EventHandler<CurrentSceneSelectionChangedEventArgs> CurrentSceneSelectionChanged;
-		public event EventHandler<IWindow> RequestWindowPreviewUpdate;
 
-		private IWindowStrategy ShowStrategy { get; } = new WindowNormalizeStrategy();
-		private IWindowStrategy HideStrategy { get; } = new WindowMinimizeStrategy();
+		private IWindowStrategy WindowStrategy { get; } = new NormalizeAndMinimizeWindowStrategy(); // new WindowNormalizeStrategy/OpacityWindowStrategy/ShowAndHideWindowStrategy
 
 		public WindowsManager WindowsManager { get; }
 
@@ -50,6 +48,14 @@ namespace StageManager
 
 		internal void Stop()
 		{
+			WindowsManager.Stop();
+
+			foreach (var scene in _scenes)
+			{
+				foreach (var w in scene.Windows)
+					WindowStrategy.Show(w);
+			}
+
 			_desktop.ShowIcons();
 		}
 
@@ -105,13 +111,12 @@ namespace StageManager
 			SwitchToSceneByNewWindow(window).SafeFireAndForget();
 		}
 
-
 		private async Task SwitchToSceneByWindow(IWindow window)
 		{
 			var scene = FindSceneForWindow(window);
 			if (scene is null)
 			{
-				scene = new Scene(window.ProcessName, window);
+				scene = new Scene(GetWindowGroupKey(window), window);
 				_scenes.Add(scene);
 				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Created));
 			}
@@ -121,7 +126,7 @@ namespace StageManager
 
 		private async Task SwitchToSceneByNewWindow(IWindow window)
 		{
-			var existentScene = FindSceneForProcess(window.ProcessName);
+			var existentScene = FindSceneForProcess(GetWindowGroupKey(window));
 			var scene = existentScene ?? new Scene(window.ProcessName, window);
 
 			if (existentScene is null)
@@ -184,24 +189,17 @@ namespace StageManager
 				var prior = _current;
 				_current = scene;
 
-				if (prior is object)
-				{
-					// screenshot the windows before hiding them
-					foreach (var w in prior.Windows)
-						RequestWindowPreviewUpdate?.Invoke(this, w);
-				}
-
 				foreach (var s in _scenes)
 					s.IsSelected = s.Equals(scene);
 
 				if (scene is object)
 				{
 					foreach (var w in scene.Windows)
-						ShowStrategy.Invoke(w);
+						WindowStrategy.Show(w);
 				}
 
 				foreach (var o in otherWindows)
-					HideStrategy.Invoke(o);
+					WindowStrategy.Hide(o);
 
 				CurrentSceneSelectionChanged?.Invoke(this, new CurrentSceneSelectionChangedEventArgs(prior, _current));
 
@@ -239,12 +237,12 @@ namespace StageManager
 
 				if (targetScene.Equals(_current))
 				{
-					ShowStrategy.Invoke(window);
+					WindowStrategy.Show(window);
 					window.Focus();
 				}
 				else
 				{
-					HideStrategy.Invoke(window);
+					WindowStrategy.Hide(window);
 
 					// reset window position after move so that the window is back at the starting position on the new scene
 					if (window is WindowsWindow w && w.PopLastLocation() is IWindowLocation l)
@@ -288,7 +286,7 @@ namespace StageManager
 			if (_scenes is null)
 			{
 				_scenes = GetSceneableWindows()
-							.GroupBy(w => w.ProcessName)
+							.GroupBy(GetWindowGroupKey)
 							.Select(group => new Scene(group.Key, group.ToArray()))
 							.ToList();
 			}
@@ -297,5 +295,7 @@ namespace StageManager
 		}
 
 		public IEnumerable<IWindow> GetCurrentWindows() => _current?.Windows ?? GetSceneableWindows();
+
+		private string GetWindowGroupKey(IWindow window) => window.ProcessName;
 	}
 }
