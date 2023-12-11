@@ -86,7 +86,6 @@ namespace StageManager
 
 			SceneManager.SceneChanged += SceneManager_SceneChanged;
 			SceneManager.CurrentSceneSelectionChanged += SceneManager_CurrentSceneSelectionChanged;
-			SceneManager.RequestWindowPreviewUpdate += SceneManager_RequestWindowPreviewUpdate;
 
 			AddInitialScenes();
 
@@ -130,23 +129,12 @@ namespace StageManager
 			SyncVisibilityByUpdatedTimeStamp();
 		}
 
-		private void SceneManager_RequestWindowPreviewUpdate(object? sender, IWindow window)
-		{
-			var toUpdate = AllScenes
-				.Select(s => s?.Windows.FirstOrDefault(w => w.Handle == window.Handle))
-				.Where(w => w is object)
-				.FirstOrDefault();
-
-			toUpdate?.ForceUpdatePreview();
-		}
-
 		protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
 		{
 			base.OnRenderSizeChanged(sizeInfo);
 			var area = this.GetMonitorWorkSize();
 			this.Left = 0;
 			this.Top = 0;
-			//this.Width = area.Width / 15;
 			this.Height = area.Height;
 		}
 
