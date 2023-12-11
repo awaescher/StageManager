@@ -5,13 +5,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace StageManager.Native
 {
-    public class WindowsWindow : IWindow
+	public class WindowsWindow : IWindow
 	{
 		private IntPtr _handle;
 		private bool _didManualHide;
@@ -32,12 +31,8 @@ namespace StageManager.Native
 
 			try
 			{
-				uint processId;
-				Win32.GetWindowThreadProcessId(_handle, out processId);
-
-				_processId = (int)processId;
-
-				var process = Process.GetProcesses().FirstOrDefault(p => p.Id == _processId);
+				var process = GetProcessByWindowHandle(_handle);
+				_processId = process.Id;
 				_processName = process.ProcessName;
 				_processExecutable = process.MainModule.FileName;
 
@@ -56,6 +51,23 @@ namespace StageManager.Native
 				_processName = "";
 				_processFileName = "";
 			}
+		}
+
+		private Process GetProcessByWindowHandle(IntPtr windowHandle)
+		{
+			Win32.GetWindowThreadProcessId(windowHandle, out var processId);
+
+			var result = (int)processId;
+
+			var process = Process.GetProcessById(result);
+
+			// handling for UWP apps
+			if (process.ProcessName.Contains("ApplicationFrameHost"))
+			{
+				// TODO
+			}
+
+			return process;
 		}
 
 		public bool DidManualHide => _didManualHide;
@@ -157,7 +169,7 @@ namespace StageManager.Native
 			get
 			{
 				return _didManualHide ||
-					(!Win32Helper.IsCloaked(_handle) &&
+					(!Win32Helper.IsCloaked(_handle) /* https://devblogs.microsoft.com/oldnewthing/20200302-00/?p=103507 */ &&
 					   Win32Helper.IsAppWindow(_handle) &&
 					   Win32Helper.IsAltTabWindow(_handle));
 			}

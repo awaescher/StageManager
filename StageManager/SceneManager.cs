@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace StageManager
 {
-    public class SceneManager
+	public class SceneManager
 	{
 		private readonly Desktop _desktop;
 		private List<Scene> _scenes;
@@ -21,7 +21,6 @@ namespace StageManager
 
 		public event EventHandler<SceneChangedEventArgs> SceneChanged;
 		public event EventHandler<CurrentSceneSelectionChangedEventArgs> CurrentSceneSelectionChanged;
-		public event EventHandler<IWindow> RequestWindowPreviewUpdate;
 
 		private IWindowStrategy WindowStrategy { get; } = new NormalizeAndMinimizeWindowStrategy(); // new WindowNormalizeStrategy/OpacityWindowStrategy/ShowAndHideWindowStrategy
 
@@ -117,7 +116,7 @@ namespace StageManager
 			var scene = FindSceneForWindow(window);
 			if (scene is null)
 			{
-				scene = new Scene(window.ProcessName, window);
+				scene = new Scene(GetWindowGroupKey(window), window);
 				_scenes.Add(scene);
 				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Created));
 			}
@@ -127,7 +126,7 @@ namespace StageManager
 
 		private async Task SwitchToSceneByNewWindow(IWindow window)
 		{
-			var existentScene = FindSceneForProcess(window.ProcessName);
+			var existentScene = FindSceneForProcess(GetWindowGroupKey(window));
 			var scene = existentScene ?? new Scene(window.ProcessName, window);
 
 			if (existentScene is null)
@@ -287,7 +286,7 @@ namespace StageManager
 			if (_scenes is null)
 			{
 				_scenes = GetSceneableWindows()
-							.GroupBy(w => w.ProcessName)
+							.GroupBy(GetWindowGroupKey)
 							.Select(group => new Scene(group.Key, group.ToArray()))
 							.ToList();
 			}
@@ -296,5 +295,7 @@ namespace StageManager
 		}
 
 		public IEnumerable<IWindow> GetCurrentWindows() => _current?.Windows ?? GetSceneableWindows();
+
+		private string GetWindowGroupKey(IWindow window) => window.ProcessName;
 	}
 }
