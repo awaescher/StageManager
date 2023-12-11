@@ -20,7 +20,6 @@ namespace StageManager.Model
 
 		private IWindow _window;
 		private ImageSource _iconSource;
-		private ImageSource _image;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -35,16 +34,6 @@ namespace StageManager.Model
 		}
 
 		public string Title => _window.Title.Length > 20 ? _window.Title.Substring(0, 17) + " ..." : _window.Title;
-
-		public ImageSource Image
-		{
-			get => _image;
-			set
-			{
-				_image = value;
-				RaisePropertyChanged();
-			}
-		}
 
 		public ImageSource ImageSourceFromBitmap(System.Drawing.Bitmap bmp)
 		{
@@ -102,14 +91,7 @@ namespace StageManager.Model
 				RaisePropertyChanged();
 				RaisePropertyChanged(nameof(Title));
 				RaisePropertyChanged(nameof(Handle));
-
-				ForceUpdatePreview();
 			}
-		}
-
-		internal void ForceUpdatePreview()
-		{
-			Image = ImageSourceFromBitmap(Screenshot.CaptureWindow(Handle));
 		}
 
 		public IntPtr Handle => _window?.Handle ?? IntPtr.Zero;

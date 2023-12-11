@@ -190,13 +190,6 @@ namespace StageManager
 				var prior = _current;
 				_current = scene;
 
-				if (prior is object)
-				{
-					// screenshot the windows before hiding them
-					foreach (var w in prior.Windows)
-						RequestWindowPreviewUpdate?.Invoke(this, w);
-				}
-
 				foreach (var s in _scenes)
 					s.IsSelected = s.Equals(scene);
 
