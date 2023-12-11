@@ -20,8 +20,8 @@
     Name="thisWindow">
     <Window.Resources>
         <Style
-            x:Key="GridOpacity"
-            TargetType="{x:Type Grid}">
+            x:Key="SceneOpacity"
+            TargetType="{x:Type StackPanel}">
             <Setter
                 Property="Opacity"
                 Value="0.8" />
@@ -49,12 +49,13 @@
             Name="scenesControl"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
+            Padding="12, 0, 0, 0"
             ItemsSource="{Binding Scenes}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid
+                    <StackPanel Orientation="Vertical"
                         Visibility="{Binding Visibility}"
-                        Style="{StaticResource GridOpacity}">
+                        Style="{StaticResource SceneOpacity}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger
                                 EventName="MouseLeftButtonUp">
@@ -69,7 +70,7 @@
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <Grid
-                                        Margin="50,0,0,0"></Grid>
+                                        Margin="0,0,0,0"></Grid>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
@@ -78,20 +79,20 @@
                                         PreviewHandle="{Binding Handle}"
                                         MinHeight="100"
                                         MinWidth="150"
-                                        Margin="0, 25, 0, 25" />
+                                        Margin="0, 0, 0, 0" />
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                         <!-- Icons -->
                         <ItemsControl
                             VerticalAlignment="Center"
-                            HorizontalAlignment="Left"
-                            Margin="5,0,0,0"
+                            HorizontalAlignment="Center"
+                            Margin="0,4,0,24"
                             ItemsSource="{Binding Windows}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel
-                                        Orientation="Vertical" />
+                                        Orientation="Horizontal" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
@@ -102,14 +103,14 @@
                                                 BlurRadius="20" />
                                         </Border.Effect>
                                         <Image
-                                            Margin="0, 2, 0, 2"
-                                            Height="36"
+                                            Margin="0, 0, 0, 0"
+                                            Height="30"
                                             Source="{Binding Icon}" />
                                     </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                    </Grid>
+                    </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
