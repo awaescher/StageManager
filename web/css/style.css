@@ -28,7 +28,13 @@ body {
     width: 100%;
     top: 0;
     z-index: 1000;
+    perspective: 1000px; /* 3Dパースペクティブを追加 */
 }
+
+.header h1 {
+    transform: rotateX(20deg); /* 3D効果を追加 */
+    transform-origin: bottom;
+} /* ここで中括弧を閉じるのを忘れていたんだ */
 
 .nav {
     max-width: 1200px;
