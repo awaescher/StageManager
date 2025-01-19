@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage Manager for Windows</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0a0b0f;
+            color: white;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        nav {
+            background-color: rgba(18, 21, 34, 0.9);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            z-index: 1001;
+        }
+
+        .logo-icon {
+            background-color: #4C84FF;
+            padding: 0.5rem;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .mobile-menu-button {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-button {
+                display: block;
+                z-index: 1001;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 100%;
+                background-color: rgba(18, 21, 34, 0.98);
+                flex-direction: column;
+                justify-content: center;
+                transition: right 0.3s ease;
+                padding: 2rem;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links a {
+                font-size: 1.2rem;
+                padding: 1rem;
+            }
+        }
+
+        .nav-links a {
+            color: #ffffff90;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        .language-button {
+            background-color: transparent;
+            border: 1px solid #ffffff30;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .hero {
+            padding: 6rem 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            background: linear-gradient(45deg, #4C84FF20, #FF4C8420);
+            border-radius: 20px;
+            margin: 5rem 1rem 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .hero {
+                grid-template-columns: 1fr 1fr;
+                padding: 8rem 2rem 4rem;
+            }
+        }
+
+        .hero-content {
+            order: 1;
+        }
+
+        @media (min-width: 768px) {
+            .hero-content {
+                order: 0;
+            }
+        }
+
+        .hero-content h1 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .hero-content h1 {
+                font-size: 3.5rem;
+            }
+        }
+
+        .hero-content h1 span {
+            display: block;
+            color: #4C84FF;
+        }
+
+        .hero-content p {
+            color: #ffffff90;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        @media (min-width: 768px) {
+            .hero-content p {
+                font-size: 1.1rem;
+            }
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .github-button {
+            background-color: #1a1f35;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            border: 1px solid #ffffff20;
+        }
+
+        .github-button:hover {
+            background-color: #2a2f45;
+        }
+
+        .cta-button {
+            background-color: #4C84FF;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .hero-image {
+            background: #1a1f35;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .features {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2rem;
+                padding: 2rem;
+            }
+        }
+
+        .feature-card {
+            background: rgba(76, 132, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: left;
+        }
+
+        .feature-card h3 {
+            color: #4C84FF;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        @media (min-width: 768px) {
+            .feature-card h3 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .feature-card p {
+            color: #ffffff90;
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .feature-card p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#" class="logo">
+            <span class="logo-icon">⊞</span>
+            Stage Manager
+        </a>
+        <button class="mobile-menu-button">☰</button>
+        <div class="nav-links">
+            <a href="#features">機能</a>
+            <a href="#download">ダウンロード</a>
+            <a href="#support">サポート</a>
+            <a href="#faq">FAQ</a>
+            <div class="header-buttons">
+                <a href="https://github.com/awaescher/StageManager" class="github-button" target="_blank" rel="noopener noreferrer">
+                    <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                    GitHub
+                </a>
+                <button class="language-button">日本語 ▾</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>ウィンドウ管理を<span>もっとスマートに</span></h1>
+            <p>Stage Manager for Windowsは、あなたのマルチタスク作業を革新的に改善します。複数のウィンドウを直感的に管理し、作業効率を大幅に向上させる新しい方法を提供します。</p>
+            <div class="button-group">
+                <a href="#download" class="cta-button">
+                    <svg height="20" width="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    無料でダウンロード
+                </a>
+                <a href="https://github.com/awaescher/StageManager" class="github-button" target="_blank" rel="noopener noreferrer">
+                    <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="/api/placeholder/800/500" alt="Stage Manager for Windows interface">
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="feature-card">
+            <h3>スマートなワークスペース</h3>
+            <p>アプリケーションをグループ化し、コンテキストごとに整理。必要なときに必要なものだけを表示します。</p>
+        </div>
+        <div class="feature-card">
+            <h3>直感的な操作</h3>
+            <p>ドラッグ＆ドロップで簡単にウィンドウを整理。ホットキーでスピーディーに切り替えができます。</p>
+        </div>
+        <div class="feature-card">
+            <h3>リソース効率</h3>
+            <p>システムリソースの使用を最適化し、パフォーマンスを維持しながら快適な操作性を提供します。</p>
+        </div>
+    </div>
+
+    <script>
+        // モバイルメニューの制御
+        const menuButton = document.querySelector('.mobile-menu-button');
+        const navLinks = document.querySelector('.nav-links');
+
+        menuButton.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // メニューリンクをクリックしたらメニューを閉じる
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
