@@ -8,6 +8,13 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <style>
+    <![CDATA[
+      text {
+        font-family: "Hiragino Kaku Gothic Pro", "Noto Sans JP", "Source Han Sans", sans-serif;
+      }
+    ]]>
+  </style>
   <sodipodi:namedview
      id="namedview62"
      pagecolor="#ffffff"
