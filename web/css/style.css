@@ -1,4 +1,5 @@
 /* モダンなダークテーマスタイル */
+/* cspell:ignore Segoe Roboto rgba */
 :root {
     --primary-color: #7B61FF;
     --accent-color: #8BE9FD;
@@ -410,7 +411,14 @@ nav {
 }
 
 .feature-card p {
-    perspective: 500px; /* 3Dパースペクティブを追加 */
-    transform: rotateX(15deg); /* 3D効果を追加 */
-    transform-origin: bottom;
+    color: #ffffff90;
+    font-size: 0.9rem;
+    /* 共通のクラスを追加 */
+    @extend .perspective-effect;
+}
+
+@media (min-width: 768px) {
+    .feature-card p {
+        font-size: 1rem;
+    }
 }
