@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+    <!-- ウインドウの背景 -->
+    <rect x="0" y="0" width="800" height="600" fill="#ffffff" stroke="#d1d1d1" stroke-width="1"/>
+    
+    <!-- タイトルバー -->
+    <rect x="0" y="0" width="800" height="30" fill="#217346"/>
+    <text x="40" y="20" fill="white" font-family="Arial" font-size="14">Book1 - Excel</text>
+    
+    <!-- ウインドウコントロール -->
+    <rect x="720" y="0" width="80" height="30" fill="#217346"/>
+    <!-- 最小化ボタン -->
+    <line x1="720" y1="15" x2="734" y2="15" stroke="white" stroke-width="1"/>
+    <!-- 最大化ボタン -->
+    <rect x="745" y="8" width="14" height="14" fill="none" stroke="white" stroke-width="1"/>
+    <!-- 閉じるボタン -->
+    <path d="M775,8 L789,22 M775,22 L789,8" stroke="white" stroke-width="1"/>
+    
+    <!-- リボンメニュー -->
+    <rect x="0" y="30" width="800" height="100" fill="#f3f3f3"/>
+    <rect x="10" y="35" width="50" height="20" fill="#217346"/>
+    <text x="15" y="50" fill="white" font-family="Arial" font-size="12">ホーム</text>
+    
+    <!-- 数式バー -->
+    <rect x="0" y="130" width="800" height="25" fill="#ffffff" stroke="#d1d1d1" stroke-width="1"/>
+    <text x="10" y="147" fill="#666" font-family="Arial" font-size="12">fx</text>
+    
+    <!-- セルグリッド -->
+    <g transform="translate(0,155)">
+        <!-- 列ヘッダー -->
+        <rect x="40" y="0" width="760" height="25" fill="#f3f3f3"/>
+        <text x="50" y="17" fill="#333" font-family="Arial" font-size="12">A</text>
+        <text x="120" y="17" fill="#333" font-family="Arial" font-size="12">B</text>
+        <text x="190" y="17" fill="#333" font-family="Arial" font-size="12">C</text>
+        
+        <!-- 行ヘッダー -->
+        <rect x="0" y="0" width="40" height="445" fill="#f3f3f3"/>
+        <text x="15" y="45" fill="#333" font-family="Arial" font-size="12">1</text>
+        <text x="15" y="75" fill="#333" font-family="Arial" font-size="12">2</text>
+        <text x="15" y="105" fill="#333" font-family="Arial" font-size="12">3</text>
+        
+        <!-- グリッドライン -->
+        <path d="M40,25 H800 M40,55 H800 M40,85 H800 M40,115 H800" stroke="#d1d1d1" stroke-width="1"/>
+        <path d="M40,25 V445 M110,25 V445 M180,25 V445" stroke="#d1d1d1" stroke-width="1"/>
+    </g>
+    
+    <!-- ステータスバー -->
+    <rect x="0" y="570" width="800" height="30" fill="#f3f3f3"/>
+    <text x="10" y="590" fill="#666" font-family="Arial" font-size="12">準備完了</text>
+</svg>
