@@ -1,4 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+
+    // デバイスの設定に応じてダークモードを適用
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const currentTheme = localStorage.getItem('theme');
+
+    if (currentTheme === 'dark' || (prefersDarkScheme && currentTheme !== 'light')) {
+        document.body.classList.add('dark-mode');
+    }
+
+    // ダークモード切り替えボタンのイベントリスナー
+    darkModeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+    });
+
     const image = document.getElementById('animatedImage');
 
     // 初期位置とアニメーションの設定

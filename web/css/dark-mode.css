@@ -1,6 +1,10 @@
+body {
+    transition: background-color 1.5s, color 1.5s;
+}
+
 body.dark-mode {
-    background-color: #1a202c;
-    color: #cbd5e0;
+    background-color: #121212;
+    color: #ffffff;
 }
 
 body.dark-mode .bg-white {
