@@ -28,9 +28,6 @@
     <rect x="100" y="100" width="80" height="80" fill="#FFB900" />
   </g>
   
-  <!-- 光の効果 -->
-  <circle cx="960" cy="540" r="400" fill="white" fill-opacity="0.05" />
-  
   <!-- 装飾的な点 -->
   <g fill="white" fill-opacity="0.2">
     <circle cx="200" cy="200" r="3" />
