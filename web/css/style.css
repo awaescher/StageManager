@@ -408,3 +408,9 @@ nav {
         font-size: 1rem;
     }
 }
+
+.feature-card p {
+    perspective: 500px; /* 3Dパースペクティブを追加 */
+    transform: rotateX(15deg); /* 3D効果を追加 */
+    transform-origin: bottom;
+}
