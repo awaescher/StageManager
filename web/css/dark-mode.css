@@ -1,0 +1,48 @@
+body.dark-mode {
+    background-color: #1a202c;
+    color: #cbd5e0;
+}
+
+body.dark-mode .bg-white {
+    background-color: #2d3748;
+}
+
+body.dark-mode .text-gray-900 {
+    color: #e2e8f0;
+}
+
+body.dark-mode .text-gray-700 {
+    color: #a0aec0;
+}
+
+body.dark-mode .bg-gray-50 {
+    background-color: #4a5568;
+}
+
+body.dark-mode .bg-gray-800 {
+    background-color: #2d3748;
+}
+
+body.dark-mode .bg-gray-700 {
+    background-color: #4a5568;
+}
+
+body.dark-mode .text-gray-500 {
+    color: #a0aec0;
+}
+
+body.dark-mode .text-gray-300 {
+    color: #e2e8f0;
+}
+
+body.dark-mode .bg-blue-600 {
+    background-color: #2b6cb0;
+}
+
+body.dark-mode .bg-blue-700 {
+    background-color: #2c5282;
+}
+
+body.dark-mode .bg-blue-800 {
+    background-color: #2a4365;
+}

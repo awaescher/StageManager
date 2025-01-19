@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stage Manager for Windows</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+<link href="dark-mode.css" rel="stylesheet">
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleButton = document.createElement('button');
+        toggleButton.textContent = 'Toggle Dark Mode';
+        toggleButton.classList.add('fixed', 'bottom-4', 'right-4', 'px-4', 'py-2', 'bg-gray-800', 'text-white', 'rounded');
+        document.body.appendChild(toggleButton);
+
+        toggleButton.addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+        });
+    });
+</script>
 </head>
 <body class="min-h-screen bg-gray-50">
     <nav class="bg-white shadow">
