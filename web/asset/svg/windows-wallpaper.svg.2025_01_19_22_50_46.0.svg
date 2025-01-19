@@ -1,0 +1,701 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1920 1080"
+   version="1.1"
+   id="svg62"
+   sodipodi:docname="windows-wallpaper.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview62"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="true"
+     showguides="true">
+    <inkscape:grid
+       id="grid62"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="1"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="true" />
+  </sodipodi:namedview>
+  <!-- 背景のグラデーション -->
+  <defs
+     id="defs4">
+    <linearGradient
+       id="bg-gradient"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="100%">
+      <stop
+         offset="0%"
+         style="stop-color:#0078D4;stop-opacity:1"
+         id="stop1" />
+      <stop
+         offset="100%"
+         style="stop-color:#002050;stop-opacity:1"
+         id="stop2" />
+    </linearGradient>
+    <!-- タスクバーの背景グラデーション -->
+    <linearGradient
+       id="taskbar-gradient"
+       x1="0%"
+       y1="0%"
+       x2="0%"
+       y2="100%">
+      <stop
+         offset="0%"
+         style="stop-color:rgba(255,255,255,0.9)"
+         id="stop3" />
+      <stop
+         offset="100%"
+         style="stop-color:rgba(255,255,255,0.85)"
+         id="stop4" />
+    </linearGradient>
+  </defs>
+  <!-- 背景 -->
+  <rect
+     width="1920"
+     height="1080"
+     fill="url(#bg-gradient)"
+     id="rect4" />
+  <!-- 装飾的な波形 -->
+  <path
+     d="M0,400 C300,350 600,450 900,400 C1200,350 1500,450 1920,400 L1920,1080 L0,1080 Z"
+     fill="#ffffff"
+     fill-opacity="0.05"
+     id="path4" />
+  <!-- Word ウィンドウ -->
+  <g
+     transform="translate(160,40)"
+     id="g36">
+    <!-- ウィンドウ背景 -->
+    <rect
+       width="1600"
+       height="940"
+       fill="white"
+       rx="8"
+       id="rect5" />
+    <!-- タイトルバー -->
+    <g
+       id="g12">
+      <rect
+         width="1600"
+         height="40"
+         fill="#2B579A"
+         rx="8 8 0 0"
+         id="rect6" />
+      <text
+         x="50"
+         y="25"
+         fill="white"
+         font-family="Segoe UI"
+         font-size="14"
+         id="text6">ドキュメント1 - Word</text>
+      <!-- ウィンドウコントロール -->
+      <g
+         transform="translate(1480,0)"
+         id="g11">
+        <rect
+           x="0"
+           y="0"
+           width="40"
+           height="40"
+           fill="transparent"
+           id="rect7" />
+        <rect
+           x="40"
+           y="0"
+           width="40"
+           height="40"
+           fill="transparent"
+           id="rect8" />
+        <rect
+           x="80"
+           y="0"
+           width="40"
+           height="40"
+           fill="transparent"
+           id="rect9" />
+        <text
+           x="20"
+           y="25"
+           fill="white"
+           font-size="16"
+           id="text9">─</text>
+        <text
+           x="60"
+           y="25"
+           fill="white"
+           font-size="16"
+           id="text10">□</text>
+        <text
+           x="100"
+           y="25"
+           fill="white"
+           font-size="16"
+           id="text11">×</text>
+      </g>
+    </g>
+    <!-- リボンメニュー -->
+    <g
+       transform="translate(0,40)"
+       id="g14">
+      <rect
+         width="1600"
+         height="100"
+         fill="#F3F3F3"
+         id="rect12" />
+      <text
+         x="80"
+         y="25"
+         fill="#444"
+         font-family="Segoe UI"
+         font-size="12"
+         id="text13">挿入</text>
+      <text
+         x="140"
+         y="25"
+         fill="#444"
+         font-family="Segoe UI"
+         font-size="12"
+         id="text14">デザイン</text>
+      <text
+         x="20"
+         y="25"
+         fill="#444"
+         font-family="Segoe UI"
+         font-size="12"
+         id="text12">ホーム<tspan
+   style="-inkscape-font-specification:'Hiragino Kaku Gothic Pro';font-family:'Hiragino Kaku Gothic Pro';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal" /></text>
+    </g>
+    <!-- ドキュメント領域の背景（グレー） -->
+    <rect
+       x="0"
+       y="140"
+       width="1600"
+       height="800"
+       fill="#E6E6E6"
+       id="rect14" />
+    <!-- A4ドキュメント領域（中央寄せ） -->
+    <g
+       transform="translate(502.5,160)"
+       id="g35">
+      <!-- ドロップシャドウ効果 -->
+      <rect
+         width="595"
+         height="740"
+         fill="black"
+         opacity="0.1"
+         transform="translate(3,3)"
+         id="rect15" />
+      <!-- A4用紙の背景（595x842ポイント = A4サイズ） -->
+      <rect
+         width="595"
+         height="740"
+         fill="white"
+         stroke="#E0E0E0"
+         id="rect16" />
+      <!-- Microsoft ロゴ -->
+      <g
+         transform="translate(143.61804,48.513999)"
+         id="g20">
+        <rect
+           x="0"
+           y="0"
+           width="40"
+           height="40"
+           fill="#00a4ef"
+           id="rect17" />
+        <rect
+           x="50"
+           y="0"
+           width="40"
+           height="40"
+           fill="#7fba00"
+           id="rect18" />
+        <rect
+           x="0"
+           y="50"
+           width="40"
+           height="40"
+           fill="#f25022"
+           id="rect19" />
+        <rect
+           x="50"
+           y="50"
+           width="40"
+           height="40"
+           fill="#ffb900"
+           id="rect20" />
+        <text
+           x="113.37401"
+           y="61.155296"
+           fill="#666666"
+           font-family="'Segoe UI'"
+           font-size="40px"
+           id="text20">Microsoft</text>
+      </g>
+      <!-- 詳細な本文 -->
+      <g
+         transform="translate(50,220)"
+         id="g34">
+        <text
+           font-family="Segoe UI"
+           font-size="12"
+           fill="#333"
+           id="text34"><tspan
+             x="0"
+             y="0"
+             id="tspan20">マイクロソフトは、1975年にビル・ゲイツとポール・アレンによって</tspan><tspan
+             x="0"
+             y="25"
+             id="tspan21">設立されました。現在では、クラウドコンピューティング、AI技術、</tspan><tspan
+             x="0"
+             y="50"
+             id="tspan22">生産性向上ツールなど、幅広い分野でイノベーションを推進しています。</tspan><tspan
+             x="0"
+             y="90"
+             id="tspan23">私たちの主力製品Microsoft 365は、以下の特徴を備えています：</tspan><tspan
+             x="0"
+             y="130"
+             id="tspan24">・ Word、Excel、PowerPointなどの統合されたオフィスツール</tspan><tspan
+             x="0"
+             y="155"
+             id="tspan25">・ Microsoft Teamsによるシームレスなコミュニケーション</tspan><tspan
+             x="0"
+             y="180"
+             id="tspan26">・ OneDriveによる安全なクラウドストレージ</tspan><tspan
+             x="0"
+             y="205"
+             id="tspan27">・ Microsoft Copilotによる最新のAIサポート</tspan><tspan
+             x="0"
+             y="245"
+             id="tspan28">さらに、Azure クラウドプラットフォームでは、企業のデジタル</tspan><tspan
+             x="0"
+             y="270"
+             id="tspan29">トランスフォーメーションを強力に支援。Windows 11では、</tspan><tspan
+             x="0"
+             y="295"
+             id="tspan30">最新のユーザーエクスペリエンスを提供しています。</tspan><tspan
+             x="0"
+             y="335"
+             id="tspan31">これからも、革新的な技術で、よりよい未来の創造に貢献して</tspan><tspan
+             x="0"
+             y="360"
+             id="tspan32">まいります。</tspan><tspan
+             x="0"
+             y="420"
+             id="tspan33">Microsoft 一同</tspan><tspan
+             x="0"
+             y="480"
+             fill="#666"
+             font-size="10"
+             id="tspan34">※この文章はAIで作成したダミーテキストです。</tspan></text>
+      </g>
+    </g>
+  </g>
+  <!-- タスクバー -->
+  <g
+     transform="translate(0,1020)"
+     id="g62">
+    <!-- タスクバーの背景 -->
+    <rect
+       width="1920"
+       height="60"
+       fill="url(#taskbar-gradient)"
+       id="rect36" />
+    <!-- Windows スタートボタン -->
+    <g
+       transform="translate(10,10)"
+       id="g37">
+      <rect
+         x="0"
+         y="0"
+         width="40"
+         height="40"
+         rx="4"
+         fill="#0078D4"
+         id="rect37" />
+      <path
+         d="M10,20 L20,10 L30,20 L20,30 Z"
+         fill="white"
+         id="path37" />
+    </g>
+    <!-- 検索バー -->
+    <g
+       transform="translate(60,10)"
+       id="g38">
+      <rect
+         x="0"
+         y="0"
+         width="200"
+         height="40"
+         rx="20"
+         fill="rgba(0,0,0,0.1)"
+         id="rect38" />
+      <text
+         x="40"
+         y="25"
+         fill="#666666"
+         font-family="'Segoe UI'"
+         font-size="14px"
+         id="text38"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'.Hiragino Kaku Gothic Interface';-inkscape-font-specification:'.Hiragino Kaku Gothic Interface'"
+           id="tspan63">検索</tspan></text>
+      <path
+         d="M20,20 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M25,25 L28,28"
+         stroke="#666"
+         fill="none"
+         stroke-width="2"
+         id="path38" />
+    </g>
+    <!-- Copilot アイコン -->
+    <g
+       transform="translate(270,10)"
+       id="g39">
+      <rect
+         x="0"
+         y="0"
+         width="40"
+         height="40"
+         rx="4"
+         fill="#0078D4"
+         id="rect39" />
+      <text
+         x="20"
+         y="25"
+         fill="white"
+         font-family="Segoe UI"
+         font-size="20"
+         text-anchor="middle"
+         id="text39">✦</text>
+    </g>
+    <!-- Word アイコン (アクティブ状態) -->
+    <g
+       transform="translate(320,10)"
+       id="g41">
+      <rect
+         x="0"
+         y="0"
+         width="40"
+         height="40"
+         rx="4"
+         fill="#2B579A"
+         id="rect40" />
+      <rect
+         x="0"
+         y="38"
+         width="40"
+         height="2"
+         fill="white"
+         id="rect41" />
+      <text
+         x="20"
+         y="25"
+         fill="white"
+         font-family="Segoe UI"
+         font-size="14"
+         text-anchor="middle"
+         id="text41">W</text>
+    </g>
+    <!-- Excel アイコン -->
+    <g
+       transform="translate(370,10)"
+       id="g42">
+      <rect
+         x="0"
+         y="0"
+         width="40"
+         height="40"
+         rx="4"
+         fill="#217346"
+         id="rect42" />
+      <text
+         x="20"
+         y="25"
+         fill="white"
+         font-family="Segoe UI"
+         font-size="14"
+         text-anchor="middle"
+         id="text42">X</text>
+    </g>
+    <!-- PowerPoint アイコン -->
+    <g
+       transform="translate(420,10)"
+       id="g43">
+      <rect
+         x="0"
+         y="0"
+         width="40"
+         height="40"
+         rx="4"
+         fill="#B7472A"
+         id="rect43" />
+      <text
+         x="20"
+         y="25"
+         fill="white"
+         font-family="Segoe UI"
+         font-size="14"
+         text-anchor="middle"
+         id="text43">P</text>
+    </g>
+    <!-- Teams アイコン -->
+    <g
+       transform="translate(470,10)"
+       id="g49">
+      <rect
+         x="0"
+         y="0"
+         width="40"
+         height="40"
+         rx="4"
+         fill="#464EB8"
+         id="rect44" />
+      <!-- 抽象的な人々のアイコン -->
+      <path
+         d="M20,12 a5,5 0 1,1 0,10 a5,5 0 1,1 0,-10"
+         fill="white"
+         id="path44" />
+      <path
+         d="M12,28 a8,8 0 0,1 16,0"
+         fill="white"
+         id="path45" />
+      <path
+         d="M13,15 a3,3 0 1,1 0,6 a3,3 0 1,1 0,-6"
+         fill="white"
+         id="path46" />
+      <path
+         d="M27,15 a3,3 0 1,1 0,6 a3,3 0 1,1 0,-6"
+         fill="white"
+         id="path47" />
+      <path
+         d="M8,25 a6,6 0 0,1 12,0"
+         fill="white"
+         opacity="0.8"
+         id="path48" />
+      <path
+         d="M20,25 a6,6 0 0,1 12,0"
+         fill="white"
+         opacity="0.8"
+         id="path49" />
+    </g>
+    <!-- Steam アイコン -->
+    <g
+       transform="translate(520,10)"
+       id="g50">
+      <rect
+         x="0"
+         y="0"
+         width="40"
+         height="40"
+         rx="4"
+         fill="#1B2838"
+         id="rect49" />
+      <path
+         d="M20,10 a10,10 0 1,0 0,20 a10,10 0 1,0 0,-20 M15,20 h10"
+         stroke="white"
+         fill="none"
+         stroke-width="2"
+         id="path50" />
+    </g>
+    <!-- Notion アイコン -->
+    <g
+       transform="translate(520,10)"
+       id="g51">
+      <rect
+         x="0"
+         y="0"
+         width="40"
+         height="40"
+         rx="4"
+         fill="#000000"
+         id="rect50" />
+      <text
+         x="20"
+         y="25"
+         fill="white"
+         font-family="Segoe UI"
+         font-size="14"
+         text-anchor="middle"
+         id="text50">N</text>
+    </g>
+    <!-- VS Code アイコン -->
+    <g
+       transform="translate(570,10)"
+       id="g52">
+      <rect
+         x="0"
+         y="0"
+         width="40"
+         height="40"
+         rx="4"
+         fill="#007ACC"
+         id="rect51" />
+      <path
+         d="M12,20 l8,-8 l8,8 l-8,8 z"
+         fill="white"
+         id="path51" />
+    </g>
+    <!-- システムトレイ -->
+    <g
+       transform="translate(1500,10)"
+       id="g61">
+      <!-- 入力言語 -->
+      <g
+         transform="translate(0,0)"
+         id="g53">
+        <rect
+           x="0"
+           y="5"
+           width="30"
+           height="30"
+           rx="4"
+           fill="transparent"
+           id="rect52" />
+        <text
+           x="15"
+           y="25"
+           fill="#666"
+           font-family="Segoe UI"
+           font-size="12"
+           text-anchor="middle"
+           id="text52">あ</text>
+      </g>
+      <!-- ネットワーク状態 -->
+      <g
+         transform="translate(40,0)"
+         id="g54">
+        <rect
+           x="0"
+           y="5"
+           width="30"
+           height="30"
+           rx="4"
+           fill="transparent"
+           id="rect53" />
+        <path
+           d="M5,25 l5,-5 l5,5 l5,-5"
+           stroke="#666"
+           fill="none"
+           stroke-width="2"
+           id="path53" />
+      </g>
+      <!-- 音量 -->
+      <g
+         transform="translate(80,0)"
+         id="g55">
+        <rect
+           x="0"
+           y="5"
+           width="30"
+           height="30"
+           rx="4"
+           fill="transparent"
+           id="rect54" />
+        <path
+           d="M10,20 l5,-5 v10 l-5,-5 M17,15 a5,5 0 0,1 0,10"
+           stroke="#666"
+           fill="none"
+           stroke-width="2"
+           id="path54" />
+      </g>
+      <!-- バッテリー -->
+      <g
+         transform="translate(120,0)"
+         id="g57">
+        <rect
+           x="0"
+           y="5"
+           width="30"
+           height="30"
+           rx="4"
+           fill="transparent"
+           id="rect55" />
+        <rect
+           x="5"
+           y="17"
+           width="20"
+           height="10"
+           stroke="#666"
+           fill="none"
+           stroke-width="2"
+           id="rect56" />
+        <rect
+           x="7"
+           y="19"
+           width="16"
+           height="6"
+           fill="#666"
+           id="rect57" />
+      </g>
+      <!-- 時計と日付 -->
+      <g
+         transform="translate(160,0)"
+         id="g59">
+        <rect
+           x="0"
+           y="5"
+           width="100"
+           height="30"
+           rx="4"
+           fill="transparent"
+           id="rect58" />
+        <text
+           x="50"
+           y="20"
+           fill="#666"
+           font-family="Segoe UI"
+           font-size="11"
+           text-anchor="middle"
+           id="text58">2025/01/19</text>
+        <text
+           x="50"
+           y="32"
+           fill="#666"
+           font-family="Segoe UI"
+           font-size="11"
+           text-anchor="middle"
+           id="text59">21:45</text>
+      </g>
+      <!-- アクションセンターボタン -->
+      <g
+         transform="translate(270,0)"
+         id="g60">
+        <rect
+           x="0"
+           y="5"
+           width="30"
+           height="30"
+           rx="4"
+           fill="transparent"
+           id="rect59" />
+        <path
+           d="M5,15 h20 M5,25 h20"
+           stroke="#666"
+           fill="none"
+           stroke-width="2"
+           id="path59" />
+      </g>
+    </g>
+  </g>
+</svg>
