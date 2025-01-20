@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <!-- 背景のグラデーション -->
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0078D4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#002050;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- タスクバーの背景グラデーション -->
+    <linearGradient id="taskbar-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.9)" />
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0.85)" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="100%" height="100%" fill="url(#bg-gradient)" />
+  
+  <!-- 装飾的な波形 -->
+  <path d="M0,400 C300,350 600,450 900,400 C1200,350 1500,450 1920,400 L1920,1080 L0,1080 Z" 
+        fill="#ffffff" fill-opacity="0.05" />
+  
+  <!-- Windows ロゴ -->
+  <g transform="translate(860,440)">
+    <rect x="0" y="0" width="80" height="80" fill="#00A4EF" />
+    <rect x="100" y="0" width="80" height="80" fill="#7FBA00" />
+    <rect x="0" y="100" width="80" height="80" fill="#F25022" />
+    <rect x="100" y="100" width="80" height="80" fill="#FFB900" />
+  </g>
+  
+  <!-- 装飾的な点 -->
+  <g fill="white" fill-opacity="0.2">
+    <circle cx="200" cy="200" r="3" />
+    <circle cx="1720" cy="300" r="2" />
+    <circle cx="400" cy="800" r="4" />
+    <circle cx="1500" cy="700" r="3" />
+    <circle cx="300" cy="600" r="2" />
+    <circle cx="1600" cy="500" r="4" />
+  </g>
+  
+  <!-- タスクバー -->
+  <g transform="translate(0,1020)">
+    <!-- タスクバーの背景 -->
+    <rect width="1920" height="60" fill="url(#taskbar-gradient)" />
+    
+    <!-- Windows スタートボタン -->
+    <g transform="translate(10,10)">
+      <rect x="0" y="0" width="40" height="40" rx="4" fill="#0078D4" />
+      <path d="M10,20 L20,10 L30,20 L20,30 Z" fill="white" />
+    </g>
+    
+    <!-- 検索バー -->
+    <g transform="translate(60,10)">
+      <rect x="0" y="0" width="200" height="40" rx="20" fill="rgba(0,0,0,0.1)" />
+      <text x="40" y="25" fill="#666" font-family="Segoe UI" font-size="14">検索</text>
+      <path d="M20,20 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M25,25 L28,28" stroke="#666" fill="none" stroke-width="2" />
+    </g>
+    
+    <!-- Copilot アイコン -->
+    <g transform="translate(270,10)">
+      <rect x="0" y="0" width="40" height="40" rx="4" fill="#0078D4" />
+      <text x="20" y="25" fill="white" font-family="Segoe UI" font-size="20" text-anchor="middle">✦</text>
+    </g>
+    
+    <!-- Word アイコン -->
+    <g transform="translate(320,10)">
+      <rect x="0" y="0" width="40" height="40" rx="4" fill="#2B579A" />
+      <text x="20" y="25" fill="white" font-family="Segoe UI" font-size="14" text-anchor="middle">W</text>
+    </g>
+    
+    <!-- Excel アイコン -->
+    <g transform="translate(370,10)">
+      <rect x="0" y="0" width="40" height="40" rx="4" fill="#217346" />
+      <text x="20" y="25" fill="white" font-family="Segoe UI" font-size="14" text-anchor="middle">X</text>
+    </g>
+    
+    <!-- PowerPoint アイコン -->
+    <g transform="translate(420,10)">
+      <rect x="0" y="0" width="40" height="40" rx="4" fill="#B7472A" />
+      <text x="20" y="25" fill="white" font-family="Segoe UI" font-size="14" text-anchor="middle">P</text>
+    </g>
+  </g>
+</svg>

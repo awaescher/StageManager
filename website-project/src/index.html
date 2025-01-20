@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage Manager for Windows</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+    <header>
+        <!-- ヘッダーコンポーネントを読み込みます -->
+        <div id="header-placeholder"></div>
+    </header>
+    <main>
+        <h1>Stage Manager for Windows</h1>
+        <p>このプロジェクトは、macOSのStage ManagerをMicrosoft Windowsに持ち込む実験的なアプローチです。</p>
+        <img src="assets/media/StageManager%20Basics.gif" alt="Stage Manager Basics">
+    </main>
+    <script src="assets/js/scripts.js"></script>
+    <script>
+        // ヘッダーコンポーネントを読み込む
+        fetch('components/header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+            });
+    </script>
+</body>
+</html>

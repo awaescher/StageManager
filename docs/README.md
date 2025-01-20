@@ -26,10 +26,9 @@ To quit, find the app's tray icon (Windows might move it into the overflow menu)
 ## To do
 
 This is an experimental fun project. I don't have any idea whether or not this is going to be a final product one day. 
-
+### Experimental stage
 |Topic|State|
 |-|-|
-|**Experimental stage**||
 |initial windows grouping by process|✅|
 |3D display of opened windows (static)|✅|
 |hide/show windows of given scenes|✅|
@@ -44,12 +43,18 @@ This is an experimental fun project. I don't have any idea whether or not this i
 |limit window count per scene (like newest 5)|⬜|
 |tray icon to start & stop|✅|
 |start with Windows|✅|
-|**Product stage**||
+
+### Product stage
+|Topic|State|
+|-|-|
 |virtual desktop support (pin window)|⬜|
 |multi-monitor support|⬜|
 |visual feedback when dragging windows from other scenes|⬜|
 |feature parity with macOS Stage Manager|⬜|
-|**Polishing stage**||
+
+### Polishing stage
+|Topic|State|
+|-|-|
 |window animations|⬜|
 |live dwm thumbnails|✅|
 |adjust 3D angle according to screen position|⬜|
