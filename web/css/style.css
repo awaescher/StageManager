@@ -7,6 +7,11 @@
     --text-gray: #8F9BB3;
 }
 
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
 * {
     margin: 0;
     padding: 0;
