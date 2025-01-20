@@ -1,12 +1,3 @@
-function toggleAccordion(id) {
-    var element = document.getElementById(id);
-    if (element.classList.contains('hidden')) {
-        element.classList.remove('hidden');
-    } else {
-        element.classList.add('hidden');
-    }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     const darkModeToggle = document.getElementById('darkModeToggle');
 
@@ -16,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (currentTheme === 'dark' || (prefersDarkScheme && currentTheme !== 'light')) {
         document.body.classList.add('dark-mode');
+        darkModeToggle.textContent = '☀️';
     }
 
     // ダークモード切り替えボタンのイベントリスナー
@@ -23,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.toggle('dark-mode');
         const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
         localStorage.setItem('theme', theme);
+        darkModeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
     });
 
     const image = document.getElementById('animatedImage');
