@@ -1,209 +1,298 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stage Manager for Windows</title>
+    <title>Stage Manager for Windows - Focus. Refined.</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-<link href="css/dark-mode.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-<script src="/web/js/script.js"></script>
 </head>
-<body class="min-h-screen bg-gray-50">
-    <nav class="bg-white shadow">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex items-center"></div>
-                    <span class="text-xl font-bold text-gray-900">Stage Manager</span>
+<body class="min-h-screen bg-white">
+    <!-- Navigation -->
+    <nav class="bg-black/80 backdrop-blur-md fixed w-full z-50 border-b border-white/10">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between h-12">
+                <!-- Left side - Logo and main navigation -->
+                <div class="flex items-center space-x-8 px-4">
+                    <!-- Logo -->
+                    <a href="#" class="flex items-center space-x-2">
+                        <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M4 6h16M4 12h16m-7 6h7"/>
+                        </svg>
+                        <span class="text-sm font-medium text-white">Stage Manager</span>
+                    </a>
+                    
+                    <!-- Main navigation -->
+                    <div class="hidden md:flex space-x-6">
+                        <a href="#overview" class="text-sm text-gray-300 hover:text-white transition-colors duration-200">
+                            Overview
+                        </a>
+                        <a href="#experience" class="text-sm text-gray-300 hover:text-white transition-colors duration-200">
+                            Experience
+                        </a>
+                        <a href="#download" class="text-sm text-gray-300 hover:text-white transition-colors duration-200">
+                            Download
+                        </a>
+                        <a href="#support" class="text-sm text-gray-300 hover:text-white transition-colors duration-200">
+                            Support
+                        </a>
+                    </div>
                 </div>
-            
-                <div class="flex items-center">
+
+                <!-- Right side - GitHub button -->
+                <div class="flex items-center pr-4">
                     <a href="https://github.com/awaescher/StageManager" 
-                       class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">
-                        <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                       class="flex items-center space-x-2 bg-white/10 rounded-full px-4 py-1 hover:bg-white/20 transition-colors duration-200">
+                        <svg class="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                             <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.647.35-1.087.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
                         </svg>
-                        GitHub
+                        <span class="text-sm text-white font-medium">GitHub</span>
                     </a>
                 </div>
             </div>
         </div>
     </nav>
-    </div>
 
-    <header class="bg-blue-600">
-        <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+    <!-- Hero Section -->
+    <header class="bg-black pt-32 pb-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
-                <h1 class="text-4xl font-extrabold text-white sm:text-5xl md:text-6xl">
-                    Stage Manager for Windows
+                <h1 class="text-6xl font-semibold text-white mb-8 tracking-tight">
+                    Focus. Refined.
                 </h1>
-                <p class="mt-3 max-w-md mx-auto text-base text-blue-100 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-                    Bringing macOS-style window management to the Windows platform
+                <p class="text-2xl text-gray-400 max-w-2xl mx-auto font-medium leading-relaxed">
+                    Stage Manager brings the future of window management to Windows.
                 </p>
-                <div class="mt-6 sm:mt-8">
-                    <div class="flex justify-center space-x-4">
-                        <a href="https://github.com/awaescher/StageManager"
-                           class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50 transition duration-150">
-                            <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.647.35-1.087.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
-                            </svg>
-                            View on GitHub
+                <div class="mt-12">
+                    <div class="flex justify-center space-x-6">
+                        <a href="#download"
+                           class="inline-flex items-center px-8 py-3 rounded-full text-base font-medium text-black bg-white hover:bg-gray-100 transition duration-150">
+                            Download Beta
                         </a>
                         <a href="https://github.com/awaescher/StageManager#readme"
-                           class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800 transition duration-150">
-                            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
-                            Documentation
+                           class="inline-flex items-center px-8 py-3 rounded-full text-base font-medium text-white border border-white/30 hover:border-white/50 transition duration-150">
+                            Learn more
                         </a>
                     </div>
                 </div>
-                <div class="mt-8 max-w-4xl mx-auto">
-                    <div class="rounded-lg bg-white shadow-xl overflow-hidden">
-                        <img src="/web/asset/svg/windows-wallpaper.svg" alt="Stage Manager Preview" class="w-full h-full object-cover">
+                <div class="mt-16">
+                    <div class="rounded-2xl overflow-hidden bg-gradient-to-b from-gray-900 to-black p-2">
+                        <img src="/api/placeholder/800/400" alt="Stage Manager Preview" class="w-full rounded-xl">
                     </div>
-                    <p class="mt-4 text-sm text-blue-100">
-                        Modern window management for Windows
-                    </p>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- What is Stage Manager for Windows? Section -->
-         <!-- Concept Section -->
-         <section class="bg-gray-100 py-16">
+    <main>
+        <!-- Concept Section -->
+        <section class="py-32 bg-black">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <p class="text-5xl font-medium text-white leading-tight tracking-tight">
+                    Powerful.<br>
+                    Intuitive.<br>
+                    Revolutionary.
+                </p>
+            </div>
+        </section>
+
+        <!-- Features Grid -->
+        <section class="py-32 bg-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center">
-                    <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-                        Simplify Your Workflow
-                    </h2>
-                    <p class="mt-4 text-lg text-gray-600">
-                        Stage Manager for Windows brings a new level of efficiency and organization to your workspace, allowing you to focus on what matters most.
-                    </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-900 mb-4">Focus Mode</h3>
+                        <p class="text-gray-500 text-lg">
+                            Eliminate distractions. Stay in your flow. Experience true focus.
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-900 mb-4">Seamless Design</h3>
+                        <p class="text-gray-500 text-lg">
+                            Natural transitions. Fluid animations. Perfect harmony.
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-900 mb-4">Smart Layout</h3>
+                        <p class="text-gray-500 text-lg">
+                            Intelligent organization. Effortless multitasking. Maximum productivity.
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
-        
-        <div class="mt-16">
-            <div class="bg-white overflow-hidden shadow-lg rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-4">What is Stage Manager for Windows?</h2>
-                    <div class="prose max-w-none">
-                        <p class="text-lg text-gray-500 mb-4">
-                            Stage Manager for Windows is a project aimed at bringing the innovative window management system from macOS to the Windows platform, offering a new way to organize and manage your workspace.
+
+        <!-- Experience Section -->
+        <section class="py-32 bg-gradient-to-b from-gray-100 to-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-semibold text-center mb-24">The Experience</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h3 class="text-3xl font-medium mb-6">
+                            Your windows.<br>
+                            Your way.
+                        </h3>
+                        <p class="text-xl text-gray-500 leading-relaxed">
+                            Stage Manager learns from your workflow, adapting to how you work. Not the other way around.
                         </p>
-                        <p class="text-lg text-gray-500 mb-4">
-                            Inspired by Stage Manager introduced in macOS Ventura, this project seeks to bring the same level of focus and efficiency to Windows users, allowing them to better organize their workspaces and maintain productivity.
-                        </p>
-                        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <h3 class="text-lg font-medium text-gray-900 mb-2">Key Features:</h3>
-                                <ul class="text-gray-500 space-y-2">
-                                    <li>• Intuitive window grouping</li>
-                                    <li>• Smooth window transitions</li>
-                                    <li>• Seamless Windows integration</li>
-                                    <li>• Customizable controls</li>
-                                </ul>
-                            </div>
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <h3 class="text-lg font-medium text-gray-900 mb-2">Development Status:</h3>
-                                <ul class="text-gray-500 space-y-2">
-                                    <li>• Feasibility study phase</li>
-                                    <li>• Open source project</li>
-                                    <li>• Community contributions welcome</li>
-                                    <li>• Active development</li>
-                                </ul>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="rounded-2xl overflow-hidden shadow-xl">
+                        <img src="/api/placeholder/600/400" alt="Stage Manager Interface" class="w-full">
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Features Section -->
-        <div class="mt-16">
-            <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                <!-- Feature 1 -->
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg font-medium text-gray-900">Efficient Window Management</h3>
-                        <p class="mt-2 text-sm text-gray-500">
-                            Manage multiple windows efficiently and maintain focus on your current task with an intuitive interface.
-                        </p>
+        <!-- Download Section -->
+        <section id="download" class="py-32 bg-black text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl font-semibold mb-8">Ready to transform your workflow?</h2>
+                <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+                    Download Stage Manager Beta and experience the future of window management.
+                </p>
+                <a href="#" class="inline-flex items-center px-8 py-3 rounded-full text-base font-medium text-black bg-white hover:bg-gray-100">
+                    Download Beta
+                </a>
+                <p class="mt-6 text-sm text-gray-500">
+                    Requires Windows 10/11 • 64-bit
+                </p>
+            </div>
+        </section>
+
+        <!-- Roadmap Section -->
+        <section class="py-32 bg-gradient-to-b from-gray-900 to-black text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-semibold text-center mb-24">The path forward</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+                    <!-- Phase 1 -->
+                    <div class="relative">
+                        <div class="text-8xl font-bold text-white/10 absolute -top-10 left-0">01</div>
+                        <div class="relative">
+                            <h3 class="text-2xl font-semibold mb-4">Foundation</h3>
+                            <p class="text-gray-400 text-lg leading-relaxed mb-6">
+                                Core window management engine and basic functionality implementation.
+                            </p>
+                            <ul class="space-y-3 text-gray-400">
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                    </svg>
+                                    Window detection system
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                    </svg>
+                                    Basic animations
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                    </svg>
+                                    Performance optimization
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2 -->
+                    <div class="relative">
+                        <div class="text-8xl font-bold text-white/10 absolute -top-10 left-0">02</div>
+                        <div class="relative">
+                            <h3 class="text-2xl font-semibold mb-4">Innovation</h3>
+                            <p class="text-gray-400 text-lg leading-relaxed mb-6">
+                                Advanced features and intelligent workspace management.
+                            </p>
+                            <ul class="space-y-3 text-gray-400">
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                    </svg>
+                                    Smart window grouping
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                    </svg>
+                                    Custom workspace layouts
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                    </svg>
+                                    Gesture controls
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3 -->
+                    <div class="relative">
+                        <div class="text-8xl font-bold text-white/10 absolute -top-10 left-0">03</div>
+                        <div class="relative">
+                            <h3 class="text-2xl font-semibold mb-4">Evolution</h3>
+                            <p class="text-gray-400 text-lg leading-relaxed mb-6">
+                                Enhanced user experience and ecosystem integration.
+                            </p>
+                            <ul class="space-y-3 text-gray-400">
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                    </svg>
+                                    Multi-monitor support
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                    </svg>
+                                    Cloud sync settings
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                    </svg>
+                                    API for developers
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Feature 2 -->
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg font-medium text-gray-900">Native Integration</h3>
-                        <p class="mt-2 text-sm text-gray-500">
-                            Seamlessly integrates with Windows OS, providing a natural and familiar experience.
-                        </p>
+                <!-- Timeline Progress -->
+                <div class="mt-24 max-w-3xl mx-auto">
+                    <div class="bg-white/10 h-1 rounded-full">
+                        <div class="bg-blue-500 h-1 w-1/3 rounded-full"></div>
                     </div>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg font-medium text-gray-900">Open Source</h3>
-                        <p class="mt-2 text-sm text-gray-500">
-                            Fully open source development, welcoming contributions from the community.
-                        </p>
+                    <div class="flex justify-between mt-4 text-sm text-gray-400">
+                        <span>Phase 1 in Progress</span>
+                        <span>Estimated Completion: Q4 2024</span>
                     </div>
                 </div>
             </div>
-        </p>
-        
-        <!-- FAQ Section -->
-        <div class="mt-16 mb-16">
-            <div class="bg-gray-800 overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <h2 class="text-2xl font-bold text-white mb-4 text-center">Frequently Asked Questions</h2>
-                    <div class="space-y-4">
-                        <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-semibold text-white">Question 1: What is Stage Manager?</h3>
-                            <p class="text-gray-300 mt-2">Stage Manager is a tool that revolutionizes window management on Windows.</p>
-                        </div>
-                        <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-semibold text-white">Question 2: How can I get involved?</h3>
-                            <p class="text-gray-300 mt-2">You can get involved by accessing the GitHub repository and contributing to the development.</p>
-                        </div>
-                        <div class="bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-semibold text-white">Question 3: What platforms are supported?</h3>
-                            <p class="text-gray-300 mt-2">Currently, it supports the Windows platform.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Get Involved Section -->
-    <div class="mt-16 mb-16">
-        <div class="bg-gray-800 overflow-hidden shadow rounded-lg">
-            <div class="px-4 py-5 sm:p-6 text-center">
-                <h2 class="text-2xl font-bold text-white mb-4">Get Involved</h2>
-                <p class="text-gray-300 mb-6">
-                    Want to help revolutionize window management on Windows? Join us in developing Stage Manager!
+        </section>
+
+        <!-- Community Section -->
+        <section class="py-32 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl font-semibold mb-8">Join the community</h2>
+                <p class="text-xl text-gray-500 mb-12 max-w-2xl mx-auto">
+                    Help shape the future of Stage Manager.
                 </p>
                 <a href="https://github.com/awaescher/StageManager" 
-                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50">
-                Check it out on GitHub
-            </a>
-        </div>
-    </div>
-</div>
-</main>
+                   class="inline-flex items-center px-8 py-3 rounded-full text-base font-medium text-white bg-gray-900 hover:bg-gray-800">
+                    View on GitHub
+                </a>
+            </div>
+        </section>
+    </main>
 
-<footer class="bg-gray-900">
-    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <p class="text-center text-base text-gray-400">
-            Stage Manager for Windows - A Project by Andreas Waescher
-        </p>
-    </div>
-</footer>
+    <footer class="bg-white border-t border-gray-200">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-base text-gray-500">
+                Stage Manager for Windows by Andreas Wäscher
+            </p>
+        </div>
+    </footer>
 </body>
 </html>
