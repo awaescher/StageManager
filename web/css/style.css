@@ -1,0 +1,92 @@
+/* レスポンシブデザインのための基本設定 */
+body {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: Arial, sans-serif;
+}
+
+/* ナビゲーションバーのスタイル */
+nav {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 1rem;
+	height: 60px;
+	background-color: rgba(0, 0, 0, 0.8);
+	backdrop-filter: blur(10px);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ナビゲーションリンクのスタイル */
+nav a {
+	color: #ccc;
+	text-decoration: none;
+	padding: 0.5rem 1rem;
+	transition: color 0.2s;
+}
+
+nav a:hover {
+	color: #fff;
+}
+
+/* ヒーローセクションのスタイル */
+header {
+	background-color: #000;
+	color: #fff;
+	padding: 4rem 1rem;
+	text-align: center;
+}
+
+header h1 {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+header p {
+	font-size: 1.25rem;
+	margin-bottom: 2rem;
+}
+
+/* セクションのスタイル */
+section {
+	padding: 4rem 1rem;
+}
+
+section.bg-black {
+	background-color: #000;
+	color: #fff;
+}
+
+section.bg-white {
+	background-color: #fff;
+	color: #000;
+}
+
+/* フッターのスタイル */
+footer {
+	background-color: #fff;
+	border-top: 1px solid #ccc;
+	padding: 2rem 1rem;
+	text-align: center;
+	color: #555;
+}
+
+/* レスポンシブデザイン */
+@media (min-width: 768px) {
+	nav .hidden {
+		display: flex;
+	}
+
+	header h1 {
+		font-size: 4rem;
+	}
+
+	header p {
+		font-size: 1.5rem;
+	}
+
+	section {
+		padding: 6rem 2rem;
+	}
+}

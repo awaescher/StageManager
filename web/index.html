@@ -4,50 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stage Manager for Windows - Focus. Refined.</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="./css/dark-mode.css">
 </head>
-<body class="min-h-screen bg-white">
+<body>
     <script src="./js/script.js"></script>
     <!-- Navigation -->
-    <nav class="bg-black/80 backdrop-blur-md fixed w-full z-50 border-b border-white/10">
-    <div class="max-w-7xl mx-auto">
-        <div class="flex justify-between h-12">
-            <!-- Left side - Logo and main navigation -->
-            <div class="flex items-center space-x-8 px-4">
-                <!-- Logo -->
-                <a href="#" class="flex items-center space-x-2">
-                    <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                        d="M4 6h16M4 12h16m-7 6h7"/>
+    <nav>
+        <div class="container">
+            <div class="nav-left">
+                <a href="#" class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
                     </svg>
-                    <span class="text-sm font-medium text-white">Stage Manager</span>
+                    <span>Stage Manager</span>
                 </a>
-                
-                <!-- Main navigation -->
-                <div class="hidden md:flex space-x-6">
-                    <a href="#overview" class="text-sm text-gray-300 hover:text-white transition-colors duration-200">
-                        Overview
-                    </a>
-                    <a href="#experience" class="text-sm text-gray-300 hover:text-white transition-colors duration-200">
-                        Experience
-                    </a>
-                    <a href="#download" class="text-sm text-gray-300 hover:text-white transition-colors duration-200">
-                        Download
-                    </a>
-                    <a href="#support" class="text-sm text-gray-300 hover:text-white transition-colors duration-200">
-                        Support
-                    </a>
+                <div class="nav-links">
+                    <a href="#overview">Overview</a>
+                    <a href="#experience">Experience</a>
+                    <a href="#download">Download</a>
+                    <a href="#support">Support</a>
                 </div>
             </div>
-            
-            <!-- Right side - Dark mode toggle -->
-            <div class="flex items-center px-4">
-                <button id="darkModeToggle" class="text-white text-2xl">🌙</button>
+            <div class="nav-right">
+                <button id="darkModeToggle">🌙</button>
             </div>
-    </div>
-</div>
-</nav>
+        </div>
+    </nav>
 
     <!-- Hero Section -->
     <header class="bg-black pt-32 pb-24">
@@ -67,35 +50,19 @@
                         </a>
                         <a href="https://github.com/awaescher/StageManager#readme"
                            class="inline-flex items-center px-8 py-3 rounded-full text-base font-medium text-white border border-white/30 hover:border-white/50 transition duration-150">
-                            Learn more
-                        </a>
-                    </div>
-                </div>
-                <div class="mt-16">
-                    <div class="rounded-2xl overflow-hidden bg-gradient-to-b from-gray-900 to-black p-2">
-                        <img src="/asset/svg/windows-wallpaper.svg" alt="Stage Manager Preview" class="w-full rounded-xl">
-                    </div>
-                </div>
+    <header>
+        <div class="container">
+            <h1>Focus. Refined.</h1>
+            <p>Stage Manager brings the future of window management to Windows.</p>
+            <div class="hero-buttons">
+                <a href="#download" class="btn-primary">Download Beta</a>
+                <a href="https://github.com/awaescher/StageManager#readme" class="btn-secondary">Learn more</a>
+            </div>
+            <div class="hero-image">
+                <img src="/asset/svg/windows-wallpaper.svg" alt="Stage Manager Preview">
             </div>
         </div>
-    </header>
-
-    <main>
-        <!-- Concept Section -->
-        <section class="py-32 bg-black">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <p class="text-5xl font-medium text-white leading-tight tracking-tight">
-                    Powerful.<br>
-                    Intuitive.<br>
-                    Revolutionary.
-                </p>
-            </div>
-        </section>
-
-        <!-- Features Grid -->
-        <section class="py-32 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+    </header>   <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
                     <div>
                         <h3 class="text-2xl font-semibold text-gray-900 mb-4">Focus Mode</h3>
                         <p class="text-gray-500 text-lg">
