@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stage Manager for Windows - Focus. Refined.</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+<link href="styles.css" rel="stylesheet">
 </head>
 <body class="min-h-screen bg-white">
     <!-- Navigation -->
@@ -27,6 +28,7 @@
                         <a href="#overview" class="text-sm text-gray-300 hover:text-white transition-colors duration-200">
                             Overview
                         </a>
+                        
                         <a href="#experience" class="text-sm text-gray-300 hover:text-white transition-colors duration-200">
                             Experience
                         </a>
@@ -50,7 +52,46 @@
                     </a>
                 </div>
             </div>
+    </nav>
+
+    <!-- FAQ Section -->
+    <section class="py-32 bg-gray-50 text-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-semibold text-center mb-24">Frequently Asked Questions</h2>
+            <div class="space-y-4">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <button class="accordion-button w-full text-left text-2xl font-semibold mb-4 focus:outline-none" onclick="toggleAccordion('faq1')">
+                        What is Stage Manager?
+                    </button>
+                    <div id="faq1" class="hidden">
+                        <p class="text-gray-700">
+                            Stage Manager is a tool that revolutionizes window management on Windows.
+                        </p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <button class="accordion-button w-full text-left text-2xl font-semibold mb-4 focus:outline-none" onclick="toggleAccordion('faq2')">
+                        How can I get involved?
+                    </button>
+                    <div id="faq2" class="hidden">
+                        <p class="text-gray-700">
+                            You can get involved by accessing the GitHub repository and contributing to the development.
+                        </p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <button class="accordion-button w-full text-left text-2xl font-semibold mb-4 focus:outline-none" onclick="toggleAccordion('faq3')">
+                        What platforms are supported?
+                    </button>
+                    <div id="faq3" class="hidden">
+                        <p class="text-gray-700">
+                            Currently, it supports the Windows platform.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
+    </section>div>
     </nav>
 
     <!-- Hero Section -->
@@ -254,8 +295,9 @@
                                     </svg>
                                     API for developers
                                 </li>
-                            </ul>
-                        </div>
+<script src="script.js"></script>
+</body>
+</html>                 </div>
                     </div>
                 </div>
 

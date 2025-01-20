@@ -18,6 +18,7 @@ body {
     background-color: var(--background-dark);
     color: var(--text-light);
     line-height: 1.6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .header {
@@ -59,16 +60,26 @@ body {
     gap: 2rem;
     align-items: center;
 }
-
 .nav-links a {
     color: var(--text-light);
     text-decoration: none;
     font-size: 0.9rem;
+    transition: color 0.3s ease;
 }
-
 .language-button {
     background-color: transparent;
     border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.language-button:hover {
+    background-color: #f5f5f7;
+}   border: 1px solid var(--accent-color);
     color: var(--accent-color);
     padding: 0.5rem 1rem;
     border-radius: 4px;
