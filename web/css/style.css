@@ -35,6 +35,9 @@ body {
     top: 0;
     z-index: 1000;
     perspective: 1000px; /* 3Dパースペクティブを追加 */
+    display: flex;
+    justify-content: flex-start; /* 左揃えに変更 */
+    align-items: center;
 }
 
 .header h1 {
@@ -62,14 +65,19 @@ body {
 
 .nav-links {
     display: flex;
-    gap: 2rem;
+    gap: 1rem;
     align-items: center;
 }
+
 .nav-links a {
     color: var(--text-light);
     text-decoration: none;
-    font-size: 0.9rem;
-    transition: color 0.3s ease;
+    font-size: 1rem;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: var(--accent-color);
 }
 .language-button {
     background-color: transparent;

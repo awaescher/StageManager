@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const darkModeToggle = document.getElementById('darkModeToggle');
+    if (!darkModeToggle) return;
 
     // デバイスの設定に応じてダークモードを適用
     const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -53,3 +54,19 @@ document.querySelectorAll('.nav-links a').forEach(link => {
         navLinks.classList.remove('active');
     });
 });
+
+// エラーハンドリング
+window.addEventListener('error', (event) => {
+    const error = {
+        message: event.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+        stack: event.error.stack
+    };
+    console.error(error);
+    alert('エラーが発生しました。コンソールを確認してください。');
+});
+
+
+
