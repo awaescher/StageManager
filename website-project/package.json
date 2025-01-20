@@ -1,0 +1,21 @@
+{
+  "name": "website-project",
+  "version": "1.0.0",
+  "description": "A project to demonstrate the experimental Stage Manager for Windows.",
+  "main": "src/index.html",
+  "scripts": {
+    "start": "live-server src",
+    "build": "echo 'Build step not defined'"
+  },
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "live-server": "^1.2.1"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "Stage Manager",
+    "Windows",
+    "experimental"
+  ]
+}
