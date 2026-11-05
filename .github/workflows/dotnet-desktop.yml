@@ -77,15 +77,19 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 10.0.x
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the solution
       run: dotnet restore $env:Solution_Name
 
+    # Run the unit tests
+    - name: Test
+      run: dotnet test StageManager.Tests --configuration ${{ matrix.configuration }}
+
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Build and publish
-      run: dotnet publish --configuration ${{ matrix.configuration }} --output ${{ env.OutputDir }} --self-contained -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+      run: dotnet publish StageManager/StageManager.csproj --configuration ${{ matrix.configuration }} --output ${{ env.OutputDir }} --self-contained -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
       env:
         OutputDir: ./Artifacts
         Configuration: ${{ matrix.configuration }}
