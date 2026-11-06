@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using StageManager.Core;
 using StageManager.Native.PInvoke;
 using System;
 using System.Runtime.InteropServices;
@@ -6,7 +7,7 @@ using System.Text;
 
 namespace StageManager
 {
-	internal class Desktop
+	internal class Desktop : IDesktopIcons
 	{
 		[DllImport("user32.dll", SetLastError = true)]
 		static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -42,22 +43,17 @@ namespace StageManager
 			return false;
 		}
 
-		private void ToggleDesktopIcons()
+		public bool IsVisible => GetDesktopIconsVisible();
+
+		public bool Toggle()
 		{
+			var view = GetDesktopSHELLDLL_DefView();
+			if (view == IntPtr.Zero)
+				return false;
+
 			var toggleDesktopCommand = new IntPtr(0x7402);
-			SendMessage(GetDesktopSHELLDLL_DefView(), WM_COMMAND, toggleDesktopCommand, IntPtr.Zero);
-		}
-
-		public void ShowIcons()
-		{
-			if (!GetDesktopIconsVisible())
-				ToggleDesktopIcons();
-		}
-
-		public void HideIcons()
-		{
-			if (GetDesktopIconsVisible())
-				ToggleDesktopIcons();
+			SendMessage(view, WM_COMMAND, toggleDesktopCommand, IntPtr.Zero);
+			return true;
 		}
 
 		static IntPtr GetDesktopSHELLDLL_DefView()
