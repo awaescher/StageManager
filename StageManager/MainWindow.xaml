@@ -19,6 +19,8 @@
     Background="Transparent"
     Name="thisWindow">
     <Window.Resources>
+        <BooleanToVisibilityConverter
+            x:Key="BoolToVisibility" />
         <Style
             x:Key="SceneOpacity"
             TargetType="{x:Type StackPanel}">
@@ -64,8 +66,10 @@
                                     CommandParameter="{Binding .}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                        <!-- Windows -->
+                        <!-- Windows: stacked thumbnails, the last window is in front -->
                         <ItemsControl
+                            Width="{Binding ThumbnailWidth}"
+                            Height="{Binding ThumbnailHeight}"
                             ItemsSource="{Binding Windows}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -77,9 +81,12 @@
                                 <DataTemplate>
                                     <local:DwmThumbnail
                                         PreviewHandle="{Binding Handle}"
-                                        MinHeight="100"
-                                        MinWidth="150"
-                                        Margin="0, 0, 0, 0" />
+                                        Width="{Binding Width}"
+                                        Height="{Binding Height}"
+                                        Margin="{Binding Margin}"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Bottom"
+                                        Visibility="{Binding IsThumbnailVisible, Converter={StaticResource BoolToVisibility}}" />
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -125,9 +132,45 @@
                     Opened="ContextMenu_Opened"
                     Closed="ContextMenu_Closed">
                     <MenuItem
+                        Header="Settings..."
+                        Click="MenuItem_Settings_Click" />
+                    <Separator />
+                    <MenuItem
                         Header="Start with Windows"
                         IsCheckable="True"
                         IsChecked="{Binding StartsWithWindows}" />
+                    <MenuItem
+                        Header="Sidebar position">
+                        <MenuItem
+                            x:Name="menuSideLeft"
+                            Header="Left"
+                            Click="MenuItem_SideLeft_Click" />
+                        <MenuItem
+                            x:Name="menuSideRight"
+                            Header="Right"
+                            Click="MenuItem_SideRight_Click" />
+                    </MenuItem>
+                    <MenuItem
+                        x:Name="menuSceneCount"
+                        Header="Scenes in sidebar" />
+                    <MenuItem
+                        Header="Desktop icons">
+                        <MenuItem
+                            x:Name="menuIconsManage"
+                            Header="Automatic (hide while a scene is active)"
+                            Tag="Manage"
+                            Click="MenuItem_Icons_Click" />
+                        <MenuItem
+                            x:Name="menuIconsHidden"
+                            Header="Always hidden"
+                            Tag="AlwaysHidden"
+                            Click="MenuItem_Icons_Click" />
+                        <MenuItem
+                            x:Name="menuIconsUntouched"
+                            Header="Never change"
+                            Tag="Untouched"
+                            Click="MenuItem_Icons_Click" />
+                    </MenuItem>
                     <MenuItem
                         Header="Project page"
                         Click="MenuItem_ProjectPage_Click" />

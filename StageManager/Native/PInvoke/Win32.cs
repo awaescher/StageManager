@@ -14,6 +14,9 @@ namespace StageManager.Native.PInvoke
             public int message { get; set; }
         }
 
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern int RegisterWindowMessage(string lpString);
+
         [DllImport("user32.dll")]
         public static extern bool GetMessage(ref Message lpMsg, IntPtr handle, uint mMsgFilterInMain, uint mMsgFilterMax);
 

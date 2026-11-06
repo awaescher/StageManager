@@ -1,6 +1,8 @@
 ﻿using AsyncAwaitBestPractices;
 using Microsoft.Xaml.Behaviors.Core;
+using Microsoft.Win32;
 using SharpHook;
+using StageManager.Core;
 using StageManager.Model;
 using StageManager.Native;
 using StageManager.Native.PInvoke;
@@ -14,6 +16,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -26,12 +29,15 @@ namespace StageManager
 	public partial class MainWindow : Window
 	{
 		private const int TIMERINTERVAL_MILLISECONDS = 500;
-		private const int MAX_SCENES = 6;
 		private const string APP_NAME = "StageManager";
 		private IntPtr _thisHandle;
 		private TaskPoolGlobalHook _hook;
 		private WindowMode _mode;
-		private double _lastWidth;
+		// physical pixels, written on the UI thread only but read by the mouse hook and timer threads
+		private volatile SidebarGeometry _geometry = new(new Area(0, 0, 0, 0), 0, SidebarSide.Left);
+		private double _dpiScale = 1;
+		private int _taskbarCreatedMessage;
+		private SidebarLayoutResult _layout = new(150, 100, 280, 6, false);
 		private Timer _overlapCheckTimer;
 		private Point _mouse = new Point(0, 0);
 		private SceneModel _removedCurrentScene;
@@ -51,18 +57,42 @@ namespace StageManager
 			SwitchSceneCommand = new ActionCommand(async model => await SceneManager!.SwitchTo(((SceneModel)model).Scene));
 		}
 
+		protected override void OnSourceInitialized(EventArgs e)
+		{
+			base.OnSourceInitialized(e);
+
+			// the Explorer broadcasts this message after a restart, the desktop icons may be visible again then
+			_taskbarCreatedMessage = Win32.RegisterWindowMessage("TaskbarCreated");
+			((System.Windows.Interop.HwndSource)PresentationSource.FromVisual(this)).AddHook(WndProc);
+		}
+
+		private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+		{
+			if (_taskbarCreatedMessage != 0 && msg == _taskbarCreatedMessage)
+				Dispatcher.BeginInvoke(() => SceneManager?.ResyncDesktopIcons());
+
+			return IntPtr.Zero;
+		}
+
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
 
 			_thisHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
-			_lastWidth = Width;
+
+			ApplySide();
+
+			App.Settings.Changed += Settings_Changed;
+			SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
 
 			StartHook();	
 		}
 
 		protected override void OnClosed(EventArgs e)
 		{
+			App.Settings.Changed -= Settings_Changed;
+			SystemEvents.DisplaySettingsChanged -= SystemEvents_DisplaySettingsChanged;
+
 			StopHook();
 
 			trayIcon.Dispose();
@@ -101,7 +131,8 @@ namespace StageManager
 			for (int i = 0; i < initialScenes.Length; i++)
 			{
 				var model = SceneModel.FromScene(initialScenes[i]);
-				model.IsVisible = i <= MAX_SCENES; // i is zero based, so it should be i+1 but one scene gets selected (and removed from the sidebar) that makes i+0 again
+				ApplyLayout(model);
+				model.IsVisible = i <= MaxScenes; // i is zero based, so it should be i+1 but one scene gets selected (and removed from the sidebar) that makes i+0 again
 				Scenes.Add(model);
 			}
 		}
@@ -132,11 +163,83 @@ namespace StageManager
 		protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
 		{
 			base.OnRenderSizeChanged(sizeInfo);
-			var area = this.GetMonitorWorkSize();
-			this.Left = 0;
-			this.Top = 0;
-			this.Height = area.Height;
+			PositionWindow();
 		}
+
+		protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
+		{
+			base.OnDpiChanged(oldDpi, newDpi);
+			PositionWindow();
+		}
+
+		private void Settings_Changed(object? sender, AppSettings e)
+		{
+			Dispatcher.BeginInvoke(() =>
+			{
+				ApplySide();
+				SyncVisibilityByUpdatedTimeStamp();
+				SceneManager?.ApplyDesktopIconSettings();
+			});
+		}
+
+		private void SystemEvents_DisplaySettingsChanged(object? sender, EventArgs e)
+		{
+			Dispatcher.BeginInvoke(PositionWindow);
+		}
+
+		private void UpdateGeometry()
+		{
+			_dpiScale = VisualTreeHelper.GetDpi(this).DpiScaleX;
+
+			// WPF works in device independent units, everything else (work area, mouse hook, window locations) in physical pixels
+			var workArea = System.Windows.Forms.Screen.PrimaryScreen!.WorkingArea;
+
+			var sidebar = App.Settings.Current.Sidebar;
+			_layout = SidebarLayout.Calculate(sidebar, workArea.Height / _dpiScale);
+
+			if (Width != _layout.SidebarWidth)
+				Width = _layout.SidebarWidth;
+
+			_geometry = new SidebarGeometry(
+				new Area(workArea.Left, workArea.Top, workArea.Right, workArea.Bottom),
+				_layout.SidebarWidth * _dpiScale,
+				sidebar.Side);
+
+			foreach (var scene in AllScenes)
+				ApplyLayout(scene);
+		}
+
+		private void ApplyLayout(SceneModel? scene)
+		{
+			scene?.ApplyLayout(_layout.ThumbnailWidth, _layout.ThumbnailHeight, App.Settings.Current.Sidebar.MaxWindowsPerScene);
+		}
+
+		private void PositionWindow()
+		{
+			UpdateGeometry();
+
+			// drop a held animation, otherwise it would override the position set below
+			BeginAnimation(LeftProperty, null);
+
+			Left = _geometry.GetLeft(Mode != WindowMode.OffScreen) / _dpiScale;
+			Top = _geometry.Area.Top / _dpiScale;
+			Height = _geometry.Area.Height / _dpiScale;
+		}
+
+		private void ApplySide()
+		{
+			var right = App.Settings.Current.Sidebar.Side == SidebarSide.Right;
+
+			scenesControl.HorizontalAlignment = right ? HorizontalAlignment.Right : HorizontalAlignment.Left;
+			scenesControl.Padding = right ? new Thickness(0, 0, SidebarLayout.EdgePadding, 0) : new Thickness(SidebarLayout.EdgePadding, 0, 0, 0);
+
+			PositionWindow();
+		}
+
+		/// <summary>
+		/// Number of scenes that fit into the sidebar. Can be lower than the configured number on small screens.
+		/// </summary>
+		private int MaxScenes => _layout.EffectiveMaxScenes;
 
 		private void SceneManager_SceneChanged(object sender, SceneChangedEventArgs e)
 		{
@@ -145,7 +248,9 @@ namespace StageManager
 				switch (e.Change)
 				{
 					case ChangeType.Created:
-						Scenes.Add(SceneModel.FromScene(e.Scene));
+						var created = SceneModel.FromScene(e.Scene);
+						ApplyLayout(created);
+						Scenes.Add(created);
 						SyncVisibilityByUpdatedTimeStamp();
 						break;
 					case ChangeType.Updated:
@@ -210,7 +315,7 @@ namespace StageManager
 
 			if (EnableWindowPullToScene)
 			{
-				if (e.Data.X > _lastWidth && _mouseDownScene is object)
+				if (_geometry.IsPulledOutOfSidebar(e.Data.X) && _mouseDownScene is object)
 				{
 					this.Dispatcher.Invoke(() =>
 					{
@@ -251,12 +356,12 @@ namespace StageManager
 		{
 			var scenes = Scenes.OrderByDescending(s => s.Updated).ToArray();
 			for (int i = 0; i < scenes.Length; i++)
-				scenes[i].IsVisible = i < MAX_SCENES;
+				scenes[i].IsVisible = i < MaxScenes;
 		}
 
 		public ObservableCollection<SceneModel> Scenes { get; } = new ObservableCollection<SceneModel>();
 
-		public IEnumerable<SceneModel> AllScenes => Scenes.Union(new[] { _removedCurrentScene });
+		public IEnumerable<SceneModel> AllScenes => _removedCurrentScene is null ? Scenes : Scenes.Append(_removedCurrentScene);
 
 		public ICommand SwitchSceneCommand { get; }
 
@@ -282,7 +387,7 @@ namespace StageManager
 
 		private void ApplyWindowMode()
 		{
-			var newLeft = Mode == StageManager.WindowMode.OffScreen ? (-1 * Width) : 0.0;
+			var newLeft = _geometry.GetLeft(Mode != WindowMode.OffScreen) / _dpiScale;
 			if (Left == newLeft)
 				return;
 
@@ -329,7 +434,7 @@ namespace StageManager
 			_mouse.X = e.Data.X;
 			_mouse.Y = e.Data.Y;
 
-			if (Mode == WindowMode.OffScreen && e.Data.X <= 44)
+			if (Mode == WindowMode.OffScreen && _geometry.IsInTriggerZone(e.Data.X))
 			{
 				Dispatcher.Invoke(() => Mode = WindowMode.Flyover);
 			}
@@ -343,11 +448,13 @@ namespace StageManager
 
 		private void UpdateModeByWindows(IEnumerable<IWindow> windows)
 		{
-			bool doesOverlap(IWindowLocation loc) => loc.State == Native.Window.WindowState.Maximized || (loc.State == Native.Window.WindowState.Normal && (loc.X * 2) < _lastWidth);
+			var geometry = _geometry;
+
+			bool doesOverlap(IWindowLocation loc) => loc.State == Native.Window.WindowState.Maximized || (loc.State == Native.Window.WindowState.Normal && geometry.DoesNormalWindowOverlap(loc.X, loc.Width));
 
 			var anyOverlappingWindows = windows.Any(w => doesOverlap(w.Location));
 
-			var containsMouse = _mouse.X <= _lastWidth;
+			var containsMouse = geometry.IsOverSidebar(_mouse.X);
 			var setMode = Mode == WindowMode.OnScreen && !containsMouse
 							|| Mode == WindowMode.OffScreen
 							|| (Mode == WindowMode.Flyover && !containsMouse);
@@ -375,6 +482,11 @@ namespace StageManager
 			set => AutoStart.SetStartup(APP_NAME, value);
 		}
 
+		private void MenuItem_Settings_Click(object sender, RoutedEventArgs e)
+		{
+			SettingsWindow.ShowSingle();
+		}
+
 		private void MenuItem_ProjectPage_Click(object sender, RoutedEventArgs e)
 		{
 			NavigateToProjectPage();
@@ -392,7 +504,48 @@ namespace StageManager
 
 		private void ContextMenu_Opened(object sender, RoutedEventArgs e)
 		{
+			var sidebar = App.Settings.Current.Sidebar;
+			var icons = App.Settings.Current.DesktopIcons;
+			menuSideLeft.IsChecked = sidebar.Side == SidebarSide.Left;
+			menuSideRight.IsChecked = sidebar.Side == SidebarSide.Right;
+
+			menuSceneCount.Items.Clear();
+			foreach (var count in SceneCountChoices.Append(sidebar.MaxScenes).Distinct().OrderBy(c => c))
+			{
+				var item = new MenuItem { Header = count.ToString(), Tag = count, IsCheckable = false, IsChecked = count == sidebar.MaxScenes };
+				item.Click += MenuItem_SceneCount_Click;
+				menuSceneCount.Items.Add(item);
+			}
+
+			menuIconsManage.IsChecked = icons.Mode == DesktopIconsMode.Manage;
+			menuIconsHidden.IsChecked = icons.Mode == DesktopIconsMode.AlwaysHidden;
+			menuIconsUntouched.IsChecked = icons.Mode == DesktopIconsMode.Untouched;
+
 			StopHook();
+		}
+
+		private static readonly int[] SceneCountChoices = { 2, 3, 4, 5, 6, 8, 10, 12 };
+
+		private void MenuItem_Icons_Click(object sender, RoutedEventArgs e)
+		{
+			if (sender is MenuItem { Tag: string tag } && Enum.TryParse<DesktopIconsMode>(tag, out var mode))
+				App.Settings.Update(s => s.DesktopIcons.Mode = mode);
+		}
+
+		private void MenuItem_SceneCount_Click(object sender, RoutedEventArgs e)
+		{
+			if (sender is MenuItem { Tag: int count })
+				App.Settings.Update(s => s.Sidebar.MaxScenes = count);
+		}
+
+		private void MenuItem_SideLeft_Click(object sender, RoutedEventArgs e)
+		{
+			App.Settings.Update(s => s.Sidebar.Side = SidebarSide.Left);
+		}
+
+		private void MenuItem_SideRight_Click(object sender, RoutedEventArgs e)
+		{
+			App.Settings.Update(s => s.Sidebar.Side = SidebarSide.Right);
 		}
 	}
 
