@@ -1,4 +1,5 @@
-﻿using StageManager.Native.Interop;
+﻿using StageManager.Core;
+using StageManager.Native.Interop;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,6 +21,7 @@ namespace StageManager
 		private IntPtr _dwmThumbnail;
 		private Window _window;
 		private Point? _dpiScaleFactor;
+		private FittedRect _backdrop;
 
 		public static readonly DependencyProperty PreviewHandleProperty = DependencyProperty.Register(nameof(PreviewHandle),
 			   typeof(IntPtr),
@@ -53,7 +55,7 @@ namespace StageManager
 		{
 			base.OnPropertyChanged(e);
 
-			if (nameof(PreviewHandle).Equals(e.Property.Name))
+			if (e.Property == PreviewHandleProperty)
 			{
 				if ((IntPtr)e.OldValue == IntPtr.Zero && (IntPtr)e.NewValue != IntPtr.Zero)
 					StartCapture();
@@ -61,10 +63,18 @@ namespace StageManager
 				UpdateThumbnailProperties();
 			}
 
-			if (nameof(IsVisible).Equals(e.Property.Name) && !(bool)e.NewValue && _dwmThumbnail != IntPtr.Zero)
+			if (e.Property == IsVisibleProperty)
 			{
-				NativeMethods.DwmUnregisterThumbnail(_dwmThumbnail);
-				_dwmThumbnail = IntPtr.Zero;
+				if (!(bool)e.NewValue)
+				{
+					StopCapture();
+				}
+				else if (_dwmThumbnail == IntPtr.Zero && PreviewHandle != IntPtr.Zero)
+				{
+					// scenes and stacked windows are hidden and shown again, the thumbnail has to be registered again
+					StartCapture();
+					UpdateThumbnailProperties();
+				}
 			}
 		}
 
@@ -81,30 +91,89 @@ namespace StageManager
 
 		private void StartCapture()
 		{
-			var windowHandle = new System.Windows.Interop.WindowInteropHelper(FindWindow()).Handle;
+			var window = FindWindow();
+			if (window is null)
+				return;
+
+			var windowHandle = new System.Windows.Interop.WindowInteropHelper(window).Handle;
+			if (windowHandle == IntPtr.Zero)
+				return;
 
 			var hr = NativeMethods.DwmRegisterThumbnail(windowHandle, PreviewHandle, out _dwmThumbnail);
 			if (hr != 0)
+				_dwmThumbnail = IntPtr.Zero;
+		}
+
+		private void StopCapture()
+		{
+			if (_dwmThumbnail == IntPtr.Zero)
 				return;
+
+			NativeMethods.DwmUnregisterThumbnail(_dwmThumbnail);
+			_dwmThumbnail = IntPtr.Zero;
 		}
 
 		private Window FindWindow() => _window ??= Window.GetWindow(this);
+
+		private (double Width, double Height) _lastSourceSize;
+
+		/// <summary>
+		/// Size of the area DWM shows, in the unit of the source window. Only the proportions matter here.
+		/// </summary>
+		private (double Width, double Height) GetSourceSize()
+		{
+			// DWM knows the size of the last rendered frame, also for minimized windows
+			if (_dwmThumbnail != IntPtr.Zero && NativeMethods.DwmQueryThumbnailSourceSize(_dwmThumbnail, out var size) == 0 && size.cx > 0 && size.cy > 0)
+				return _lastSourceSize = (size.cx, size.cy);
+
+			// never ask a minimized window for its size, Chromium reports the 144 x 20 pixels of its minimized caption bar
+			if (!NativeMethods.IsIconic(PreviewHandle))
+			{
+				if (NativeMethods.GetClientRect(PreviewHandle, out var client) && client.right > 0 && client.bottom > 0)
+					return _lastSourceSize = (client.right, client.bottom);
+			}
+			else if (NativeMethods.TryGetRestoredSize(PreviewHandle, out var restored))
+			{
+				return _lastSourceSize = restored;
+			}
+
+			return _lastSourceSize;
+		}
+
+		private void UpdateBackdrop(FittedRect fit)
+		{
+			if (fit == _backdrop)
+				return;
+
+			_backdrop = fit;
+			backdrop.Margin = new Thickness(fit.X, fit.Y, 0, 0);
+			backdrop.Width = fit.Width;
+			backdrop.Height = fit.Height;
+		}
 
 		private void UpdateThumbnailProperties()
 		{
 			if (_dwmThumbnail == IntPtr.Zero)
 				return;
 
-			var dpi = GetDpiScaleFactor();
+			var window = FindWindow();
+			if (window is null || ActualWidth <= 0 || ActualHeight <= 0)
+				return;
 
-			var previewBounds = BoundsRelativeTo(this, FindWindow());
+			var dpi = GetDpiScaleFactor();
+			var origin = this.TransformToVisual(window).Transform(new Point(0, 0));
+
+			// the white backdrop and the thumbnail share the same proportions as the source window, so it is not distorted
+			var source = GetSourceSize();
+			var fit = AspectFit.Calculate(ActualWidth, ActualHeight, source.Width, source.Height);
+			UpdateBackdrop(fit);
 
 			var thumbnailRect = new RECT
 			{
-				top = (int)(previewBounds.Top * dpi.Y),
-				left = (int)(previewBounds.Left * dpi.X),
-				bottom = (int)((previewBounds.Bottom - Margin.Top - Margin.Bottom) * dpi.Y) + 1,
-				right = (int)((previewBounds.Right - Margin.Left - Margin.Right) * dpi.X) + 1
+				left = (int)Math.Round((origin.X + fit.X) * dpi.X),
+				top = (int)Math.Round((origin.Y + fit.Y) * dpi.Y),
+				right = (int)Math.Round((origin.X + fit.X + fit.Width) * dpi.X),
+				bottom = (int)Math.Round((origin.Y + fit.Y + fit.Height) * dpi.Y)
 			};
 
 			var props = new DWM_THUMBNAIL_PROPERTIES
