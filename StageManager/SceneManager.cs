@@ -1,4 +1,5 @@
 ﻿using AsyncAwaitBestPractices;
+using StageManager.Core;
 using StageManager.Native;
 using StageManager.Native.PInvoke;
 using StageManager.Native.Window;
@@ -14,6 +15,7 @@ namespace StageManager
 	public class SceneManager
 	{
 		private readonly Desktop _desktop;
+		private readonly DesktopIconsPolicy _desktopIcons;
 		private List<Scene> _scenes;
 		private Scene _current;
 		private bool _suspend = false;
@@ -30,12 +32,24 @@ namespace StageManager
 		{
 			WindowsManager = windowsManager ?? throw new ArgumentNullException(nameof(windowsManager));
 			_desktop = new Desktop();
-			_desktop.HideIcons();
+			_desktopIcons = new DesktopIconsPolicy(
+				_desktop,
+				new FileDesktopIconsState(System.IO.Path.Combine(AppPaths.DataDirectory, "desktop-icons.state")),
+				() => App.Settings.Current.DesktopIcons);
+			_desktopIcons.Start();
+			_desktopIcons.Apply(sceneActive: true);
 		}
+
+		/// <summary>Applies a changed desktop icon setting right away.</summary>
+		public void ApplyDesktopIconSettings() => _desktopIcons.Reapply();
+
+		/// <summary>The Explorer was restarted and may show the icons again.</summary>
+		public void ResyncDesktopIcons() => _desktopIcons.Resync();
 
 		public async Task Start()
 		{
-			if (Thread.CurrentThread.ManagedThreadId != 1)
+			// the WinEvent hooks only fire on a thread with a message loop, that is the UI thread (its managed id is not guaranteed to be 1)
+			if (System.Windows.Application.Current?.Dispatcher.CheckAccess() != true)
 				throw new NotSupportedException("Start has to be called on the main thread, otherwise events won't be fired.");
 
 			WindowsManager.WindowCreated += WindowsManager_WindowCreated;
@@ -56,7 +70,7 @@ namespace StageManager
 					WindowStrategy.Show(w);
 			}
 
-			_desktop.ShowIcons();
+			_desktopIcons.Stop();
 		}
 
 		private void WindowsManager_WindowUpdated(IWindow window, WindowUpdateType type)
@@ -203,10 +217,7 @@ namespace StageManager
 
 				CurrentSceneSelectionChanged?.Invoke(this, new CurrentSceneSelectionChangedEventArgs(prior, _current));
 
-				if (scene is null)
-					_desktop.ShowIcons();
-				else
-					_desktop.HideIcons();
+				_desktopIcons.Apply(sceneActive: scene is object);
 			}
 			finally
 			{
