@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using StageManager.Core;
 
 namespace StageManager.Model
 {
@@ -11,6 +12,7 @@ namespace StageManager.Model
 		public event PropertyChangedEventHandler PropertyChanged;
 		private bool _isVisible;
 		private Scene _scene;
+		private int _maxVisibleWindows = 3;
 
 		public static SceneModel FromScene(Scene scene)
 		{
@@ -68,6 +70,8 @@ namespace StageManager.Model
 				}
 			}
 
+			Restack();
+
 			Updated = DateTime.UtcNow;
 		}
 
@@ -119,5 +123,35 @@ namespace StageManager.Model
 		public System.Windows.Visibility Visibility => IsVisible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
 
 		public ObservableCollection<WindowModel> Windows { get; set; } = new ObservableCollection<WindowModel>();
+
+		public double ThumbnailWidth { get; private set; } = 150;
+
+		public double ThumbnailHeight { get; private set; } = 100;
+
+		/// <summary>
+		/// Sets the card size and arranges the thumbnails of the windows as a stack. Called again whenever the layout or the windows change.
+		/// </summary>
+		public void ApplyLayout(double thumbnailWidth, double thumbnailHeight, int maxVisibleWindows)
+		{
+			_maxVisibleWindows = maxVisibleWindows;
+
+			if (ThumbnailWidth != thumbnailWidth || ThumbnailHeight != thumbnailHeight)
+			{
+				ThumbnailWidth = thumbnailWidth;
+				ThumbnailHeight = thumbnailHeight;
+				RaisePropertyChanged(nameof(ThumbnailWidth));
+				RaisePropertyChanged(nameof(ThumbnailHeight));
+			}
+
+			Restack();
+		}
+
+		private void Restack()
+		{
+			var slots = ThumbnailStack.Calculate(ThumbnailWidth, ThumbnailHeight, Windows.Count, _maxVisibleWindows);
+
+			for (int i = 0; i < slots.Length; i++)
+				Windows[i].ApplySlot(slots[i]);
+		}
 	}
 }

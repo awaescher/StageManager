@@ -9,7 +9,10 @@
     d:DesignHeight="450"
     d:DesignWidth="800">
     <Grid>
-        <Border>
+        <Border
+            x:Name="backdrop"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top">
             <Border.Effect>
                 <DropShadowEffect
                     BlurRadius="20" />

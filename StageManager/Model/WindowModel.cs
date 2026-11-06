@@ -1,4 +1,5 @@
-﻿using StageManager.Native;
+﻿using StageManager.Core;
+using StageManager.Native;
 using StageManager.Native.Window;
 using System;
 using System.ComponentModel;
@@ -95,5 +96,30 @@ namespace StageManager.Model
 		}
 
 		public IntPtr Handle => _window?.Handle ?? IntPtr.Zero;
+
+		public double Width { get; private set; } = 150;
+
+		public double Height { get; private set; } = 100;
+
+		public Thickness Margin { get; private set; }
+
+		/// <summary>
+		/// Windows beyond the visible stack are only shown as icons, so their thumbnail is not registered at DWM.
+		/// </summary>
+		public bool IsThumbnailVisible { get; private set; } = true;
+
+		public void ApplySlot(StackSlot slot)
+		{
+			Width = slot.Width;
+			Height = slot.Height;
+			// the slot offsets are measured from the bottom left corner of the card
+			Margin = new Thickness(slot.OffsetX, 0, 0, slot.OffsetY);
+			IsThumbnailVisible = slot.IsVisible;
+
+			RaisePropertyChanged(nameof(Width));
+			RaisePropertyChanged(nameof(Height));
+			RaisePropertyChanged(nameof(Margin));
+			RaisePropertyChanged(nameof(IsThumbnailVisible));
+		}
 	}
 }
