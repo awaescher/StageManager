@@ -1,4 +1,5 @@
-﻿using StageManager.Native.PInvoke;
+﻿using StageManager.Core;
+using StageManager.Native.PInvoke;
 using StageManager.Native.Window;
 using System;
 using System.Collections.Generic;
@@ -31,43 +32,23 @@ namespace StageManager.Native
 
 			try
 			{
-				var process = GetProcessByWindowHandle(_handle);
-				_processId = process.Id;
-				_processName = process.ProcessName;
-				_processExecutable = process.MainModule.FileName;
+				var processId = ProcessInfo.GetOwningProcessId(_handle, Class);
+				_processExecutable = ProcessInfo.GetExecutablePath(processId);
 
-				try
-				{
-					_processFileName = Path.GetFileName(process.MainModule.FileName);
-				}
-				catch (System.ComponentModel.Win32Exception)
-				{
-					_processFileName = "--NA--";
-				}
+				if (string.IsNullOrEmpty(_processExecutable))
+					throw new InvalidOperationException("The executable of the process cannot be read.");
+
+				_processId = (int)processId;
+				_processFileName = Path.GetFileName(_processExecutable);
+				_processName = Path.GetFileNameWithoutExtension(_processExecutable);
 			}
 			catch (Exception)
 			{
 				_processId = -1;
 				_processName = "";
 				_processFileName = "";
+				_processExecutable = null;
 			}
-		}
-
-		private Process GetProcessByWindowHandle(IntPtr windowHandle)
-		{
-			Win32.GetWindowThreadProcessId(windowHandle, out var processId);
-
-			var result = (int)processId;
-
-			var process = Process.GetProcessById(result);
-
-			// handling for UWP apps
-			if (process.ProcessName.Contains("ApplicationFrameHost"))
-			{
-				// TODO
-			}
-
-			return process;
 		}
 
 		public bool DidManualHide => _didManualHide;
@@ -163,6 +144,8 @@ namespace StageManager.Native
 		public int ProcessId => _processId;
 		public string ProcessFileName => _processFileName;
 		public string ProcessName => _processName;
+		public string ProcessExecutable => _processExecutable;
+		public string AppKey => AppIdentity.KeyFromPath(_processExecutable);
 
 		public bool CanLayout
 		{
@@ -180,37 +163,19 @@ namespace StageManager.Native
 			if (!CanLayout)
 				return false;
 
-			var ignoreClasses = new List<string>()
-			{
-				"TaskManagerWindow",
-				"MSCTFIME UI",
-				"SHELLDLL_DefView",
-				"LockScreenBackstopFrame",
-				"Progman",
-				"Shell_TrayWnd", // Windows 11 start
-				"WorkerW"
-			};
+			var rootWindow = Win32.GetAncestor(_handle, Win32.GA.GA_ROOT) == _handle;
+			var minimized = IsMinimized;
+			var bounds = Location;
 
-			if (ignoreClasses.Contains(Class))
+			// the owner of a window decides: tool windows are only managed if they ask to show up in the taskbar
+			var exStyle = Win32.GetWindowExStyleLongPtr(_handle);
+			if (exStyle.HasFlag(Win32.WS_EX.WS_EX_TOOLWINDOW) && !exStyle.HasFlag(Win32.WS_EX.WS_EX_APPWINDOW))
 				return false;
 
-			var ignoreProcesses = new List<string>()
-			{
-				"SearchUI",
-				"ShellExperienceHost",
-				"PeopleExperienceHost",
-				"LockApp",
-				"StartMenuExperienceHost",
-				"SearchApp",
-				"SearchHost", // Windows 11 search
-				"search", // Windows 11 RTM search
-				"ScreenClippingHost"
-			};
-
-			if (ignoreProcesses.Contains(ProcessName))
+			if (!WindowFilter.IsCandidate(new WindowFacts(Class, ProcessName, rootWindow, minimized, bounds.Width, bounds.Height)))
 				return false;
 
-			return true;
+			return !AppIdentity.IsListed(App.Settings.Current.Stage.ExcludedApps, _processExecutable);
 		}
 
 		public bool IsFocused => Win32.GetForegroundWindow() == _handle;
@@ -290,6 +255,19 @@ namespace StageManager.Native
 
 		public Icon ExtractIcon()
 		{
+			// ask the window first, that is the icon of the app the user sees, and never wait long for an app that hangs
+			var handle = ProcessInfo.GetWindowIcon(_handle);
+			if (handle != IntPtr.Zero)
+			{
+				try
+				{
+					return (Icon)Icon.FromHandle(handle).Clone();
+				}
+				catch (ArgumentException)
+				{
+				}
+			}
+
 			if (string.IsNullOrWhiteSpace(_processExecutable))
 				return null;
 
@@ -297,7 +275,7 @@ namespace StageManager.Native
 			{
 				return Icon.ExtractAssociatedIcon(_processExecutable);
 			}
-			catch (IOException)
+			catch (Exception ex) when (ex is IOException or ArgumentException)
 			{
 				return null;
 			}
