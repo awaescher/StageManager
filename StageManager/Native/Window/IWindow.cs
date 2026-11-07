@@ -31,6 +31,9 @@ namespace StageManager.Native.Window
         string ProcessFileName { get; }
         string ProcessName { get; }
 
+        /// <summary>Identifies the app, not the process: the upper case path of the executable. Windows are grouped by it.</summary>
+        string AppKey { get; }
+
         bool CanLayout { get; }
 
         bool IsFocused { get; }

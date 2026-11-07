@@ -16,10 +16,11 @@ namespace StageManager
 	{
 		private readonly Desktop _desktop;
 		private readonly DesktopIconsPolicy _desktopIcons;
+		private readonly SceneRegistry _registry = new();
+		private readonly Dictionary<Guid, Scene> _sceneById = new();
 		private List<Scene> _scenes;
 		private Scene _current;
 		private bool _suspend = false;
-		private Guid? _reentrancyLockSceneId;
 
 		public event EventHandler<SceneChangedEventArgs> SceneChanged;
 		public event EventHandler<CurrentSceneSelectionChangedEventArgs> CurrentSceneSelectionChanged;
@@ -64,7 +65,7 @@ namespace StageManager
 		{
 			WindowsManager.Stop();
 
-			foreach (var scene in _scenes)
+			foreach (var scene in _scenes ?? new List<Scene>())
 			{
 				foreach (var w in scene.Windows)
 					WindowStrategy.Show(w);
@@ -96,29 +97,31 @@ namespace StageManager
 
 		private void WindowsManager_WindowDestroyed(IWindow window)
 		{
-			var scene = FindSceneForWindow(window);
+			var removal = _registry.Remove(window.Handle.ToInt64());
+			if (removal.GroupId is not Guid id || !_sceneById.TryGetValue(id, out var scene))
+				return;
 
-			if (scene is not null)
+			scene.Remove(window);
+
+			if (!removal.GroupRemoved)
 			{
-				scene.Remove(window);
-
-				if (scene.Windows.Any())
-				{
-					SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Updated));
-				}
-				else
-				{
-					_scenes.Remove(scene);
-					SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Removed));
-				}
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Updated));
+			}
+			else
+			{
+				_scenes.Remove(scene);
+				_sceneById.Remove(id);
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Removed));
 			}
 		}
 
 		public Scene FindSceneForWindow(IWindow window) => FindSceneForWindow(window.Handle);
 
-		public Scene FindSceneForWindow(IntPtr handle) => _scenes?.FirstOrDefault(s => s.Windows.Any(w => w.Handle == handle));
-
-		private Scene FindSceneForProcess(string processName) => _scenes.FirstOrDefault(s => string.Equals(s.Key, processName, StringComparison.OrdinalIgnoreCase));
+		public Scene FindSceneForWindow(IntPtr handle)
+		{
+			var id = _registry.FindGroupId(handle.ToInt64());
+			return id is Guid g && _sceneById.TryGetValue(g, out var scene) ? scene : null;
+		}
 
 		private async void WindowsManager_WindowCreated(IWindow window, bool firstCreate)
 		{
@@ -129,69 +132,56 @@ namespace StageManager
 		{
 			var scene = FindSceneForWindow(window);
 			if (scene is null)
-			{
-				scene = new Scene(GetWindowGroupKey(window), window);
-				_scenes.Add(scene);
-				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Created));
-			}
+				scene = PlaceWindow(window, companion: false).Scene;
 
 			await SwitchTo(scene);
 		}
 
 		private async Task SwitchToSceneByNewWindow(IWindow window)
 		{
-			var existentScene = FindSceneForProcess(GetWindowGroupKey(window));
-			var scene = existentScene ?? new Scene(window.ProcessName, window);
+			var placed = PlaceWindow(window, IsCompanion(window));
 
-			if (existentScene is null)
+			// a companion joins the current scene, nothing has to be hidden or shown for it
+			if (!placed.Switch)
 			{
-				_scenes.Add(scene);
-				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Created));
+				WindowStrategy.Show(window);
+				return;
 			}
-			else
+
+			await SwitchTo(placed.Scene).ConfigureAwait(true);
+		}
+
+		private (Scene Scene, bool Switch) PlaceWindow(IWindow window, bool companion)
+		{
+			EnsureScenes();
+
+			var placement = _registry.Place(window.Handle.ToInt64(), GetWindowGroupKey(window), companion);
+
+			if (placement.Created)
+			{
+				var created = new Scene(placement.GroupId, GetWindowGroupKey(window), window);
+				_scenes.Add(created);
+				_sceneById[placement.GroupId] = created;
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(created, window, ChangeType.Created));
+				return (created, placement.Switch);
+			}
+
+			var scene = _sceneById[placement.GroupId];
+			if (!scene.Windows.Contains(window))
 			{
 				scene.Add(window);
 				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, window, ChangeType.Updated));
 			}
 
-			await SwitchTo(scene).ConfigureAwait(true);
+			return (scene, placement.Switch);
 		}
 
-		/// <summary>
-		/// Determines if a scene is switched back to shortly after it has been hidden.
-		/// This can happen if an app activates one of it's windows after being hidde,
-		/// like Microsoft Teams does if there's a small floating window for a current call.
-		/// </summary>
-		/// <param name="scene"></param>
-		/// <returns></returns>
-		private bool IsReentrancy(Scene? scene)
-		{
-			if (scene is null)
-				return false;
-
-			if (Guid.Equals(scene.Id, _reentrancyLockSceneId))
-				return true;
-
-			if (_current is object)
-			{
-				_reentrancyLockSceneId = _current.Id;
-
-				Task.Run(async () =>
-				{
-					await Task.Delay(1000).ConfigureAwait(false);
-					_reentrancyLockSceneId = null;
-				}).SafeFireAndForget();
-			}
-
-			return false;
-		}
+		private static bool IsCompanion(IWindow window) =>
+			window is WindowsWindow w && AppIdentity.IsListed(App.Settings.Current.Stage.Companions, w.ProcessExecutable);
 
 		public async Task SwitchTo(Scene? scene)
 		{
-			if (object.Equals(scene, _current))
-				return;
-
-			if (IsReentrancy(scene))
+			if (!_registry.TrySwitch(scene?.Id))
 				return;
 
 			try
@@ -234,15 +224,20 @@ namespace StageManager
 				if (sourceScene is null || sourceScene.Equals(targetScene))
 					return Task.CompletedTask;
 
+				var moved = _registry.Move(window.Handle.ToInt64(), targetScene.Id);
+				if (moved is null)
+					return Task.CompletedTask;
+
 				sourceScene.Remove(window);
 				targetScene.Add(window);
 
 				SceneChanged?.Invoke(this, new SceneChangedEventArgs(sourceScene, window, ChangeType.Updated));
 				SceneChanged?.Invoke(this, new SceneChangedEventArgs(targetScene, window, ChangeType.Updated));
 
-				if (!sourceScene.Windows.Any())
+				if (moved.Value.SourceRemoved)
 				{
 					_scenes.Remove(sourceScene);
+					_sceneById.Remove(sourceScene.Id);
 					SceneChanged?.Invoke(this, new SceneChangedEventArgs(sourceScene, window, ChangeType.Removed));
 				}
 
@@ -294,19 +289,32 @@ namespace StageManager
 
 		public IEnumerable<Scene> GetScenes()
 		{
-			if (_scenes is null)
-			{
-				_scenes = GetSceneableWindows()
-							.GroupBy(GetWindowGroupKey)
-							.Select(group => new Scene(group.Key, group.ToArray()))
-							.ToList();
-			}
-
+			EnsureScenes();
 			return _scenes;
+		}
+
+		private void EnsureScenes()
+		{
+			if (_scenes is not null)
+				return;
+
+			var windows = (GetSceneableWindows() ?? Enumerable.Empty<IWindow>()).ToList();
+			var byHandle = windows.ToDictionary(w => w.Handle.ToInt64());
+
+			var snapshots = _registry.Initialize(windows.Select(w => (w.Handle.ToInt64(), GetWindowGroupKey(w))));
+
+			_scenes = new List<Scene>();
+			foreach (var group in snapshots)
+			{
+				var scene = new Scene(group.Id, group.Key, group.Windows.Select(h => byHandle[h]).ToArray());
+				_scenes.Add(scene);
+				_sceneById[group.Id] = scene;
+			}
 		}
 
 		public IEnumerable<IWindow> GetCurrentWindows() => _current?.Windows ?? GetSceneableWindows();
 
-		private string GetWindowGroupKey(IWindow window) => window.ProcessName;
+		private static string GetWindowGroupKey(IWindow window) =>
+			string.IsNullOrEmpty(window.AppKey) ? window.ProcessName.ToUpperInvariant() : window.AppKey;
 	}
 }

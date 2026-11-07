@@ -11,7 +11,7 @@ namespace StageManager
 	{
 		public event EventHandler SelectedChanged;
 
-		public Guid Id { get; } = Guid.NewGuid();
+		public Guid Id { get; }
 
 		public string Title { get; private set; }
 
@@ -20,8 +20,13 @@ namespace StageManager
 		private List<IWindow> _windows = new List<IWindow>();
 		private bool _selected;
 
-		public Scene(string key, params IWindow[] windows)
+		public Scene(string key, params IWindow[] windows) : this(Guid.NewGuid(), key, windows)
 		{
+		}
+
+		public Scene(Guid id, string key, params IWindow[] windows)
+		{
+			Id = id;
 			_windows.AddRange(windows);
 			UpdateTitle();
 			Key = key;
@@ -35,6 +40,9 @@ namespace StageManager
 
 		public void Add(IWindow window)
 		{
+			if (_windows.Contains(window))
+				return;
+
 			_windows.Add(window);
 			UpdateTitle();
 		}
