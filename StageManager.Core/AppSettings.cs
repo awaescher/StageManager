@@ -64,6 +64,31 @@ public sealed class DesktopIconsSettings
 	public bool RestoreOnExit { get; set; } = true;
 }
 
+public sealed class StageSettings
+{
+	/// <summary>
+	/// Apps that join the current scene when they open a window instead of getting a scene of their own, e.g. a calculator.
+	/// Entries are file names ("calc.exe") or full paths of the executable.
+	/// </summary>
+	public List<string> Companions { get; set; } = new();
+
+	/// <summary>Apps StageManager leaves alone. Entries are file names ("calc.exe") or full paths of the executable.</summary>
+	public List<string> ExcludedApps { get; set; } = new();
+
+	internal void Normalize()
+	{
+		Companions = Clean(Companions);
+		ExcludedApps = Clean(ExcludedApps);
+	}
+
+	private static List<string> Clean(List<string>? entries) =>
+		(entries ?? new List<string>())
+			.Where(e => !string.IsNullOrWhiteSpace(e))
+			.Select(e => e.Trim())
+			.Distinct(StringComparer.OrdinalIgnoreCase)
+			.ToList();
+}
+
 public sealed class AppSettings
 {
 	public const int CurrentVersion = 1;
@@ -82,6 +107,8 @@ public sealed class AppSettings
 
 	public DesktopIconsSettings DesktopIcons { get; set; } = new();
 
+	public StageSettings Stage { get; set; } = new();
+
 	/// <summary>
 	/// Replaces missing or out-of-range values with usable ones, so that a hand-edited file can never break the app.
 	/// </summary>
@@ -90,6 +117,8 @@ public sealed class AppSettings
 		Version = CurrentVersion;
 		Sidebar ??= new SidebarSettings();
 		DesktopIcons ??= new DesktopIconsSettings();
+		Stage ??= new StageSettings();
+		Stage.Normalize();
 
 		if (!Enum.IsDefined(DesktopIcons.Mode))
 			DesktopIcons.Mode = DesktopIconsMode.Manage;
