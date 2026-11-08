@@ -223,3 +223,85 @@ public class FlightTests
 		Assert.Equal(Card, f.At(0));
 	}
 }
+
+public class FlightPlannerTests
+{
+	[Fact]
+	public void A_window_on_a_card_keeps_its_proportions_and_is_centered()
+	{
+		var card = new Area(10, 100, 170, 200); // 160 x 100
+
+		var pose = FlightPlanner.OnCard(card, 400, 400, 0.5);
+
+		Assert.Equal(100, pose.Width, 6);
+		Assert.Equal(100, pose.Height, 6);
+		Assert.Equal(40, pose.X, 6);
+		Assert.Equal(100, pose.Y, 6);
+		Assert.Equal(0.5, pose.Opacity);
+	}
+
+	[Fact]
+	public void A_window_with_the_proportions_of_the_card_fills_it()
+	{
+		var card = new Area(0, 0, 160, 100);
+
+		var pose = FlightPlanner.OnCard(card, 1600, 1000, 1);
+
+		Assert.Equal(new Pose(0, 0, 160, 100, 1), pose);
+	}
+
+	[Fact]
+	public void Insets_are_the_difference_between_window_rectangle_and_visible_frame()
+	{
+		var windowRect = new Area(92, 100, 1000, 700);
+		var frame = new Area(100, 100, 992, 693);
+
+		var insets = FlightPlanner.InsetsOf(windowRect, frame);
+
+		Assert.Equal(new Insets(8, 0, 8, 7), insets);
+	}
+
+	[Fact]
+	public void The_frame_of_a_window_rectangle_follows_from_the_insets()
+	{
+		var windowRect = new Area(92, 100, 1000, 700);
+
+		var frame = FlightPlanner.FrameOf(windowRect, new Insets(8, 0, 8, 7));
+
+		Assert.Equal(new Area(100, 100, 992, 693), frame);
+	}
+
+	[Fact]
+	public void Insets_and_frame_round_trip()
+	{
+		var windowRect = new Area(50, 60, 850, 560);
+		var frame = new Area(57, 60, 843, 553);
+
+		Assert.Equal(frame, FlightPlanner.FrameOf(windowRect, FlightPlanner.InsetsOf(windowRect, frame)));
+	}
+
+	[Fact]
+	public void Insets_that_swallow_the_window_are_ignored()
+	{
+		var windowRect = new Area(0, 0, 10, 10);
+
+		Assert.Equal(windowRect, FlightPlanner.FrameOf(windowRect, new Insets(7, 0, 7, 7)));
+	}
+
+	[Fact]
+	public void Default_insets_match_the_usual_windows_borders()
+	{
+		Assert.Equal(new Area(7, 0, 93, 93), FlightPlanner.FrameOf(new Area(0, 0, 100, 100), Insets.Default));
+	}
+
+	[Theory]
+	[InlineData(0, 0, 100, 100, 50, 50, 150, 150, true)]
+	[InlineData(0, 0, 100, 100, 100, 0, 200, 100, false)]
+	[InlineData(0, 0, 100, 100, 200, 200, 300, 300, false)]
+	[InlineData(-500, 0, -100, 100, 0, 0, 100, 100, false)]
+	[InlineData(0, 0, 1920, 1080, 500, 500, 600, 600, true)]
+	public void Windows_on_another_monitor_do_not_intersect(double al, double at, double ar, double ab, double bl, double bt, double br, double bb, bool expected)
+	{
+		Assert.Equal(expected, FlightPlanner.Intersects(new Area(al, at, ar, ab), new Area(bl, bt, br, bb)));
+	}
+}

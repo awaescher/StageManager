@@ -1,6 +1,7 @@
 using AsyncAwaitBestPractices;
 using StageManager.Core;
 using StageManager.Native;
+using StageManager.Native.Interop;
 using StageManager.Native.PInvoke;
 using StageManager.Native.Window;
 using StageManager.Strategies;
@@ -182,8 +183,21 @@ namespace StageManager
 		private static bool IsCompanion(IWindow window) =>
 			window is WindowsWindow w && AppIdentity.IsListed(App.Settings.Current.Stage.Companions, w.ProcessExecutable);
 
+		/// <summary>Screen rectangle of the thumbnail area of a card in physical pixels, null if the card is not on screen. Set by the sidebar.</summary>
+		public Func<Scene, Area?>? CardAreaOf { get; set; }
+
+		private Task _flight = Task.CompletedTask;
+		private FlightOverlay? _overlay;
+
 		public async Task SwitchTo(Scene? scene)
 		{
+			// a switch that comes in while windows still fly lets them land first
+			if (_overlay is not null)
+			{
+				_overlay.Skip();
+				await _flight.ConfigureAwait(true);
+			}
+
 			if (!_registry.TrySwitch(scene?.Id))
 				return;
 
@@ -199,7 +213,10 @@ namespace StageManager
 				foreach (var s in _scenes)
 					s.IsSelected = s.Equals(scene);
 
-				if (scene is object)
+				var animated = PrepareFlight(prior, scene, otherWindows);
+
+				// with an animation the windows of the scene show up when the flight lands, not before it takes off
+				if (scene is object && animated is null)
 				{
 					foreach (var w in scene.Windows)
 						WindowStrategy.Show(w);
@@ -211,10 +228,146 @@ namespace StageManager
 				CurrentSceneSelectionChanged?.Invoke(this, new CurrentSceneSelectionChangedEventArgs(prior, _current));
 
 				_desktopIcons.Apply(sceneActive: scene is object);
+
+				if (animated is not null)
+					await RunFlight(animated, scene!).ConfigureAwait(true);
 			}
 			finally
 			{
 				_suspend = false;
+			}
+		}
+
+		private sealed record PreparedFlight(FlightOverlay Overlay, IReadOnlyList<IntPtr> Windows);
+
+		/// <summary>
+		/// Puts the windows of the scenes on a transparent overlay at the position they have now. Must run before the real windows
+		/// are shown or hidden, because DWM keeps showing the picture of a window it takes a thumbnail of even after the window is minimized.
+		/// </summary>
+		private PreparedFlight? PrepareFlight(Scene? prior, Scene? scene, IWindow[] otherWindows)
+		{
+			if (scene is null)
+				return null;
+
+			var style = SystemAnimation.CurrentStyle();
+			if (style == FlightStyle.None)
+				return null;
+
+			var card = CardAreaOf?.Invoke(scene);
+			if (card is not Area cardArea || cardArea.Width < 8 || cardArea.Height < 8)
+				return null;
+
+			var monitor = WindowGeometry.BoundsOf(cardArea);
+			if (!FlightPlanner.Intersects(monitor, cardArea))
+				return null;
+
+			var overlay = new FlightOverlay(monitor, style);
+			var involved = new List<IntPtr>();
+
+			try
+			{
+				overlay.Show();
+
+				// the windows that leave fly where they stand to the card, the ones that come fly from the card to where they will show
+				foreach (var w in (prior?.Windows ?? Enumerable.Empty<IWindow>()).Intersect(otherWindows))
+				{
+					if (!Win32.IsWindowVisible(w.Handle) || Win32.IsIconic(w.Handle))
+						continue;
+
+					if (WindowGeometry.FrameOf(w.Handle) is not Area frame || !FlightPlanner.Intersects(monitor, frame))
+						continue;
+
+					overlay.Add(w.Handle, FlightPlanner.OfFrame(frame), FlightPlanner.OnCard(cardArea, frame.Width, frame.Height, 1));
+					involved.Add(w.Handle);
+				}
+
+				foreach (var w in scene.Windows)
+				{
+					if (WindowGeometry.FrameOf(w.Handle) is not Area frame || !FlightPlanner.Intersects(monitor, frame))
+						continue;
+
+					overlay.Add(w.Handle, FlightPlanner.OnCard(cardArea, frame.Width, frame.Height, 1), FlightPlanner.OfFrame(frame));
+					involved.Add(w.Handle);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error("The animation could not be prepared", ex);
+				overlay.Finish();
+				return null;
+			}
+
+			if (!overlay.HasFlights)
+			{
+				overlay.Finish();
+				return null;
+			}
+
+			// the animation Windows plays when a window is shown or minimized would run below ours
+			foreach (var h in involved.Union(scene.Windows.Select(w => w.Handle)).Union(otherWindows.Select(w => w.Handle)))
+				NativeMethods.SetTransitionsDisabled(h, true);
+
+			_overlay = overlay;
+			return new PreparedFlight(overlay, involved);
+		}
+
+		/// <summary>How long the real windows have to paint themselves under the overlay before it goes. Both show the same picture, so the overlap cannot be seen.</summary>
+		private static readonly TimeSpan LandingDelay = TimeSpan.FromMilliseconds(90);
+
+		private async Task RunFlight(PreparedFlight flight, Scene scene)
+		{
+			var duration = FlightMotion.Duration(App.Settings.Current.Animations.Speed);
+			var landed = false;
+
+			void Land()
+			{
+				// a newer switch may have taken over while this flight was still in the air: then these windows stay hidden
+				if (landed || !ReferenceEquals(_current, scene))
+					return;
+
+				landed = true;
+				foreach (var w in scene.Windows)
+					WindowStrategy.Show(w);
+			}
+
+			try
+			{
+				_flight = flight.Overlay.Fly(duration);
+
+				// never leave the overlay on the screen, whatever happens to the flight
+				await Task.WhenAny(_flight, Task.Delay(duration + TimeSpan.FromMilliseconds(1500))).ConfigureAwait(true);
+
+				Land();
+				await Task.Delay(LandingDelay).ConfigureAwait(true);
+			}
+			catch (Exception ex)
+			{
+				Log.Error("The animation failed", ex);
+			}
+			finally
+			{
+				// the windows of the scene have to show up even if the animation failed
+				Land();
+
+				try
+				{
+					flight.Overlay.Finish();
+				}
+				catch (Exception ex)
+				{
+					Log.Error("The animation overlay could not be closed", ex);
+				}
+
+				// only forget the flight if no newer switch has replaced it in the meantime
+				if (ReferenceEquals(_overlay, flight.Overlay))
+				{
+					_overlay = null;
+					_flight = Task.CompletedTask;
+				}
+
+				// the windows animate on their own again when the user minimizes them
+				foreach (var h in GetSceneableWindows().Select(w => w.Handle))
+					NativeMethods.SetTransitionsDisabled(h, false);
 			}
 		}
 

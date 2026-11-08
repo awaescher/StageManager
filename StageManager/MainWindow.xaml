@@ -141,6 +141,7 @@
                         </i:Interaction.Triggers>
                         <!-- Windows: stacked thumbnails, the last window is in front -->
                         <ItemsControl
+                            x:Name="thumbnailArea"
                             Width="{Binding ThumbnailWidth}"
                             Height="{Binding ThumbnailHeight}"
                             ItemsSource="{Binding Windows}">
