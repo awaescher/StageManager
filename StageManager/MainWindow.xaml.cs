@@ -123,6 +123,8 @@ namespace StageManager
 			SceneManager = new SceneManager(windowsManager);
 			await SceneManager.Start().ConfigureAwait(true);
 
+			SceneManager.CardAreaOf = CardArea;
+
 			SceneManager.SceneChanged += SceneManager_SceneChanged;
 			SceneManager.CurrentSceneSelectionChanged += SceneManager_CurrentSceneSelectionChanged;
 
@@ -144,6 +146,47 @@ namespace StageManager
 				model.IsVisible = i <= MaxScenes; // i is zero based, so it should be i+1 but one scene gets selected (and removed from the sidebar) that makes i+0 again
 				Scenes.Add(model);
 			}
+		}
+
+		/// <summary>
+		/// Where the thumbnails of a card are on the screen, in physical pixels. Null if the card is not in the sidebar at the moment.
+		/// </summary>
+		private Area? CardArea(Scene scene)
+		{
+			if (!IsVisible)
+				return null;
+
+			var model = Scenes.FirstOrDefault(s => s.Id == scene.Id);
+			if (model is null)
+				return null;
+
+			if (scenesControl.ItemContainerGenerator.ContainerFromItem(model) is not FrameworkElement container)
+				return null;
+
+			var thumbs = FindThumbnailArea(container);
+			if (thumbs is null || thumbs.ActualWidth <= 0 || thumbs.ActualHeight <= 0)
+				return null;
+
+			var topLeft = thumbs.PointToScreen(new Point(0, 0));
+			var scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
+			return new Area(topLeft.X, topLeft.Y, topLeft.X + thumbs.ActualWidth * scale, topLeft.Y + thumbs.ActualHeight * scale);
+		}
+
+		/// <summary>The control that holds the thumbnails of a card.</summary>
+		private static FrameworkElement? FindThumbnailArea(DependencyObject root)
+		{
+			for (var i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+			{
+				var child = VisualTreeHelper.GetChild(root, i);
+
+				if (child is ItemsControl { Name: "thumbnailArea" } area)
+					return area;
+
+				if (FindThumbnailArea(child) is FrameworkElement found)
+					return found;
+			}
+
+			return null;
 		}
 
 		private void SceneManager_CurrentSceneSelectionChanged(object? sender, CurrentSceneSelectionChangedEventArgs args)
