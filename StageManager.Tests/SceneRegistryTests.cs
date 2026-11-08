@@ -288,4 +288,220 @@ public class SceneRegistryTests
 		Assert.NotNull(r.FindGroupIdByKey(@"c:\a\app.exe"));
 		Assert.Null(r.FindGroupIdByKey(@"c:\b\app.exe"));
 	}
-}
+
+	[Fact]
+	public void A_group_knows_the_apps_of_its_windows()
+	{
+		var r = Create();
+		var groups = r.Initialize(new (long, string)[] { (1, "A"), (2, "A") });
+
+		Assert.Equal(new[] { "A" }, groups[0].Keys);
+		Assert.Equal("A", groups[0].Key);
+	}
+
+	[Fact]
+	public void Merge_puts_everything_into_the_target_and_removes_the_source()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A"), (2, "B"), (3, "B") });
+		var a = r.FindGroupId(1)!.Value;
+		var b = r.FindGroupId(2)!.Value;
+
+		var merged = r.Merge(b, a);
+
+		Assert.NotNull(merged);
+		Assert.Equal(new long[] { 2, 3 }, merged!.Value.Windows);
+		Assert.Equal(new long[] { 1, 2, 3 }, r.WindowsOf(a));
+		Assert.Equal(new[] { "A", "B" }, r.KeysOf(a));
+		Assert.Single(r.GroupIds);
+		Assert.Equal(a, r.FindGroupId(3));
+	}
+
+	[Fact]
+	public void A_merged_scene_stays_together()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A"), (2, "B"), (3, "C") });
+		var a = r.FindGroupId(1)!.Value;
+		r.Merge(r.FindGroupId(2)!.Value, a);
+
+		// leaving and coming back selects the same scene with both apps
+		r.TrySwitch(a);
+		r.TrySwitch(r.FindGroupId(3));
+		_now += TimeSpan.FromSeconds(2);
+		r.TrySwitch(a);
+
+		Assert.Equal(a, r.CurrentId);
+		Assert.Equal(new long[] { 1, 2 }, r.WindowsOf(a));
+	}
+
+	[Fact]
+	public void A_new_window_of_a_merged_app_joins_the_merged_scene()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A"), (2, "B") });
+		var a = r.FindGroupId(1)!.Value;
+		r.Merge(r.FindGroupId(2)!.Value, a);
+
+		var p = r.Place(3, "B");
+
+		Assert.False(p.Created);
+		Assert.Equal(a, p.GroupId);
+	}
+
+	[Fact]
+	public void Merge_with_the_same_or_an_unknown_group_does_nothing()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A") });
+		var a = r.FindGroupId(1)!.Value;
+
+		Assert.Null(r.Merge(a, a));
+		Assert.Null(r.Merge(Guid.NewGuid(), a));
+		Assert.Null(r.Merge(a, Guid.NewGuid()));
+		Assert.Single(r.GroupIds);
+	}
+
+	[Fact]
+	public void Merging_the_current_scene_makes_the_target_current()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A"), (2, "B") });
+		var a = r.FindGroupId(1)!.Value;
+		var b = r.FindGroupId(2)!.Value;
+		r.TrySwitch(b);
+
+		r.Merge(b, a);
+
+		Assert.Equal(a, r.CurrentId);
+	}
+
+	[Fact]
+	public void Split_gives_an_app_its_own_scene_right_after_the_group()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A"), (2, "B"), (3, "C") });
+		var a = r.FindGroupId(1)!.Value;
+		r.Merge(r.FindGroupId(2)!.Value, a);
+		var c = r.FindGroupId(3)!.Value;
+
+		var split = r.Split(a, "B");
+
+		Assert.NotNull(split);
+		Assert.Equal(new long[] { 2 }, split!.Value.Windows);
+		Assert.Equal(new long[] { 1 }, r.WindowsOf(a));
+		Assert.Equal(new[] { "A" }, r.KeysOf(a));
+		Assert.Equal(new[] { "B" }, r.KeysOf(split.Value.NewGroupId));
+		Assert.Equal(new[] { a, split.Value.NewGroupId, c }, r.GroupIds);
+	}
+
+	[Fact]
+	public void Split_takes_all_windows_of_the_app()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A"), (2, "B"), (3, "B"), (4, "A") });
+		var a = r.FindGroupId(1)!.Value;
+		r.Merge(r.FindGroupId(2)!.Value, a);
+
+		var split = r.Split(a, "b");
+
+		Assert.Equal(new long[] { 2, 3 }, split!.Value.Windows);
+		Assert.Equal(new long[] { 1, 4 }, r.WindowsOf(a));
+	}
+
+	[Fact]
+	public void Split_of_a_group_with_a_single_app_does_nothing()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A"), (2, "A") });
+		var a = r.FindGroupId(1)!.Value;
+
+		Assert.Null(r.Split(a, "A"));
+		Assert.Single(r.GroupIds);
+	}
+
+	[Fact]
+	public void Split_of_an_unknown_app_or_group_does_nothing()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A"), (2, "B") });
+		var a = r.FindGroupId(1)!.Value;
+		r.Merge(r.FindGroupId(2)!.Value, a);
+
+		Assert.Null(r.Split(a, "X"));
+		Assert.Null(r.Split(Guid.NewGuid(), "A"));
+		Assert.Equal(new long[] { 1, 2 }, r.WindowsOf(a));
+	}
+
+	[Fact]
+	public void Closing_the_last_window_of_an_app_removes_the_app_from_the_scene()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A"), (2, "B"), (3, "B") });
+		var a = r.FindGroupId(1)!.Value;
+		r.Merge(r.FindGroupId(2)!.Value, a);
+
+		r.Remove(2);
+		Assert.Equal(new[] { "A", "B" }, r.KeysOf(a));
+
+		r.Remove(3);
+		Assert.Equal(new[] { "A" }, r.KeysOf(a));
+		Assert.Null(r.Split(a, "B"));
+	}
+
+	[Fact]
+	public void A_new_window_of_a_closed_app_opens_a_new_scene_again()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A"), (2, "B") });
+		var a = r.FindGroupId(1)!.Value;
+		r.Merge(r.FindGroupId(2)!.Value, a);
+		r.Remove(2);
+
+		var p = r.Place(5, "B");
+
+		Assert.True(p.Created);
+		Assert.NotEqual(a, p.GroupId);
+	}
+
+	[Fact]
+	public void Moving_a_window_takes_its_app_along_and_drops_it_from_the_source()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A"), (2, "B"), (3, "B") });
+		var a = r.FindGroupId(1)!.Value;
+		var b = r.FindGroupId(2)!.Value;
+
+		r.Move(1, b);
+
+		Assert.Equal(new[] { "B", "A" }, r.KeysOf(b));
+		Assert.Empty(r.KeysOf(a));
+		Assert.Single(r.GroupIds);
+	}
+
+	[Fact]
+	public void Moving_one_of_two_windows_keeps_the_app_in_both_scenes()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A"), (2, "A"), (3, "B") });
+		var a = r.FindGroupId(1)!.Value;
+		var b = r.FindGroupId(3)!.Value;
+
+		r.Move(1, b);
+
+		Assert.Equal(new[] { "A" }, r.KeysOf(a));
+		Assert.Equal(new[] { "B", "A" }, r.KeysOf(b));
+	}
+
+	[Fact]
+	public void A_companion_adds_its_app_to_the_current_scene()
+	{
+		var r = Create();
+		r.Initialize(new (long, string)[] { (1, "A") });
+		var a = r.FindGroupId(1)!.Value;
+		r.TrySwitch(a);
+
+		r.Place(2, "CALC", companion: true);
+
+		Assert.Equal(new[] { "A", "CALC" }, r.KeysOf(a));
+	}}

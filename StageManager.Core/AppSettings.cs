@@ -64,6 +64,32 @@ public sealed class DesktopIconsSettings
 	public bool RestoreOnExit { get; set; } = true;
 }
 
+public enum AnimationMode
+{
+	/// <summary>Follows the Windows setting for animations.</summary>
+	System,
+
+	/// <summary>Always animate, also if Windows has animations switched off.</summary>
+	On,
+
+	/// <summary>Never animate, switch right away.</summary>
+	Off
+}
+
+public sealed class AnimationSettings
+{
+	public const double MinSpeed = 0.25;
+	public const double MaxSpeed = 3.0;
+
+	public AnimationMode Mode { get; set; } = AnimationMode.System;
+
+	/// <summary>1 is the normal speed, 2 is twice as fast.</summary>
+	public double Speed { get; set; } = 1.0;
+
+	/// <summary>Fly a frame instead of the windows if Windows shows only a frame while windows are dragged.</summary>
+	public bool FrameIfWindowContentIsOff { get; set; } = true;
+}
+
 public sealed class StageSettings
 {
 	/// <summary>
@@ -109,6 +135,8 @@ public sealed class AppSettings
 
 	public StageSettings Stage { get; set; } = new();
 
+	public AnimationSettings Animations { get; set; } = new();
+
 	/// <summary>
 	/// Replaces missing or out-of-range values with usable ones, so that a hand-edited file can never break the app.
 	/// </summary>
@@ -119,6 +147,14 @@ public sealed class AppSettings
 		DesktopIcons ??= new DesktopIconsSettings();
 		Stage ??= new StageSettings();
 		Stage.Normalize();
+		Animations ??= new AnimationSettings();
+
+		if (!Enum.IsDefined(Animations.Mode))
+			Animations.Mode = AnimationMode.System;
+
+		Animations.Speed = double.IsFinite(Animations.Speed)
+			? Math.Clamp(Animations.Speed, AnimationSettings.MinSpeed, AnimationSettings.MaxSpeed)
+			: 1.0;
 
 		if (!Enum.IsDefined(DesktopIcons.Mode))
 			DesktopIcons.Mode = DesktopIconsMode.Manage;
