@@ -45,6 +45,16 @@ namespace StageManager
 				new Choice<DesktopIconsMode>("Never change", DesktopIconsMode.Untouched)
 			});
 
+			Fill(animationMode, new[]
+			{
+				new Choice<AnimationMode>("Follow Windows (default)", AnimationMode.System),
+				new Choice<AnimationMode>("Always", AnimationMode.On),
+				new Choice<AnimationMode>("Never", AnimationMode.Off)
+			});
+
+			Fill(animationSpeed, new[] { 0.5, 0.75, 1.0, 1.5, 2.0, 3.0 }
+				.Select(s => new Choice<double>(s == 1.0 ? "Normal" : $"{s:0.##}x", s)));
+
 			Loaded += (_, _) => Settings.Changed += Settings_Changed;
 			Closed += (_, _) =>
 			{
@@ -122,6 +132,17 @@ namespace StageManager
 
 				Select(iconsMode, current.DesktopIcons.Mode);
 				iconsRestore.IsChecked = current.DesktopIcons.RestoreOnExit;
+
+				Select(animationMode, current.Animations.Mode);
+
+				// a speed set by hand in settings.json stays selectable
+				var speeds = new[] { 0.5, 0.75, 1.0, 1.5, 2.0, 3.0 }.Append(current.Animations.Speed).Distinct().OrderBy(s => s)
+					.Select(s => new Choice<double>(s == 1.0 ? "Normal" : $"{s:0.##}x", s));
+				Fill(animationSpeed, speeds);
+				Select(animationSpeed, current.Animations.Speed);
+				animationFrames.IsChecked = current.Animations.FrameIfWindowContentIsOff;
+
+				UpdateAnimationInfo();
 
 				UpdateLayoutInfo();
 			}
@@ -203,6 +224,39 @@ namespace StageManager
 		{
 			var restore = iconsRestore.IsChecked == true;
 			Change(s => s.DesktopIcons.RestoreOnExit = restore);
+		}
+
+		private void UpdateAnimationInfo()
+		{
+			var system = Native.SystemAnimation.Read();
+			var style = AnimationPolicy.Decide(Settings.Current.Animations, system);
+
+			var effect = style switch
+			{
+				FlightStyle.Windows => "The windows fly between the sidebar and the stage.",
+				FlightStyle.Frames => "A frame flies in place of the windows.",
+				_ => "Scenes switch without animation."
+			};
+
+			animationInfo.Text = $"Windows: animations {(system.AnimationsEnabled ? "on" : "off")}, window content while dragging {(system.DragFullWindows ? "shown" : "hidden (frame only)")}. {effect}";
+		}
+
+		private void AnimationMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (animationMode.SelectedItem is Choice<AnimationMode> c)
+				Change(s => s.Animations.Mode = c.Value);
+		}
+
+		private void AnimationSpeed_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (animationSpeed.SelectedItem is Choice<double> c)
+				Change(s => s.Animations.Speed = c.Value);
+		}
+
+		private void AnimationFrames_Click(object sender, RoutedEventArgs e)
+		{
+			var frames = animationFrames.IsChecked == true;
+			Change(s => s.Animations.FrameIfWindowContentIsOff = frames);
 		}
 
 		private void Reset_Click(object sender, RoutedEventArgs e)

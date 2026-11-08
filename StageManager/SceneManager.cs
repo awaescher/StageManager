@@ -1,4 +1,4 @@
-﻿using AsyncAwaitBestPractices;
+using AsyncAwaitBestPractices;
 using StageManager.Core;
 using StageManager.Native;
 using StageManager.Native.PInvoke;
@@ -28,6 +28,9 @@ namespace StageManager
 		private IWindowStrategy WindowStrategy { get; } = new NormalizeAndMinimizeWindowStrategy(); // new WindowNormalizeStrategy/OpacityWindowStrategy/ShowAndHideWindowStrategy
 
 		public WindowsManager WindowsManager { get; }
+
+		/// <summary>The scene on the stage. Null in the desktop view.</summary>
+		public Scene Current => _current;
 
 		public SceneManager(WindowsManager windowsManager)
 		{
@@ -155,11 +158,11 @@ namespace StageManager
 		{
 			EnsureScenes();
 
-			var placement = _registry.Place(window.Handle.ToInt64(), GetWindowGroupKey(window), companion);
+			var placement = _registry.Place(window.Handle.ToInt64(), GroupKeyOf(window), companion);
 
 			if (placement.Created)
 			{
-				var created = new Scene(placement.GroupId, GetWindowGroupKey(window), window);
+				var created = new Scene(placement.GroupId, GroupKeyOf(window), window);
 				_scenes.Add(created);
 				_sceneById[placement.GroupId] = created;
 				SceneChanged?.Invoke(this, new SceneChangedEventArgs(created, window, ChangeType.Created));
@@ -285,6 +288,103 @@ namespace StageManager
 				await MoveWindow(sourceScene, window, _current).ConfigureAwait(false);
 		}
 
+		/// <summary>
+		/// Adds all windows and apps of a scene to the scene on the stage. They stay together as one scene from now on.
+		/// In the desktop view there is no stage, then the scene is just selected.
+		/// </summary>
+		public Task JoinToCurrent(Scene source)
+		{
+			if (source is null || source.Equals(_current))
+				return Task.CompletedTask;
+
+			if (_current is null)
+				return SwitchTo(source);
+
+			try
+			{
+				_suspend = true;
+
+				var target = _current;
+				if (_registry.Merge(source.Id, target.Id) is null)
+					return Task.CompletedTask;
+
+				var moving = source.Windows.ToList();
+				foreach (var w in moving)
+				{
+					source.Remove(w);
+					target.Add(w);
+				}
+
+				_scenes.Remove(source);
+				_sceneById.Remove(source.Id);
+
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(target, moving.FirstOrDefault(), ChangeType.Updated));
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(source, moving.FirstOrDefault(), ChangeType.Removed));
+
+				foreach (var w in moving)
+					WindowStrategy.Show(w);
+
+				return Task.CompletedTask;
+			}
+			finally
+			{
+				_suspend = false;
+			}
+		}
+
+		/// <summary>Takes one app out of a scene that holds several apps and gives it a card of its own.</summary>
+		public Task SplitApp(Scene scene, string appKey)
+		{
+			if (scene is null || _registry.Split(scene.Id, appKey) is not SplitResult split)
+				return Task.CompletedTask;
+
+			try
+			{
+				_suspend = true;
+
+				var windows = scene.Windows.Where(w => split.Windows.Contains(w.Handle.ToInt64())).ToArray();
+				foreach (var w in windows)
+					scene.Remove(w);
+
+				var created = new Scene(split.NewGroupId, appKey, windows);
+				_scenes.Insert(_scenes.IndexOf(scene) + 1, created);
+				_sceneById[created.Id] = created;
+
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, windows.FirstOrDefault(), ChangeType.Updated));
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(created, windows.FirstOrDefault(), ChangeType.Created));
+
+				// an app that leaves the stage is no longer shown
+				if (scene.Equals(_current))
+				{
+					foreach (var w in windows)
+						WindowStrategy.Hide(w);
+				}
+
+				return Task.CompletedTask;
+			}
+			finally
+			{
+				_suspend = false;
+			}
+		}
+
+		/// <summary>Asks all windows of a scene to close, like the close button of each window does. Apps can still ask to save their work.</summary>
+		public void CloseScene(Scene scene)
+		{
+			if (scene is null)
+				return;
+
+			foreach (var w in scene.Windows.ToArray())
+				w.Close();
+		}
+
+		/// <summary>The apps a scene consists of, with the key that identifies them and a name to show.</summary>
+		public static IReadOnlyList<(string Key, string Name)> AppsOf(Scene scene) =>
+			scene.Windows
+				.GroupBy(GroupKeyOf, StringComparer.OrdinalIgnoreCase)
+				.Select(g => (g.Key, g.First().ProcessName))
+				.ToList();
+
 		private IEnumerable<IWindow> GetSceneableWindows() => WindowsManager?.Windows?.Where(w => !string.IsNullOrEmpty(w.ProcessFileName) && !string.IsNullOrEmpty(w.Title));
 
 		public IEnumerable<Scene> GetScenes()
@@ -301,7 +401,7 @@ namespace StageManager
 			var windows = (GetSceneableWindows() ?? Enumerable.Empty<IWindow>()).ToList();
 			var byHandle = windows.ToDictionary(w => w.Handle.ToInt64());
 
-			var snapshots = _registry.Initialize(windows.Select(w => (w.Handle.ToInt64(), GetWindowGroupKey(w))));
+			var snapshots = _registry.Initialize(windows.Select(w => (w.Handle.ToInt64(), GroupKeyOf(w))));
 
 			_scenes = new List<Scene>();
 			foreach (var group in snapshots)
@@ -314,7 +414,7 @@ namespace StageManager
 
 		public IEnumerable<IWindow> GetCurrentWindows() => _current?.Windows ?? GetSceneableWindows();
 
-		private static string GetWindowGroupKey(IWindow window) =>
+		public static string GroupKeyOf(IWindow window) =>
 			string.IsNullOrEmpty(window.AppKey) ? window.ProcessName.ToUpperInvariant() : window.AppKey;
 	}
 }

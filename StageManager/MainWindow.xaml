@@ -22,6 +22,61 @@
         <BooleanToVisibilityConverter
             x:Key="BoolToVisibility" />
         <Style
+            x:Key="CloseButton"
+            TargetType="Button">
+            <Setter
+                Property="Width"
+                Value="22" />
+            <Setter
+                Property="Height"
+                Value="22" />
+            <Setter
+                Property="Cursor"
+                Value="Hand" />
+            <Setter
+                Property="Visibility"
+                Value="Collapsed" />
+            <Setter
+                Property="Template">
+                <Setter.Value>
+                    <ControlTemplate
+                        TargetType="Button">
+                        <Grid
+                            Background="Transparent">
+                            <Ellipse
+                                x:Name="disc"
+                                Fill="#99000000" />
+                            <Path
+                                Data="M 7,7 L 15,15 M 15,7 L 7,15"
+                                Stroke="White"
+                                StrokeThickness="1.6"
+                                StrokeStartLineCap="Round"
+                                StrokeEndLineCap="Round" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger
+                                Property="IsMouseOver"
+                                Value="True">
+                                <Setter
+                                    TargetName="disc"
+                                    Property="Fill"
+                                    Value="#E0C42B1C" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=StackPanel}}"
+                    Value="True">
+                    <Setter
+                        Property="Visibility"
+                        Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style
             x:Key="SceneOpacity"
             TargetType="{x:Type StackPanel}">
             <Setter
@@ -58,6 +113,24 @@
                     <StackPanel Orientation="Vertical"
                         Visibility="{Binding Visibility}"
                         Style="{StaticResource SceneOpacity}">
+                        <StackPanel.ContextMenu>
+                            <ContextMenu
+                                Opened="CardMenu_Opened"
+                                Closed="CardMenu_Closed">
+                                <MenuItem
+                                    Tag="add"
+                                    Header="Add to stage"
+                                    Click="CardMenu_Click" />
+                                <MenuItem
+                                    Tag="split"
+                                    Header="Separate from group" />
+                                <Separator />
+                                <MenuItem
+                                    Tag="close"
+                                    Header="Close"
+                                    Click="CardMenu_Click" />
+                            </ContextMenu>
+                        </StackPanel.ContextMenu>
                         <i:Interaction.Triggers>
                             <i:EventTrigger
                                 EventName="MouseLeftButtonUp">
@@ -90,33 +163,42 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                        <!-- Icons -->
-                        <ItemsControl
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Center"
+                        <!-- Icons and the close button. The button sits here and not on the thumbnails, because DWM draws thumbnails above all WPF content. -->
+                        <Grid
                             Margin="0,4,0,24"
-                            ItemsSource="{Binding Windows}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel
-                                        Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border>
-                                        <Border.Effect>
-                                            <DropShadowEffect
-                                                BlurRadius="20" />
-                                        </Border.Effect>
-                                        <Image
-                                            Margin="0, 0, 0, 0"
-                                            Height="30"
-                                            Source="{Binding Icon}" />
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                            Width="{Binding ThumbnailWidth}">
+                            <ItemsControl
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                ItemsSource="{Binding Windows}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel
+                                            Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border>
+                                            <Border.Effect>
+                                                <DropShadowEffect
+                                                    BlurRadius="20" />
+                                            </Border.Effect>
+                                            <Image
+                                                Margin="0, 0, 0, 0"
+                                                Height="30"
+                                                Source="{Binding Icon}" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <Button
+                                Style="{StaticResource CloseButton}"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                ToolTip="Close"
+                                Click="CloseScene_Click" />
+                        </Grid>
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

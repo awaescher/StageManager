@@ -149,14 +149,59 @@
 
         <TextBlock
             Style="{StaticResource Heading}"
+            Text="Animations" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition
+                    Width="170" />
+                <ColumnDefinition
+                    Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock
+                Style="{StaticResource Label}"
+                Text="Animate scene changes" />
+            <ComboBox
+                x:Name="animationMode"
+                Grid.Column="1"
+                SelectionChanged="AnimationMode_SelectionChanged" />
+            <TextBlock
+                Grid.Row="1"
+                Style="{StaticResource Label}"
+                Text="Speed" />
+            <ComboBox
+                x:Name="animationSpeed"
+                Grid.Row="1"
+                Grid.Column="1"
+                SelectionChanged="AnimationSpeed_SelectionChanged" />
+        </Grid>
+        <CheckBox
+            x:Name="animationFrames"
+            Click="AnimationFrames_Click">
+            <TextBlock
+                TextWrapping="Wrap"
+                Text="Fly a frame instead of the windows if Windows shows only a frame while dragging" />
+        </CheckBox>
+        <TextBlock
+            x:Name="animationInfo"
+            Style="{StaticResource Hint}" />
+
+        <TextBlock
+            Style="{StaticResource Heading}"
             Text="Desktop icons" />
         <ComboBox
             x:Name="iconsMode"
             SelectionChanged="IconsMode_SelectionChanged" />
         <CheckBox
             x:Name="iconsRestore"
-            Content="Restore the icons to their previous state when StageManager exits"
-            Click="IconsRestore_Click" />
+            Click="IconsRestore_Click">
+            <TextBlock
+                TextWrapping="Wrap"
+                Text="Restore the icons to their previous state when StageManager exits" />
+        </CheckBox>
 
         <Grid
             Margin="0,20,0,0">

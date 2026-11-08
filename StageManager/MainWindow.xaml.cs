@@ -1,4 +1,4 @@
-﻿using AsyncAwaitBestPractices;
+using AsyncAwaitBestPractices;
 using Microsoft.Xaml.Behaviors.Core;
 using Microsoft.Win32;
 using SharpHook;
@@ -54,7 +54,16 @@ namespace StageManager
 
 			_overlapCheckTimer = new Timer(OverlapCheck, null, 2500, TIMERINTERVAL_MILLISECONDS);
 
-			SwitchSceneCommand = new ActionCommand(async model => await SceneManager!.SwitchTo(((SceneModel)model).Scene));
+			SwitchSceneCommand = new ActionCommand(async model =>
+			{
+				var scene = ((SceneModel)model).Scene;
+
+				// Shift adds the app to the stage instead of replacing it
+				if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+					await SceneManager!.JoinToCurrent(scene);
+				else
+					await SceneManager!.SwitchTo(scene);
+			});
 		}
 
 		protected override void OnSourceInitialized(EventArgs e)
@@ -273,6 +282,10 @@ namespace StageManager
 
 		private void OnMousePressed(object? sender, MouseHookEventArgs e)
 		{
+			// only the left button drags a card
+			if (e.Data.Button != SharpHook.Native.MouseButton.Button1)
+				return;
+
 			// if it's allowed to drag windows into scenes, we cannot hide the scenes
 			if (EnableWindowDropToScene)
 				_overlapCheckTimer.Change(TimeSpan.Zero, TimeSpan.Zero);
@@ -293,6 +306,9 @@ namespace StageManager
 
 		private void OnMouseReleased(object? sender, MouseHookEventArgs e)
 		{
+			if (e.Data.Button != SharpHook.Native.MouseButton.Button1)
+				return;
+
 			// if it's allowed to drag windows into scenes, we cannot hide the scenes
 			if (EnableWindowDropToScene)
 			{
@@ -317,10 +333,18 @@ namespace StageManager
 			{
 				if (_geometry.IsPulledOutOfSidebar(e.Data.X) && _mouseDownScene is object)
 				{
+					var pulled = _mouseDownScene;
+					_mouseDownScene = null;
+
+					// the whole card goes to the stage, all its apps stay together
 					this.Dispatcher.Invoke(() =>
 					{
-						SceneManager.PopWindowFrom(_mouseDownScene.Scene).SafeFireAndForget();
+						SceneManager.JoinToCurrent(pulled.Scene).SafeFireAndForget();
 					});
+				}
+				else
+				{
+					_mouseDownScene = null;
 				}
 			}
 		}
@@ -485,6 +509,78 @@ namespace StageManager
 		private void MenuItem_Settings_Click(object sender, RoutedEventArgs e)
 		{
 			SettingsWindow.ShowSingle();
+		}
+
+		private void CloseScene_Click(object sender, RoutedEventArgs e)
+		{
+			e.Handled = true;
+
+			if (sender is FrameworkElement { DataContext: SceneModel model })
+				SceneManager.CloseScene(model.Scene);
+		}
+
+		private static SceneModel? CardOf(object sender) =>
+			sender is ContextMenu { PlacementTarget: FrameworkElement { DataContext: SceneModel m } } ? m
+			: sender is MenuItem { Parent: ContextMenu { PlacementTarget: FrameworkElement { DataContext: SceneModel m2 } } } ? m2
+			: null;
+
+		private void CardMenu_Opened(object sender, RoutedEventArgs e)
+		{
+			StopHook();
+			_mouseDownScene = null;
+
+			if (sender is not ContextMenu menu || CardOf(menu) is not SceneModel card)
+				return;
+
+			var apps = SceneManager.AppsOf(card.Scene);
+			var canAdd = SceneManager.Current is object;
+
+			foreach (var item in menu.Items.OfType<MenuItem>())
+			{
+				switch (item.Tag as string)
+				{
+					case "add":
+						item.IsEnabled = canAdd;
+						break;
+					case "split":
+						item.Items.Clear();
+						item.Visibility = apps.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+						foreach (var (key, name) in apps)
+						{
+							var sub = new MenuItem { Header = name, Tag = key };
+							sub.Click += CardMenu_Split_Click;
+							item.Items.Add(sub);
+						}
+						break;
+				}
+			}
+		}
+
+		private void CardMenu_Closed(object sender, RoutedEventArgs e)
+		{
+			StartHook();
+		}
+
+		private void CardMenu_Click(object sender, RoutedEventArgs e)
+		{
+			if (sender is not MenuItem item || CardOf(item) is not SceneModel card)
+				return;
+
+			switch (item.Tag as string)
+			{
+				case "add":
+					SceneManager.JoinToCurrent(card.Scene).SafeFireAndForget();
+					break;
+				case "close":
+					SceneManager.CloseScene(card.Scene);
+					break;
+			}
+		}
+
+		private void CardMenu_Split_Click(object sender, RoutedEventArgs e)
+		{
+			if (sender is MenuItem { Tag: string key, Parent: MenuItem { Parent: ContextMenu menu } } && CardOf(menu) is SceneModel card)
+				SceneManager.SplitApp(card.Scene, key).SafeFireAndForget();
 		}
 
 		private void MenuItem_ProjectPage_Click(object sender, RoutedEventArgs e)
