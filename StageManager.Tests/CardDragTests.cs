@@ -302,6 +302,49 @@ public class DragPreviewLayoutTests
 		Assert.Equal(new Pose(10, 20, 200, 120, 1), slot);
 	}
 
+	[Fact]
+	public void The_steps_of_the_stack_grow_with_the_scale_of_the_display()
+	{
+		// a card of 200 x 120 layout units on a display at 150 percent
+		var card = new Area(0, 0, 300, 180);
+
+		var slots = DragPreviewLayout.Slots(card, 2, 2, scale: 1.5);
+
+		// the back window is one step (8 units = 12 pixels) up and to the right
+		Assert.Equal(12, slots[0].X, 6);
+		Assert.Equal(0, slots[0].Y, 6);
+		Assert.Equal((200 - 8) * 1.5, slots[0].Width, 6);
+		Assert.Equal(0, slots[1].X, 6);
+		Assert.Equal(180, slots[1].Y + slots[1].Height, 6);
+	}
+
+	[Fact]
+	public void On_the_stack_each_window_keeps_its_proportions_inside_its_slot()
+	{
+		var card = new Area(100, 100, 300, 220);
+
+		var poses = DragPreviewLayout.OnStack(card, new[] { (1000.0, 1000.0), (1600.0, 900.0) }, maxVisible: 3);
+		var slots = DragPreviewLayout.Slots(card, 2, 3);
+
+		Assert.Equal(2, poses.Length);
+		for (var i = 0; i < 2; i++)
+		{
+			Assert.InRange(poses[i].X, slots[i].X - 0.001, slots[i].X + slots[i].Width);
+			Assert.InRange(poses[i].Y + poses[i].Height, slots[i].Y, slots[i].Y + slots[i].Height + 0.001);
+		}
+
+		Assert.Equal(1.0, poses[0].Width / poses[0].Height, 6);
+		Assert.Equal(16.0 / 9, poses[1].Width / poses[1].Height, 6);
+	}
+
+	[Fact]
+	public void On_the_stack_hidden_windows_are_invisible()
+	{
+		var poses = DragPreviewLayout.OnStack(new Area(0, 0, 200, 120), new[] { (800.0, 600.0), (800.0, 600.0), (800.0, 600.0) }, maxVisible: 1);
+
+		Assert.Equal(new[] { 0.0, 0.0, 1.0 }, poses.Select(p => p.Opacity));
+	}
+
 	[Theory]
 	[InlineData(0, false, 0)]
 	[InlineData(1, false, 0.35)]

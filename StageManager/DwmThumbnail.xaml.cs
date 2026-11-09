@@ -131,12 +131,18 @@ namespace StageManager
 		private Window FindWindow() => _window ??= Window.GetWindow(this);
 
 		private (double Width, double Height) _lastSourceSize;
+		private RECT? _source;
 
 		/// <summary>
 		/// Size of the area DWM shows, in the unit of the source window. Only the proportions matter here.
 		/// </summary>
 		private (double Width, double Height) GetSourceSize()
 		{
+			// the visible frame of the window, the same part the flying windows show, so the card and the flights match
+			_source = Native.WindowGeometry.FrameSourceOf(_dwmThumbnail, PreviewHandle);
+			if (_source is RECT s)
+				return _lastSourceSize = (s.right - s.left, s.bottom - s.top);
+
 			// DWM knows the size of the last rendered frame, also for minimized windows
 			if (_dwmThumbnail != IntPtr.Zero && NativeMethods.DwmQueryThumbnailSourceSize(_dwmThumbnail, out var size) == 0 && size.cx > 0 && size.cy > 0)
 				return _lastSourceSize = (size.cx, size.cy);
@@ -194,11 +200,22 @@ namespace StageManager
 			var props = new DWM_THUMBNAIL_PROPERTIES
 			{
 				fVisible = true,
-				dwFlags = (int)(DWM_TNP.DWM_TNP_VISIBLE | DWM_TNP.DWM_TNP_OPACITY | DWM_TNP.DWM_TNP_RECTDESTINATION | DWM_TNP.DWM_TNP_SOURCECLIENTAREAONLY),
+				dwFlags = (int)(DWM_TNP.DWM_TNP_VISIBLE | DWM_TNP.DWM_TNP_OPACITY | DWM_TNP.DWM_TNP_RECTDESTINATION),
 				opacity = (byte)Math.Clamp(Math.Round(255 * GetThumbnailOpacity(this)), 0, 255),
-				rcDestination = thumbnailRect,
-				fSourceClientAreaOnly = true
+				rcDestination = thumbnailRect
 			};
+
+			if (_source is RECT sourceRect)
+			{
+				props.dwFlags |= (int)DWM_TNP.DWM_TNP_RECTSOURCE;
+				props.rcSource = sourceRect;
+			}
+			else
+			{
+				props.dwFlags |= (int)DWM_TNP.DWM_TNP_SOURCECLIENTAREAONLY;
+				props.fSourceClientAreaOnly = true;
+			}
+
 			NativeMethods.DwmUpdateThumbnailProperties(_dwmThumbnail, ref props);
 		}
 	}

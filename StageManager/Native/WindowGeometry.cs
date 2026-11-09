@@ -52,6 +52,51 @@ namespace StageManager.Native
 		public static Area BoundsOf(Area near) =>
 			ToArea(Screen.FromRectangle(new System.Drawing.Rectangle((int)near.Left, (int)near.Top, Math.Max(1, (int)near.Width), Math.Max(1, (int)near.Height))).Bounds);
 
+		/// <summary>
+		/// The part of a DWM thumbnail that shows the visible frame of the window, without the invisible resize borders around it.
+		/// The card in the sidebar and the flying windows both draw this part, so one can take over from the other without a jump.
+		/// Null if the size of the thumbnail is unknown.
+		/// </summary>
+		public static Interop.RECT? FrameSourceOf(IntPtr thumbnail, IntPtr window)
+		{
+			if (thumbnail == IntPtr.Zero || Interop.NativeMethods.DwmQueryThumbnailSourceSize(thumbnail, out var size) != 0 || size.cx <= 0 || size.cy <= 0)
+				return null;
+
+			var insets = InsetsOf(window);
+			var rect = new Interop.RECT
+			{
+				left = (int)Math.Round(insets.Left),
+				top = (int)Math.Round(insets.Top),
+				right = size.cx - (int)Math.Round(insets.Right),
+				bottom = size.cy - (int)Math.Round(insets.Bottom)
+			};
+
+			return rect.right > rect.left && rect.bottom > rect.top ? rect : null;
+		}
+
+		private static Insets InsetsOf(IntPtr window)
+		{
+			// a minimized window has no frame to measure, the usual borders are the best guess
+			if (Win32.IsIconic(window))
+				return Insets.Default;
+
+			var rect = new Win32.Rect();
+			if (!Win32.GetWindowRect(window, ref rect)
+				|| Win32.DwmGetWindowAttribute(window, DWMWA_EXTENDED_FRAME_BOUNDS, out Win32.Rect frame, Marshal.SizeOf<Win32.Rect>()) != 0
+				|| frame.Right <= frame.Left || frame.Bottom <= frame.Top)
+				return Insets.Default;
+
+			var insets = FlightPlanner.InsetsOf(new Area(rect.Left, rect.Top, rect.Right, rect.Bottom), new Area(frame.Left, frame.Top, frame.Right, frame.Bottom));
+			return insets.Left < 0 || insets.Top < 0 || insets.Right < 0 || insets.Bottom < 0 ? Insets.Default : insets;
+		}
+
+		/// <summary>Width and height of the visible frame of a window, the proportions its thumbnail on a card gets.</summary>
+		public static (double Width, double Height) FrameSizeOf(IntPtr window)
+		{
+			var frame = Parking.OriginalFrameOf(window) ?? FrameOf(window);
+			return frame is Area f && f.Width > 0 && f.Height > 0 ? (f.Width, f.Height) : (0, 0);
+		}
+
 		private static Area ToArea(System.Drawing.Rectangle r) => new(r.Left, r.Top, r.Right, r.Bottom);
 	}
 }

@@ -126,6 +126,25 @@ namespace StageManager.Model
 
 		public double ThumbnailWidth { get; private set; } = 150;
 
+		private double _cardOpacity = 1;
+
+		/// <summary>
+		/// How visible the thumbnails and icons of the card are. 0 while the windows of the card are still flying to it, dimmed while the
+		/// card is dragged out of the sidebar.
+		/// </summary>
+		public double CardOpacity
+		{
+			get => _cardOpacity;
+			set
+			{
+				if (_cardOpacity == value)
+					return;
+
+				_cardOpacity = value;
+				RaisePropertyChanged();
+			}
+		}
+
 		public double ThumbnailHeight { get; private set; } = 100;
 
 		/// <summary>

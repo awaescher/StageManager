@@ -25,6 +25,7 @@ namespace StageManager.Native
 			public required Pose To { get; set; }
 			public Pose Current { get; set; }
 			public IntPtr Thumbnail { get; set; }
+			public RECT? Source { get; set; }
 			public Border? Frame { get; set; }
 			public Flight? Flight { get; set; }
 		}
@@ -87,6 +88,7 @@ namespace StageManager.Native
 					return false;
 
 				item.Thumbnail = thumbnail;
+				item.Source = WindowGeometry.FrameSourceOf(thumbnail, window);
 			}
 			else
 			{
@@ -109,6 +111,29 @@ namespace StageManager.Native
 		}
 
 		public bool HasFlights => _items.Count > 0;
+
+		/// <summary>
+		/// Completes once DWM shows the overlay. Until then, a window that is hidden or a card that is removed would leave a gap
+		/// where its flying copy should already be.
+		/// </summary>
+		public async Task WhenOnScreen()
+		{
+			var rendered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+			EventHandler? handler = null;
+			handler = (_, _) =>
+			{
+				CompositionTarget.Rendering -= handler;
+				rendered.TrySetResult();
+			};
+			CompositionTarget.Rendering += handler;
+
+			await Task.WhenAny(rendered.Task, Task.Delay(100)).ConfigureAwait(true);
+			CompositionTarget.Rendering -= handler;
+
+			// the frame WPF prepares now reaches the screen with the next composition of DWM
+			NativeMethods.DwmFlush();
+			NativeMethods.DwmFlush();
+		}
 
 		/// <summary>Shows a window at a pose right away, e.g. while it follows the pointer. Stops a flight of all windows that is under way.</summary>
 		public void Place(int index, Pose pose)
@@ -239,6 +264,14 @@ namespace StageManager.Native
 						bottom = (int)Math.Round(top + pose.Height)
 					}
 				};
+
+				// only the visible frame, the poses are measured on it
+				if (item.Source is RECT source)
+				{
+					properties.dwFlags |= (int)DWM_TNP.DWM_TNP_RECTSOURCE;
+					properties.rcSource = source;
+				}
+
 				NativeMethods.DwmUpdateThumbnailProperties(item.Thumbnail, ref properties);
 			}
 			else if (item.Frame is not null)
@@ -255,6 +288,9 @@ namespace StageManager.Native
 		public void Finish()
 		{
 			CompositionTarget.Rendering -= OnRendering;
+
+			// hide first: closing a layered window can show its last frame once more
+			Win32.ShowWindow(_handle, Win32.SW.SW_HIDE);
 
 			foreach (var item in _items.Where(i => i.Thumbnail != IntPtr.Zero))
 				NativeMethods.DwmUnregisterThumbnail(item.Thumbnail);
