@@ -41,10 +41,18 @@ namespace StageManager
 		private Timer _overlapCheckTimer;
 		private Point _mouse = new Point(0, 0);
 		private SceneModel _removedCurrentScene;
-		private SceneModel _mouseDownScene;
+
+		// dragging a card out of the sidebar, UI thread only
+		private readonly CardDragTracker _drag = new();
+		private FrameworkElement? _dragElement;
+		private SceneModel? _dragCard;
+		private Area _dragCardArea;
+		private Point _dragGrabOffset;
+		private CardDragPreview? _dragPreview;
+		// read by the timer thread: the sidebar must not slide away while a card is dragged out of it or flies back
+		private volatile bool _dragActive;
 
 		public bool EnableWindowDropToScene = false;
-		public bool EnableWindowPullToScene = true;
 
 		public MainWindow()
 		{
@@ -335,19 +343,6 @@ namespace StageManager
 			// if it's allowed to drag windows into scenes, we cannot hide the scenes
 			if (EnableWindowDropToScene)
 				_overlapCheckTimer.Change(TimeSpan.Zero, TimeSpan.Zero);
-
-			var foregroundWindow = Win32.GetForegroundWindow();
-			if (foregroundWindow != _thisHandle)
-				return;
-
-			if (EnableWindowPullToScene)
-			{
-				var screenPoint = new Point(e.Data.X, e.Data.Y);
-				this.Dispatcher.Invoke(() =>
-				{
-					_mouseDownScene = FindSceneByPoint(screenPoint);
-				});
-			}
 		}
 
 		private void OnMouseReleased(object? sender, MouseHookEventArgs e)
@@ -374,25 +369,225 @@ namespace StageManager
 						SceneManager.MoveWindow(foregroundWindow, sceneModel.Scene).SafeFireAndForget();
 				});
 			}
+		}
 
-			if (EnableWindowPullToScene)
+		private const int VK_ESCAPE = 0x1B;
+
+		/// <summary>Pointer in physical screen pixels, the unit of the sidebar geometry and of window positions.</summary>
+		private static Point ScreenPoint(FrameworkElement element, MouseEventArgs e) => element.PointToScreen(e.GetPosition(element));
+
+		private void Card_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			if (sender is not FrameworkElement { DataContext: SceneModel card } element)
+				return;
+
+			e.Handled = true;
+
+			// a card that still flies back or to the stage cannot be grabbed again
+			if (_dragActive)
+				return;
+
+			if (!element.CaptureMouse())
+				return;
+
+			var p = ScreenPoint(element, e);
+			_drag.Press(p.X, p.Y);
+			_dragElement = element;
+			_dragCard = card;
+		}
+
+		private void Card_MouseMove(object sender, MouseEventArgs e)
+		{
+			if (!_drag.IsPressed || !ReferenceEquals(sender, _dragElement))
+				return;
+
+			// the button went up without telling us, or Escape was pressed while the window has no keyboard focus
+			if (e.LeftButton != MouseButtonState.Pressed || (Win32.GetAsyncKeyState(VK_ESCAPE) & 0x8000) != 0)
 			{
-				if (_geometry.IsPulledOutOfSidebar(e.Data.X) && _mouseDownScene is object)
-				{
-					var pulled = _mouseDownScene;
-					_mouseDownScene = null;
+				CancelCardDrag();
+				return;
+			}
 
-					// the whole card goes to the stage, all its apps stay together
-					this.Dispatcher.Invoke(() =>
-					{
-						SceneManager.JoinToCurrent(pulled.Scene).SafeFireAndForget();
-					});
-				}
-				else
+			if (!App.Settings.Current.Sidebar.DragToStage)
+				return;
+
+			var p = ScreenPoint(_dragElement!, e);
+			var wasDragging = _drag.IsDragging;
+			var state = _drag.Move(p.X, p.Y, _geometry.DistanceOutside(p.X, p.Y));
+
+			if (!state.IsDragging)
+				return;
+
+			if (!wasDragging)
+				BeginCardDrag(p);
+
+			if (_dragPreview is null)
+				return;
+
+			var rect = DragPreviewLayout.CardRect(p.X, p.Y, _dragGrabOffset.X, _dragGrabOffset.Y, _dragCardArea.Width, _dragCardArea.Height, state.Progress);
+			_dragPreview.Update(rect, DragPreviewLayout.HintOpacity(state.Progress, state.IsArmed));
+		}
+
+		private void Card_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+		{
+			if (!_drag.IsPressed || !ReferenceEquals(sender, _dragElement))
+				return;
+
+			e.Handled = true;
+
+			var card = _dragCard;
+			var result = _drag.Release();
+
+			// releasing the capture raises LostMouseCapture, the drag is over already then
+			_dragElement?.ReleaseMouseCapture();
+
+			switch (result)
+			{
+				case DragEnd.Click:
+					ClearCardDrag();
+					if (card is object)
+						SwitchSceneCommand.Execute(card);
+					break;
+				case DragEnd.Drop:
+					EndCardDrag(drop: true).SafeFireAndForget(ex => Log.Error("Dropping a card failed", ex));
+					break;
+				default:
+					EndCardDrag(drop: false).SafeFireAndForget(ex => Log.Error("Returning a card failed", ex));
+					break;
+			}
+		}
+
+		private void Card_LostMouseCapture(object sender, MouseEventArgs e)
+		{
+			// another window took the mouse, e.g. Alt+Tab, a menu or a dialog: never move windows then
+			if (_drag.IsPressed && ReferenceEquals(sender, _dragElement))
+				CancelCardDrag();
+		}
+
+		protected override void OnPreviewKeyDown(KeyEventArgs e)
+		{
+			if (e.Key == Key.Escape && _drag.IsPressed)
+			{
+				e.Handled = true;
+				CancelCardDrag();
+				return;
+			}
+
+			base.OnPreviewKeyDown(e);
+		}
+
+		private void CancelCardDrag()
+		{
+			if (!_drag.IsPressed)
+				return;
+
+			_drag.Cancel();
+			_dragElement?.ReleaseMouseCapture();
+			EndCardDrag(drop: false).SafeFireAndForget(ex => Log.Error("Returning a card failed", ex));
+		}
+
+		/// <summary>The press became a drag: the windows of the card come off the sidebar and follow the pointer.</summary>
+		private void BeginCardDrag(Point pointer)
+		{
+			if (_dragCard is null || _dragElement is null || CardArea(_dragCard.Scene) is not Area card)
+				return;
+
+			_dragActive = true;
+			_dragCardArea = card;
+			_dragGrabOffset = new Point(pointer.X - (card.Left + card.Width / 2), pointer.Y - (card.Top + card.Height / 2));
+
+			var settings = App.Settings.Current;
+			var style = AnimationPolicy.DecideDragPreview(settings.Animations, SystemAnimation.Read());
+			var margin = 16 * _dpiScale;
+			var stage = _geometry.StageArea;
+			var hint = new Area(stage.Left + margin, stage.Top + margin, stage.Right - margin, stage.Bottom - margin);
+			var windows = _dragCard.Scene.Windows.Select(w => w.Handle).ToArray();
+
+			_dragPreview = CardDragPreview.Start(windows, card, hint, style, settings.Sidebar.MaxWindowsPerScene);
+
+			// the card stays in the sidebar as a faint placeholder, like on macOS
+			DwmThumbnail.SetThumbnailOpacity(_dragElement, 0.3);
+			_dragElement.Opacity = 0.4;
+		}
+
+		private async Task EndCardDrag(bool drop)
+		{
+			var preview = _dragPreview;
+			var card = _dragCard;
+			var element = _dragElement;
+			var cardArea = _dragCardArea;
+
+			_dragPreview = null;
+			_dragCard = null;
+			_dragElement = null;
+
+			try
+			{
+				if (card is null)
+					return;
+
+				var animations = App.Settings.Current.Animations;
+				var duration = FlightMotion.Duration(animations.Speed);
+
+				// without animations the windows only snap into place, the drag itself was feedback enough
+				if (SystemAnimation.CurrentStyle() == FlightStyle.None)
+					duration = TimeSpan.FromTicks(duration.Ticks / 3);
+
+				if (drop)
 				{
-					_mouseDownScene = null;
+					var handles = card.Scene.Windows.Select(w => w.Handle).ToArray();
+					if (preview is object)
+					{
+						foreach (var h in handles)
+							NativeMethods.SetTransitionsDisabled(h, true);
+
+						await Task.WhenAny(preview.Drop(duration), Task.Delay(duration + TimeSpan.FromMilliseconds(500))).ConfigureAwait(true);
+					}
+
+					// the preview has already flown the windows to their places, the switch must not fly them once more
+					await SceneManager.JoinToCurrent(card.Scene, animate: preview is null).ConfigureAwait(true);
+
+					// let the real windows paint under the preview before it goes, both show the same picture
+					if (preview is object)
+					{
+						await Task.Delay(90).ConfigureAwait(true);
+
+						foreach (var h in handles)
+							NativeMethods.SetTransitionsDisabled(h, false);
+					}
+				}
+				else if (preview is object)
+				{
+					var target = CardArea(card.Scene) ?? cardArea;
+					var back = TimeSpan.FromTicks(duration.Ticks * 3 / 4);
+					await Task.WhenAny(preview.Return(target, back), Task.Delay(back + TimeSpan.FromMilliseconds(500))).ConfigureAwait(true);
 				}
 			}
+			finally
+			{
+				try
+				{
+					preview?.Finish();
+				}
+				catch (Exception ex)
+				{
+					Log.Error("The drag preview could not be closed", ex);
+				}
+
+				if (element is object)
+				{
+					element.ClearValue(DwmThumbnail.ThumbnailOpacityProperty);
+					element.ClearValue(OpacityProperty);
+				}
+
+				_dragActive = false;
+			}
+		}
+
+		private void ClearCardDrag()
+		{
+			_dragElement = null;
+			_dragCard = null;
 		}
 
 		private SceneModel FindSceneByPoint(Point p)
@@ -518,6 +713,9 @@ namespace StageManager
 
 		private void UpdateModeByWindows(IEnumerable<IWindow> windows)
 		{
+			if (_dragActive)
+				return;
+
 			var geometry = _geometry;
 
 			bool doesOverlap(IWindowLocation loc) => loc.State == Native.Window.WindowState.Maximized || (loc.State == Native.Window.WindowState.Normal && geometry.DoesNormalWindowOverlap(loc.X, loc.Width));
@@ -573,7 +771,7 @@ namespace StageManager
 		private void CardMenu_Opened(object sender, RoutedEventArgs e)
 		{
 			StopHook();
-			_mouseDownScene = null;
+			CancelCardDrag();
 
 			if (sender is not ContextMenu menu || CardOf(menu) is not SceneModel card)
 				return;

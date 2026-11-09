@@ -165,6 +165,14 @@
             Style="{StaticResource Hint}"
             Foreground="DarkOrange"
             Visibility="Collapsed" />
+        <CheckBox
+            x:Name="dragToStage"
+            Margin="0,8,0,4"
+            Click="DragToStage_Click">
+            <TextBlock
+                TextWrapping="Wrap"
+                Text="Drag a card onto the stage to add its apps to it" />
+        </CheckBox>
 
         <TextBlock
             Style="{StaticResource Heading}"

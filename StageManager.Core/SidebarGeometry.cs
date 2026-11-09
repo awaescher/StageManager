@@ -43,6 +43,23 @@ public sealed record SidebarGeometry(Area Area, double Width, SidebarSide Side)
 	public bool IsPulledOutOfSidebar(double mouseX) =>
 		IsLeft ? mouseX > Area.Left + Width : mouseX < Area.Right - Width;
 
+	/// <summary>
+	/// How far the pointer is beyond the inner edge of the sidebar, in pixels. Negative above the sidebar.
+	/// Negative infinity if the pointer is not on this monitor, so dragging to another monitor never counts as "on the stage".
+	/// </summary>
+	public double DistanceOutside(double mouseX, double mouseY)
+	{
+		if (mouseX < Area.Left || mouseX > Area.Right || mouseY < Area.Top || mouseY > Area.Bottom)
+			return double.NegativeInfinity;
+
+		return IsLeft ? mouseX - (Area.Left + Width) : (Area.Right - Width) - mouseX;
+	}
+
+	/// <summary>The part of the monitor the windows of the stage use: everything but the sidebar.</summary>
+	public Area StageArea => IsLeft
+		? new Area(Area.Left + Width, Area.Top, Area.Right, Area.Bottom)
+		: new Area(Area.Left, Area.Top, Area.Right - Width, Area.Bottom);
+
 	/// <summary>True if a window in normal state reaches far enough below the sidebar that the sidebar should hide (half its width).</summary>
 	public bool DoesNormalWindowOverlap(double windowLeft, double windowWidth) =>
 		IsLeft
