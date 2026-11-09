@@ -38,6 +38,12 @@ namespace StageManager
 				new Choice<SidebarSide>("Right", SidebarSide.Right)
 			});
 
+			Fill(hideStrategy, new[]
+			{
+				new Choice<HideStrategy>("Moving them out of the screen (recommended)", HideStrategy.Park),
+				new Choice<HideStrategy>("Minimizing them", HideStrategy.Minimize)
+			});
+
 			Fill(iconsMode, new[]
 			{
 				new Choice<DesktopIconsMode>("Automatic: hide while a scene is active, show in the desktop view", DesktopIconsMode.Manage),
@@ -105,6 +111,7 @@ namespace StageManager
 				var sidebar = current.Sidebar;
 
 				autostart.IsChecked = MainWindow.StartsWithWindows;
+				Select(hideStrategy, current.HideStrategy);
 				Select(side, sidebar.Side);
 
 				// the values the user can choose from, plus the current one if it was set by hand in settings.json
@@ -178,6 +185,12 @@ namespace StageManager
 		private void Autostart_Click(object sender, RoutedEventArgs e)
 		{
 			MainWindow.StartsWithWindows = autostart.IsChecked == true;
+		}
+
+		private void HideStrategy_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (hideStrategy.SelectedItem is Choice<HideStrategy> c)
+				Change(s => s.HideStrategy = c.Value);
 		}
 
 		private void Side_SelectionChanged(object sender, SelectionChangedEventArgs e)

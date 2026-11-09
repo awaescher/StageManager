@@ -71,6 +71,25 @@
             x:Name="autostart"
             Content="Start with Windows"
             Click="Autostart_Click" />
+        <Grid
+            Margin="0,4,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition
+                    Width="170" />
+                <ColumnDefinition
+                    Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Style="{StaticResource Label}"
+                Text="Hide other windows by" />
+            <ComboBox
+                x:Name="hideStrategy"
+                Grid.Column="1"
+                SelectionChanged="HideStrategy_SelectionChanged" />
+        </Grid>
+        <TextBlock
+            Style="{StaticResource Hint}"
+            Text="Moving a window out of the screen keeps its picture in the sidebar. Minimized windows of browsers and WebView apps lose theirs." />
 
         <TextBlock
             Style="{StaticResource Heading}"
