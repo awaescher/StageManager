@@ -19,6 +19,7 @@ public sealed class SettingsTests : IDisposable
 	{
 		var s = new AppSettings().Normalize();
 
+		Assert.Equal(HideStrategy.Park, s.HideStrategy);
 		Assert.Equal(DesktopIconsMode.Manage, s.DesktopIcons.Mode);
 		Assert.True(s.DesktopIcons.RestoreOnExit);
 		Assert.Equal(SidebarSide.Left, s.Sidebar.Side);

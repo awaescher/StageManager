@@ -119,6 +119,9 @@ namespace StageManager
 
 			_thisHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
 
+			// windows a killed run left out of the screen come back before anything else looks at them
+			Parking.Recover();
+
 			var windowsManager = new WindowsManager();
 			SceneManager = new SceneManager(windowsManager);
 			await SceneManager.Start().ConfigureAwait(true);

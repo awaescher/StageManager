@@ -26,7 +26,7 @@ namespace StageManager
 		public event EventHandler<SceneChangedEventArgs> SceneChanged;
 		public event EventHandler<CurrentSceneSelectionChangedEventArgs> CurrentSceneSelectionChanged;
 
-		private IWindowStrategy WindowStrategy { get; } = new NormalizeAndMinimizeWindowStrategy(); // new WindowNormalizeStrategy/OpacityWindowStrategy/ShowAndHideWindowStrategy
+		private IWindowStrategy WindowStrategy { get; } = new ScreenOffsetWindowStrategy(); // alternatives: NormalizeAndMinimizeWindowStrategy/OpacityWindowStrategy/ShowAndHideWindowStrategy
 
 		public WindowsManager WindowsManager { get; }
 
@@ -75,6 +75,9 @@ namespace StageManager
 					WindowStrategy.Show(w);
 			}
 
+			// whatever the scenes know about, nothing may stay out of the screen
+			Parking.RestoreAll();
+
 			_desktopIcons.Stop();
 		}
 
@@ -101,6 +104,8 @@ namespace StageManager
 
 		private void WindowsManager_WindowDestroyed(IWindow window)
 		{
+			Parking.Forget(window.Handle);
+
 			var removal = _registry.Remove(window.Handle.ToInt64());
 			if (removal.GroupId is not Guid id || !_sceneById.TryGetValue(id, out var scene))
 				return;
@@ -271,7 +276,7 @@ namespace StageManager
 				// the windows that leave fly where they stand to the card, the ones that come fly from the card to where they will show
 				foreach (var w in (prior?.Windows ?? Enumerable.Empty<IWindow>()).Intersect(otherWindows))
 				{
-					if (!Win32.IsWindowVisible(w.Handle) || Win32.IsIconic(w.Handle))
+					if (!Win32.IsWindowVisible(w.Handle) || Win32.IsIconic(w.Handle) || Parking.IsParked(w.Handle))
 						continue;
 
 					if (WindowGeometry.FrameOf(w.Handle) is not Area frame || !FlightPlanner.Intersects(monitor, frame))
@@ -283,10 +288,15 @@ namespace StageManager
 
 				foreach (var w in scene.Windows)
 				{
-					if (WindowGeometry.FrameOf(w.Handle) is not Area frame || !FlightPlanner.Intersects(monitor, frame))
+					// a window that is on screen already (activated from the taskbar or with Alt+Tab) has arrived, it must not fly there once more
+					if (Win32.IsWindowVisible(w.Handle) && !Win32.IsIconic(w.Handle) && !Parking.IsParked(w.Handle))
 						continue;
 
-					overlay.Add(w.Handle, FlightPlanner.OnCard(cardArea, frame.Width, frame.Height, 1), FlightPlanner.OfFrame(frame));
+					var frame = Parking.OriginalFrameOf(w.Handle) ?? WindowGeometry.FrameOf(w.Handle);
+					if (frame is not Area target || !FlightPlanner.Intersects(monitor, target))
+						continue;
+
+					overlay.Add(w.Handle, FlightPlanner.OnCard(cardArea, target.Width, target.Height, 1), FlightPlanner.OfFrame(target));
 					involved.Add(w.Handle);
 				}
 			}
@@ -404,11 +414,11 @@ namespace StageManager
 				}
 				else
 				{
-					WindowStrategy.Hide(window);
-
-					// reset window position after move so that the window is back at the starting position on the new scene
+					// back to the place the window was dragged from, before it is hidden: a hidden window is out of the screen
 					if (window is WindowsWindow w && w.PopLastLocation() is IWindowLocation l)
 						Win32.SetWindowPos(window.Handle, IntPtr.Zero, l.X, l.Y, 0, 0, Win32.SetWindowPosFlags.IgnoreResize);
+
+					WindowStrategy.Hide(window);
 				}
 
 				return Task.CompletedTask;
@@ -565,7 +575,9 @@ namespace StageManager
 			}
 		}
 
-		public IEnumerable<IWindow> GetCurrentWindows() => _current?.Windows ?? GetSceneableWindows();
+		/// <summary>The windows that decide if the sidebar has to get out of the way. Parked windows are not on the screen, they do not count.</summary>
+		public IEnumerable<IWindow> GetCurrentWindows() =>
+			(_current?.Windows ?? GetSceneableWindows()).Where(w => !Parking.IsParked(w.Handle));
 
 		public static string GroupKeyOf(IWindow window) =>
 			string.IsNullOrEmpty(window.AppKey) ? window.ProcessName.ToUpperInvariant() : window.AppKey;

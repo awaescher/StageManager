@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -115,6 +115,10 @@ namespace StageManager.Native.PInvoke
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool IsWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool IsZoomed(IntPtr hWnd);
 
         [DllImport("user32.dll")]
@@ -135,6 +139,7 @@ namespace StageManager.Native.PInvoke
 		public static extern bool ShowWindowAsync(IntPtr hWnd, SW nCmdShow);
 
         public static IntPtr HWND_TOPMOST = new IntPtr(-1);
+        public static IntPtr HWND_TOP = IntPtr.Zero;
 
 		public enum SW
 		{

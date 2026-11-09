@@ -115,6 +115,15 @@ public sealed class StageSettings
 			.ToList();
 }
 
+public enum HideStrategy
+{
+	/// <summary>Other windows are moved out of the screen. They keep the picture the sidebar shows of them.</summary>
+	Park,
+
+	/// <summary>Other windows are minimized. Chromium and WebView based windows lose their picture in the sidebar.</summary>
+	Minimize
+}
+
 public sealed class AppSettings
 {
 	public const int CurrentVersion = 1;
@@ -128,6 +137,8 @@ public sealed class AppSettings
 	};
 
 	public int Version { get; set; } = CurrentVersion;
+
+	public HideStrategy HideStrategy { get; set; } = HideStrategy.Park;
 
 	public SidebarSettings Sidebar { get; set; } = new();
 
@@ -148,6 +159,9 @@ public sealed class AppSettings
 		Stage ??= new StageSettings();
 		Stage.Normalize();
 		Animations ??= new AnimationSettings();
+
+		if (!Enum.IsDefined(HideStrategy))
+			HideStrategy = HideStrategy.Park;
 
 		if (!Enum.IsDefined(Animations.Mode))
 			Animations.Mode = AnimationMode.System;
