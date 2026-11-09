@@ -20,21 +20,24 @@ namespace StageManager.Native
 		private readonly List<Entry> _entries;
 		private readonly int _windowCount;
 		private readonly int _maxVisible;
+		private readonly double _scale;
 		private readonly Area _hintArea;
 
-		private CardDragPreview(FlightOverlay overlay, List<Entry> entries, int windowCount, int maxVisible, Area hintArea)
+		private CardDragPreview(FlightOverlay overlay, List<Entry> entries, int windowCount, int maxVisible, double scale, Area hintArea)
 		{
 			_overlay = overlay;
 			_entries = entries;
 			_windowCount = windowCount;
 			_maxVisible = maxVisible;
+			_scale = scale;
 			_hintArea = hintArea;
 		}
 
 		/// <param name="windows">The windows of the card, back to front.</param>
 		/// <param name="card">Where the thumbnails of the card are, in physical pixels.</param>
 		/// <param name="stage">Where the hint shows, in physical pixels.</param>
-		public static CardDragPreview? Start(IReadOnlyList<IntPtr> windows, Area card, Area stage, FlightStyle style, int maxVisible)
+		/// <param name="scale">Physical pixels per unit of the sidebar layout.</param>
+		public static CardDragPreview? Start(IReadOnlyList<IntPtr> windows, Area card, Area stage, FlightStyle style, int maxVisible, double scale)
 		{
 			if (windows.Count == 0 || card.Width < 8 || card.Height < 8)
 				return null;
@@ -46,7 +49,7 @@ namespace StageManager.Native
 			{
 				overlay.Show();
 
-				var slots = DragPreviewLayout.Slots(card, windows.Count, maxVisible);
+				var slots = DragPreviewLayout.Slots(card, windows.Count, maxVisible, scale);
 				for (var i = 0; i < windows.Count; i++)
 				{
 					// hidden windows are out of the screen, they come back where they were before
@@ -54,7 +57,7 @@ namespace StageManager.Native
 					if (frame is not Area f || f.Width <= 0 || f.Height <= 0)
 						continue;
 
-					var pose = OnSlot(slots[i], f);
+					var pose = DragPreviewLayout.InSlot(slots[i], f.Width, f.Height);
 					if (overlay.Add(windows[i], pose, pose))
 						entries.Add(new Entry(i, f));
 				}
@@ -72,19 +75,19 @@ namespace StageManager.Native
 				return null;
 			}
 
-			return new CardDragPreview(overlay, entries, windows.Count, maxVisible, stage);
+			return new CardDragPreview(overlay, entries, windows.Count, maxVisible, scale, stage);
 		}
 
-		private static Pose OnSlot(Pose slot, Area frame) =>
-			FlightPlanner.OnCard(new Area(slot.X, slot.Y, slot.X + slot.Width, slot.Y + slot.Height), frame.Width, frame.Height, slot.Opacity);
+		/// <summary>Completes once the windows show on the overlay, exactly on top of the card.</summary>
+		public Task WhenOnScreen() => _overlay.WhenOnScreen();
 
 		/// <param name="card">The rectangle of the whole card, see <see cref="DragPreviewLayout.CardRect"/>.</param>
 		public void Update(Area card, double hintOpacity)
 		{
-			var slots = DragPreviewLayout.Slots(card, _windowCount, _maxVisible);
+			var slots = DragPreviewLayout.Slots(card, _windowCount, _maxVisible, _scale);
 
 			for (var k = 0; k < _entries.Count; k++)
-				_overlay.Place(k, OnSlot(slots[_entries[k].Slot], _entries[k].Frame));
+				_overlay.Place(k, DragPreviewLayout.InSlot(slots[_entries[k].Slot], _entries[k].Frame.Width, _entries[k].Frame.Height));
 
 			_overlay.ShowHint(_hintArea, HintText, hintOpacity);
 		}
@@ -100,8 +103,8 @@ namespace StageManager.Native
 		public Task Return(Area card, TimeSpan duration)
 		{
 			_overlay.ShowHint(_hintArea, HintText, 0);
-			var slots = DragPreviewLayout.Slots(card, _windowCount, _maxVisible);
-			return _overlay.FlyTo(_entries.Select(e => OnSlot(slots[e.Slot], e.Frame)).ToArray(), duration);
+			var slots = DragPreviewLayout.Slots(card, _windowCount, _maxVisible, _scale);
+			return _overlay.FlyTo(_entries.Select(e => DragPreviewLayout.InSlot(slots[e.Slot], e.Frame.Width, e.Frame.Height)).ToArray(), duration);
 		}
 
 		public void Finish() => _overlay.Finish();

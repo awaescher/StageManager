@@ -135,6 +135,8 @@ namespace StageManager
 			await SceneManager.Start().ConfigureAwait(true);
 
 			SceneManager.CardAreaOf = CardArea;
+			SceneManager.CardScale = _dpiScale;
+			SceneManager.CardLanded += SceneManager_CardLanded;
 
 			SceneManager.SceneChanged += SceneManager_SceneChanged;
 			SceneManager.CurrentSceneSelectionChanged += SceneManager_CurrentSceneSelectionChanged;
@@ -220,7 +222,21 @@ namespace StageManager
 
 			_removedCurrentScene = currentModel;
 
+			// the windows of the prior scene are still flying to this card, it shows them when they arrive
+			if (args.PriorCardWaits && args.Prior is object && AllScenes.FirstOrDefault(m => m.Id == args.Prior.Id) is SceneModel priorModel)
+				priorModel.CardOpacity = 0;
+
+			// a card that waited for windows that never arrived must not stay invisible
+			if (currentModel is object)
+				currentModel.CardOpacity = 1;
+
 			SyncVisibilityByUpdatedTimeStamp();
+		}
+
+		private void SceneManager_CardLanded(object? sender, Scene scene)
+		{
+			if (AllScenes.FirstOrDefault(m => m.Id == scene.Id) is SceneModel model && !ReferenceEquals(model, _dragCard))
+				model.CardOpacity = 1;
 		}
 
 		protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
@@ -259,6 +275,9 @@ namespace StageManager
 
 			var sidebar = App.Settings.Current.Sidebar;
 			_layout = SidebarLayout.Calculate(sidebar, workArea.Height / _dpiScale);
+
+			if (SceneManager is object)
+				SceneManager.CardScale = _dpiScale;
 
 			if (Width != _layout.SidebarWidth)
 				Width = _layout.SidebarWidth;
@@ -503,11 +522,19 @@ namespace StageManager
 			var hint = new Area(stage.Left + margin, stage.Top + margin, stage.Right - margin, stage.Bottom - margin);
 			var windows = _dragCard.Scene.Windows.Select(w => w.Handle).ToArray();
 
-			_dragPreview = CardDragPreview.Start(windows, card, hint, style, settings.Sidebar.MaxWindowsPerScene);
+			_dragPreview = CardDragPreview.Start(windows, card, hint, style, settings.Sidebar.MaxWindowsPerScene, _dpiScale);
 
-			// the card stays in the sidebar as a faint placeholder, like on macOS
-			DwmThumbnail.SetThumbnailOpacity(_dragElement, 0.3);
-			_dragElement.Opacity = 0.4;
+			// the card stays in the sidebar as a faint placeholder, like on macOS, once the windows show above it
+			if (_dragPreview is CardDragPreview preview)
+				DimWhenLifted(preview, _dragCard).SafeFireAndForget();
+		}
+
+		private async Task DimWhenLifted(CardDragPreview preview, SceneModel card)
+		{
+			await preview.WhenOnScreen().ConfigureAwait(true);
+
+			if (ReferenceEquals(_dragPreview, preview))
+				card.CardOpacity = 0.3;
 		}
 
 		private async Task EndCardDrag(bool drop)
@@ -541,16 +568,21 @@ namespace StageManager
 						foreach (var h in handles)
 							NativeMethods.SetTransitionsDisabled(h, true);
 
+						// the placeholder goes while the windows leave for the stage
+						card.CardOpacity = 0;
+
 						await Task.WhenAny(preview.Drop(duration), Task.Delay(duration + TimeSpan.FromMilliseconds(500))).ConfigureAwait(true);
 					}
 
 					// the preview has already flown the windows to their places, the switch must not fly them once more
 					await SceneManager.JoinToCurrent(card.Scene, animate: preview is null).ConfigureAwait(true);
 
-					// let the real windows paint under the preview before it goes, both show the same picture
+					// the real windows are drawn under the preview before it goes, both show the same picture
 					if (preview is object)
 					{
+						NativeMethods.DwmFlush();
 						await Task.Delay(90).ConfigureAwait(true);
+						NativeMethods.DwmFlush();
 
 						foreach (var h in handles)
 							NativeMethods.SetTransitionsDisabled(h, false);
@@ -561,6 +593,12 @@ namespace StageManager
 					var target = CardArea(card.Scene) ?? cardArea;
 					var back = TimeSpan.FromTicks(duration.Ticks * 3 / 4);
 					await Task.WhenAny(preview.Return(target, back), Task.Delay(back + TimeSpan.FromMilliseconds(500))).ConfigureAwait(true);
+
+					// the card takes over under the windows that landed on it, then they go
+					card.CardOpacity = 1;
+					NativeMethods.DwmFlush();
+					await Task.Delay(50).ConfigureAwait(true);
+					NativeMethods.DwmFlush();
 				}
 			}
 			finally
@@ -574,11 +612,8 @@ namespace StageManager
 					Log.Error("The drag preview could not be closed", ex);
 				}
 
-				if (element is object)
-				{
-					element.ClearValue(DwmThumbnail.ThumbnailOpacityProperty);
-					element.ClearValue(OpacityProperty);
-				}
+				if (card is object)
+					card.CardOpacity = 1;
 
 				_dragActive = false;
 			}

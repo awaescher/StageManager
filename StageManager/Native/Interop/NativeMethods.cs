@@ -18,6 +18,10 @@ namespace StageManager.Native.Interop
         [DllImport("dwmapi.dll")]
         public static extern int DwmUnregisterThumbnail(IntPtr thumb);
 
+        /// <summary>Waits until DWM has composed the next frame.</summary>
+        [DllImport("dwmapi.dll")]
+        public static extern int DwmFlush();
+
         [DllImport("dwmapi.dll", PreserveSig = true)]
         public static extern int DwmQueryThumbnailSourceSize(IntPtr hThumbnail, out NativeSize size);
 

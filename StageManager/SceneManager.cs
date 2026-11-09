@@ -191,12 +191,21 @@ namespace StageManager
 		/// <summary>Screen rectangle of the thumbnail area of a card in physical pixels, null if the card is not on screen. Set by the sidebar.</summary>
 		public Func<Scene, Area?>? CardAreaOf { get; set; }
 
+		/// <summary>Physical pixels per unit of the sidebar layout. Set by the sidebar.</summary>
+		public double CardScale { get; set; } = 1;
+
+		/// <summary>The windows of a scene that left the stage have arrived on its card, the card can show them now.</summary>
+		public event EventHandler<Scene>? CardLanded;
+
 		private Task _flight = Task.CompletedTask;
 		private FlightOverlay? _overlay;
 
 		/// <param name="animate">False if the windows have been shown flying already, e.g. by dragging their card onto the stage.</param>
 		public async Task SwitchTo(Scene? scene, bool animate = true)
 		{
+			// a switch that is still waiting for its overlay to show has to start flying first
+			await _takeoff.ConfigureAwait(true);
+
 			// a switch that comes in while windows still fly lets them land first
 			if (_overlay is not null)
 			{
@@ -207,9 +216,12 @@ namespace StageManager
 			if (!_registry.TrySwitch(scene?.Id))
 				return;
 
+			var takeoff = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
 			try
 			{
 				_suspend = true;
+				_takeoff = takeoff.Task;
 
 				var otherWindows = GetSceneableWindows().Except(scene?.Windows ?? Array.Empty<IWindow>()).ToArray();
 
@@ -221,6 +233,10 @@ namespace StageManager
 
 				var animated = animate ? PrepareFlight(prior, scene, otherWindows) : null;
 
+				// nothing may vanish before its flying copy is on the screen: not the windows, not the card in the sidebar
+				if (animated is not null)
+					await animated.Overlay.WhenOnScreen().ConfigureAwait(true);
+
 				// with an animation the windows of the scene show up when the flight lands, not before it takes off
 				if (scene is object && animated is null)
 				{
@@ -231,20 +247,23 @@ namespace StageManager
 				foreach (var o in otherWindows)
 					WindowStrategy.Hide(o);
 
-				CurrentSceneSelectionChanged?.Invoke(this, new CurrentSceneSelectionChangedEventArgs(prior, _current));
+				CurrentSceneSelectionChanged?.Invoke(this, new CurrentSceneSelectionChangedEventArgs(prior, _current, animated?.PriorCardWaits == true));
 
 				_desktopIcons.Apply(sceneActive: scene is object);
 
 				if (animated is not null)
-					await RunFlight(animated, scene!).ConfigureAwait(true);
+					await RunFlight(animated, scene!, prior, takeoff).ConfigureAwait(true);
 			}
 			finally
 			{
+				takeoff.TrySetResult();
 				_suspend = false;
 			}
 		}
 
-		private sealed record PreparedFlight(FlightOverlay Overlay, IReadOnlyList<IntPtr> Windows);
+		private Task _takeoff = Task.CompletedTask;
+
+		private sealed record PreparedFlight(FlightOverlay Overlay, IReadOnlyList<IntPtr> Windows, bool PriorCardWaits);
 
 		/// <summary>
 		/// Puts the windows of the scenes on a transparent overlay at the position they have now. Must run before the real windows
@@ -269,26 +288,46 @@ namespace StageManager
 
 			var overlay = new FlightOverlay(monitor, style);
 			var involved = new List<IntPtr>();
+			var priorCardWaits = false;
+			var maxVisible = App.Settings.Current.Sidebar.MaxWindowsPerScene;
 
 			try
 			{
 				overlay.Show();
 
+				// the card of the prior scene takes the place of the card of the new scene, both stacks are laid out on that place
+				// exactly like the sidebar draws them, so the flying windows and the card match when one takes over from the other
+				var priorWindows = (prior?.Windows ?? Enumerable.Empty<IWindow>()).ToArray();
+				var priorStack = DragPreviewLayout.OnStack(cardArea, priorWindows.Select(w => WindowGeometry.FrameSizeOf(w.Handle)).ToArray(), maxVisible, CardScale);
+
 				// the windows that leave fly where they stand to the card, the ones that come fly from the card to where they will show
-				foreach (var w in (prior?.Windows ?? Enumerable.Empty<IWindow>()).Intersect(otherWindows))
+				for (var i = 0; i < priorWindows.Length; i++)
 				{
+					var w = priorWindows[i];
+					if (!otherWindows.Contains(w))
+						continue;
+
 					if (!Win32.IsWindowVisible(w.Handle) || Win32.IsIconic(w.Handle) || Parking.IsParked(w.Handle))
 						continue;
 
 					if (WindowGeometry.FrameOf(w.Handle) is not Area frame || !FlightPlanner.Intersects(monitor, frame))
 						continue;
 
-					overlay.Add(w.Handle, FlightPlanner.OfFrame(frame), FlightPlanner.OnCard(cardArea, frame.Width, frame.Height, 1));
-					involved.Add(w.Handle);
+					// a window that is not shown on the card fades out on the way
+					if (overlay.Add(w.Handle, FlightPlanner.OfFrame(frame), priorStack[i]))
+					{
+						involved.Add(w.Handle);
+						priorCardWaits = true;
+					}
 				}
 
-				foreach (var w in scene.Windows)
+				var windows = scene.Windows.ToArray();
+				var stack = DragPreviewLayout.OnStack(cardArea, windows.Select(w => WindowGeometry.FrameSizeOf(w.Handle)).ToArray(), maxVisible, CardScale);
+
+				for (var i = 0; i < windows.Length; i++)
 				{
+					var w = windows[i];
+
 					// a window that is on screen already (activated from the taskbar or with Alt+Tab) has arrived, it must not fly there once more
 					if (Win32.IsWindowVisible(w.Handle) && !Win32.IsIconic(w.Handle) && !Parking.IsParked(w.Handle))
 						continue;
@@ -297,8 +336,9 @@ namespace StageManager
 					if (frame is not Area target || !FlightPlanner.Intersects(monitor, target))
 						continue;
 
-					overlay.Add(w.Handle, FlightPlanner.OnCard(cardArea, target.Width, target.Height, 1), FlightPlanner.OfFrame(target));
-					involved.Add(w.Handle);
+					// a window that is not shown on the card fades in on the way
+					if (overlay.Add(w.Handle, stack[i], FlightPlanner.OfFrame(target)))
+						involved.Add(w.Handle);
 				}
 			}
 			catch (Exception ex)
@@ -319,19 +359,27 @@ namespace StageManager
 				NativeMethods.SetTransitionsDisabled(h, true);
 
 			_overlay = overlay;
-			return new PreparedFlight(overlay, involved);
+			return new PreparedFlight(overlay, involved, priorCardWaits);
 		}
 
 		/// <summary>How long the real windows have to paint themselves under the overlay before it goes. Both show the same picture, so the overlap cannot be seen.</summary>
 		private static readonly TimeSpan LandingDelay = TimeSpan.FromMilliseconds(90);
 
-		private async Task RunFlight(PreparedFlight flight, Scene scene)
+		private async Task RunFlight(PreparedFlight flight, Scene scene, Scene? prior, TaskCompletionSource takeoff)
 		{
 			var duration = FlightMotion.Duration(App.Settings.Current.Animations.Speed);
 			var landed = false;
+			var cardLanded = false;
 
 			void Land()
 			{
+				// the card shows its windows the moment their flying copies arrive on it, both lie exactly on top of each other
+				if (!cardLanded && flight.PriorCardWaits && prior is object)
+				{
+					cardLanded = true;
+					CardLanded?.Invoke(this, prior);
+				}
+
 				// a newer switch may have taken over while this flight was still in the air: then these windows stay hidden
 				if (landed || !ReferenceEquals(_current, scene))
 					return;
@@ -344,12 +392,17 @@ namespace StageManager
 			try
 			{
 				_flight = flight.Overlay.Fly(duration);
+				takeoff.TrySetResult();
 
 				// never leave the overlay on the screen, whatever happens to the flight
 				await Task.WhenAny(_flight, Task.Delay(duration + TimeSpan.FromMilliseconds(1500))).ConfigureAwait(true);
 
 				Land();
+
+				// the real windows and the card are drawn under the overlay before it goes, both show the same picture
+				NativeMethods.DwmFlush();
 				await Task.Delay(LandingDelay).ConfigureAwait(true);
+				NativeMethods.DwmFlush();
 			}
 			catch (Exception ex)
 			{

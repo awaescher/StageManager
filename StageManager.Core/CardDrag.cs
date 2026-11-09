@@ -138,21 +138,41 @@ public static class DragPreviewLayout
 	}
 
 	/// <summary>One slot per window, back to front. Windows beyond the visible ones get a slot without opacity.</summary>
-	public static IReadOnlyList<Pose> Slots(Area card, int windowCount, int maxVisible)
+	/// <param name="scale">Physical pixels per unit of the sidebar layout, the steps of the stack are measured in that unit.</param>
+	public static IReadOnlyList<Pose> Slots(Area card, int windowCount, int maxVisible, double scale = 1)
 	{
-		var stack = ThumbnailStack.Calculate(card.Width, card.Height, windowCount, maxVisible);
+		scale = double.IsFinite(scale) && scale > 0 ? scale : 1;
+		var stack = ThumbnailStack.Calculate(card.Width / scale, card.Height / scale, windowCount, maxVisible);
 		var poses = new List<Pose>(stack.Length);
 
 		foreach (var slot in stack)
 		{
 			// the offsets of a stack are measured from the bottom left corner of the card
-			var left = card.Left + slot.OffsetX;
-			var top = card.Bottom - slot.OffsetY - slot.Height;
-			poses.Add(new Pose(left, top, slot.Width, slot.Height, slot.IsVisible ? 1 : 0));
+			var left = card.Left + slot.OffsetX * scale;
+			var top = card.Bottom - (slot.OffsetY + slot.Height) * scale;
+			poses.Add(new Pose(left, top, slot.Width * scale, slot.Height * scale, slot.IsVisible ? 1 : 0));
 		}
 
 		return poses;
 	}
+
+	/// <summary>
+	/// Where each window shows on a card in the sidebar: in its slot of the stack, fitted without distortion, like the card draws it.
+	/// Back to front. Flights start and end here, so the card and the flying windows match when one takes over from the other.
+	/// </summary>
+	public static Pose[] OnStack(Area card, IReadOnlyList<(double Width, double Height)> sources, int maxVisible, double scale = 1)
+	{
+		var slots = Slots(card, sources.Count, maxVisible, scale);
+		var poses = new Pose[sources.Count];
+
+		for (var i = 0; i < poses.Length; i++)
+			poses[i] = InSlot(slots[i], sources[i].Width, sources[i].Height);
+
+		return poses;
+	}
+
+	public static Pose InSlot(Pose slot, double sourceWidth, double sourceHeight) =>
+		FlightPlanner.OnCard(new Area(slot.X, slot.Y, slot.X + slot.Width, slot.Y + slot.Height), sourceWidth, sourceHeight, slot.Opacity);
 
 	/// <summary>How visible the hint for the stage is: a faint outline while the card leaves the sidebar, fully when letting go would drop it.</summary>
 	public static double HintOpacity(double progress, bool armed) => armed ? 1 : Math.Clamp(progress, 0, 1) * 0.35;
