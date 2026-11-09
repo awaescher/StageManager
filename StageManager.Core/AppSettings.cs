@@ -25,6 +25,9 @@ public sealed class SidebarSettings
 
 	public SidebarSide Side { get; set; } = SidebarSide.Left;
 
+	/// <summary>Cards can be dragged out of the sidebar onto the stage to add their apps to it.</summary>
+	public bool DragToStage { get; set; } = true;
+
 	/// <summary>Number of scenes (cards) shown in the sidebar at the same time.</summary>
 	public int MaxScenes { get; set; } = 6;
 

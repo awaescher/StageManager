@@ -194,7 +194,8 @@ namespace StageManager
 		private Task _flight = Task.CompletedTask;
 		private FlightOverlay? _overlay;
 
-		public async Task SwitchTo(Scene? scene)
+		/// <param name="animate">False if the windows have been shown flying already, e.g. by dragging their card onto the stage.</param>
+		public async Task SwitchTo(Scene? scene, bool animate = true)
 		{
 			// a switch that comes in while windows still fly lets them land first
 			if (_overlay is not null)
@@ -218,7 +219,7 @@ namespace StageManager
 				foreach (var s in _scenes)
 					s.IsSelected = s.Equals(scene);
 
-				var animated = PrepareFlight(prior, scene, otherWindows);
+				var animated = animate ? PrepareFlight(prior, scene, otherWindows) : null;
 
 				// with an animation the windows of the scene show up when the flight lands, not before it takes off
 				if (scene is object && animated is null)
@@ -455,13 +456,13 @@ namespace StageManager
 		/// Adds all windows and apps of a scene to the scene on the stage. They stay together as one scene from now on.
 		/// In the desktop view there is no stage, then the scene is just selected.
 		/// </summary>
-		public Task JoinToCurrent(Scene source)
+		public Task JoinToCurrent(Scene source, bool animate = true)
 		{
 			if (source is null || source.Equals(_current))
 				return Task.CompletedTask;
 
 			if (_current is null)
-				return SwitchTo(source);
+				return SwitchTo(source, animate);
 
 			try
 			{

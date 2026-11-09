@@ -112,7 +112,12 @@
                 <DataTemplate>
                     <StackPanel Orientation="Vertical"
                         Visibility="{Binding Visibility}"
-                        Style="{StaticResource SceneOpacity}">
+                        Style="{StaticResource SceneOpacity}"
+                        Background="Transparent"
+                        MouseLeftButtonDown="Card_MouseLeftButtonDown"
+                        MouseMove="Card_MouseMove"
+                        MouseLeftButtonUp="Card_MouseLeftButtonUp"
+                        LostMouseCapture="Card_LostMouseCapture">
                         <StackPanel.ContextMenu>
                             <ContextMenu
                                 Opened="CardMenu_Opened"
@@ -131,14 +136,6 @@
                                     Click="CardMenu_Click" />
                             </ContextMenu>
                         </StackPanel.ContextMenu>
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger
-                                EventName="MouseLeftButtonUp">
-                                <i:InvokeCommandAction
-                                    Command="{Binding SwitchSceneCommand, Mode=OneTime, Source={x:Reference thisWindow}}"
-                                    CommandParameter="{Binding .}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
                         <!-- Windows: stacked thumbnails, the last window is in front -->
                         <ItemsControl
                             x:Name="thumbnailArea"

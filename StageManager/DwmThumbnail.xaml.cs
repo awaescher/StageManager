@@ -34,6 +34,18 @@ namespace StageManager
 			set { SetValue(PreviewHandleProperty, value); }
 		}
 
+		/// <summary>
+		/// Opacity of the thumbnails below an element. DWM draws thumbnails above all WPF content, so the opacity of WPF does not reach them.
+		/// </summary>
+		public static readonly DependencyProperty ThumbnailOpacityProperty = DependencyProperty.RegisterAttached("ThumbnailOpacity",
+			typeof(double),
+			typeof(DwmThumbnail),
+			new FrameworkPropertyMetadata(1.0, FrameworkPropertyMetadataOptions.Inherits));
+
+		public static double GetThumbnailOpacity(DependencyObject element) => (double)element.GetValue(ThumbnailOpacityProperty);
+
+		public static void SetThumbnailOpacity(DependencyObject element, double value) => element.SetValue(ThumbnailOpacityProperty, value);
+
 		private Point GetDpiScaleFactor()
 		{
 			if (_dpiScaleFactor is null)
@@ -62,6 +74,9 @@ namespace StageManager
 
 				UpdateThumbnailProperties();
 			}
+
+			if (e.Property == ThumbnailOpacityProperty)
+				UpdateThumbnailProperties();
 
 			if (e.Property == IsVisibleProperty)
 			{
@@ -180,7 +195,7 @@ namespace StageManager
 			{
 				fVisible = true,
 				dwFlags = (int)(DWM_TNP.DWM_TNP_VISIBLE | DWM_TNP.DWM_TNP_OPACITY | DWM_TNP.DWM_TNP_RECTDESTINATION | DWM_TNP.DWM_TNP_SOURCECLIENTAREAONLY),
-				opacity = 255,
+				opacity = (byte)Math.Clamp(Math.Round(255 * GetThumbnailOpacity(this)), 0, 255),
 				rcDestination = thumbnailRect,
 				fSourceClientAreaOnly = true
 			};

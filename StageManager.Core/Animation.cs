@@ -36,6 +36,13 @@ public static class AnimationPolicy
 
 		return FlightStyle.Windows;
 	}
+
+	/// <summary>
+	/// How a card that is dragged out of the sidebar looks. This is feedback for what the user does, not decoration, so it is shown
+	/// even if animations are off. It follows Windows only in showing a frame where Windows would show a frame.
+	/// </summary>
+	public static FlightStyle DecideDragPreview(AnimationSettings settings, SystemAnimationState system) =>
+		settings.FrameIfWindowContentIsOff && !system.DragFullWindows ? FlightStyle.Frames : FlightStyle.Windows;
 }
 
 /// <summary>Time and easing of a flight.</summary>

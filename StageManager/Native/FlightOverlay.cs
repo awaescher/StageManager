@@ -21,8 +21,9 @@ namespace StageManager.Native
 	{
 		private sealed class Item
 		{
-			public required Pose From { get; init; }
-			public required Pose To { get; init; }
+			public required Pose From { get; set; }
+			public required Pose To { get; set; }
+			public Pose Current { get; set; }
 			public IntPtr Thumbnail { get; set; }
 			public Border? Frame { get; set; }
 			public Flight? Flight { get; set; }
@@ -75,15 +76,15 @@ namespace StageManager.Native
 				Win32.SetWindowPosFlags.DoNotActivate);
 		}
 
-		/// <summary>Prepares a window at its starting pose. Nothing moves until <see cref="Fly"/>.</summary>
-		public void Add(IntPtr window, Pose from, Pose to)
+		/// <summary>Prepares a window at its starting pose. Nothing moves until <see cref="Fly"/>. False if DWM gave no thumbnail for it.</summary>
+		public bool Add(IntPtr window, Pose from, Pose to)
 		{
 			var item = new Item { From = from, To = to };
 
 			if (_style == FlightStyle.Windows)
 			{
 				if (NativeMethods.DwmRegisterThumbnail(_handle, window, out var thumbnail) != 0)
-					return;
+					return false;
 
 				item.Thumbnail = thumbnail;
 			}
@@ -104,9 +105,89 @@ namespace StageManager.Native
 
 			_items.Add(item);
 			Apply(item, from);
+			return true;
 		}
 
 		public bool HasFlights => _items.Count > 0;
+
+		/// <summary>Shows a window at a pose right away, e.g. while it follows the pointer. Stops a flight of all windows that is under way.</summary>
+		public void Place(int index, Pose pose)
+		{
+			CompositionTarget.Rendering -= OnRendering;
+			_flying?.TrySetResult();
+			Apply(_items[index], pose);
+		}
+
+		/// <summary>Lets every window fly from where it shows now to a new pose, one per window in the order they were added.</summary>
+		public Task FlyTo(IReadOnlyList<Pose> targets, TimeSpan duration)
+		{
+			CompositionTarget.Rendering -= OnRendering;
+			_flying?.TrySetResult();
+
+			for (var i = 0; i < _items.Count && i < targets.Count; i++)
+			{
+				_items[i].From = _items[i].Current;
+				_items[i].To = targets[i];
+			}
+
+			return Fly(duration);
+		}
+
+		private Border? _hint;
+		private double _hintOpacity = -1;
+
+		/// <summary>
+		/// The field that shows where a dragged card can be let go. It sits below the windows of the card, the DWM thumbnails are drawn
+		/// above everything of WPF anyway.
+		/// </summary>
+		public void ShowHint(Area area, string text, double opacity)
+		{
+			if (_hint is null)
+			{
+				var accent = SystemParameters.WindowGlassColor;
+				var label = new Border
+				{
+					CornerRadius = new CornerRadius(14),
+					Padding = new Thickness(16, 7, 16, 8),
+					Margin = new Thickness(0, 28, 0, 0),
+					HorizontalAlignment = HorizontalAlignment.Center,
+					VerticalAlignment = VerticalAlignment.Top,
+					Background = new SolidColorBrush(Color.FromArgb(235, accent.R, accent.G, accent.B)),
+					Child = new TextBlock
+					{
+						Text = text,
+						Foreground = Brushes.White,
+						FontSize = 15,
+						FontWeight = FontWeights.SemiBold
+					}
+				};
+
+				_hint = new Border
+				{
+					CornerRadius = new CornerRadius(18),
+					BorderThickness = new Thickness(3),
+					BorderBrush = new SolidColorBrush(Color.FromArgb(220, accent.R, accent.G, accent.B)),
+					Background = new SolidColorBrush(Color.FromArgb(40, accent.R, accent.G, accent.B)),
+					Opacity = 0,
+					IsHitTestVisible = false,
+					Child = label
+				};
+
+				// below the frames of the frame style
+				_canvas.Children.Insert(0, _hint);
+			}
+
+			Canvas.SetLeft(_hint, (area.Left - _bounds.Left) / _dpi);
+			Canvas.SetTop(_hint, (area.Top - _bounds.Top) / _dpi);
+			_hint.Width = Math.Max(0, area.Width / _dpi);
+			_hint.Height = Math.Max(0, area.Height / _dpi);
+
+			if (Math.Abs(opacity - _hintOpacity) < 0.01)
+				return;
+
+			_hintOpacity = opacity;
+			_hint.BeginAnimation(OpacityProperty, new System.Windows.Media.Animation.DoubleAnimation(opacity, TimeSpan.FromMilliseconds(140)));
+		}
 
 		public Task Fly(TimeSpan duration)
 		{
@@ -139,6 +220,7 @@ namespace StageManager.Native
 
 		private void Apply(Item item, Pose pose)
 		{
+			item.Current = pose;
 			var left = pose.X - _bounds.Left;
 			var top = pose.Y - _bounds.Top;
 

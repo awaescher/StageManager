@@ -136,6 +136,7 @@ namespace StageManager
 					.Select(w => new Choice<int>($"{w}", w)));
 				Fill(sidebarWidth, widths);
 				Select(sidebarWidth, sidebar.Width);
+				dragToStage.IsChecked = sidebar.DragToStage;
 
 				Select(iconsMode, current.DesktopIcons.Mode);
 				iconsRestore.IsChecked = current.DesktopIcons.RestoreOnExit;
@@ -225,6 +226,12 @@ namespace StageManager
 		{
 			if (sidebarWidth.SelectedItem is Choice<int> c)
 				Change(s => s.Sidebar.Width = c.Value);
+		}
+
+		private void DragToStage_Click(object sender, RoutedEventArgs e)
+		{
+			var enabled = dragToStage.IsChecked == true;
+			Change(s => s.Sidebar.DragToStage = enabled);
 		}
 
 		private void IconsMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
