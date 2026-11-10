@@ -66,6 +66,38 @@ namespace StageManager.Native.Interop
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
 
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool SetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+
+        private const int SW_SHOWNOACTIVATE = 4;
+        private const int SW_SHOWMAXIMIZED = 3;
+
+        /// <summary>
+        /// The rectangle a window gets when it is restored, as Windows keeps it: in workspace coordinates, which differ from screen
+        /// coordinates when the taskbar is at the top or the left.
+        /// </summary>
+        public static bool TryGetNormalPosition(IntPtr hWnd, out RECT rect)
+        {
+            var placement = new WINDOWPLACEMENT { length = Marshal.SizeOf<WINDOWPLACEMENT>() };
+            var ok = GetWindowPlacement(hWnd, ref placement);
+            rect = placement.rcNormalPosition;
+            return ok && rect.right > rect.left && rect.bottom > rect.top;
+        }
+
+        /// <summary>Puts a window into the normal or the maximized state without activating it. <paramref name="normal"/> in workspace coordinates.</summary>
+        public static bool SetPlacement(IntPtr hWnd, RECT normal, bool maximized)
+        {
+            var placement = new WINDOWPLACEMENT { length = Marshal.SizeOf<WINDOWPLACEMENT>() };
+            if (!GetWindowPlacement(hWnd, ref placement))
+                return false;
+
+            placement.flags = 0;
+            placement.showCmd = maximized ? SW_SHOWMAXIMIZED : SW_SHOWNOACTIVATE;
+            placement.rcNormalPosition = normal;
+            return SetWindowPlacement(hWnd, ref placement);
+        }
+
         /// <summary>Size of a window as it will be after it is restored. Only the proportions are of interest.</summary>
         public static bool TryGetRestoredSize(IntPtr hWnd, out (double Width, double Height) size)
         {

@@ -28,12 +28,14 @@ namespace StageManager.Model
 			Updated = DateTime.UtcNow;
 		}
 
-		public void UpdateFromScene(Scene updatedScene)
+		/// <returns>True if the windows of the card are in a new order, their thumbnails have to be stacked again then.</returns>
+		public bool UpdateFromScene(Scene updatedScene)
 		{
 			if (Id != updatedScene.Id)
 				throw new NotSupportedException();
 
 			Scene = updatedScene;
+			var before = Windows.Select(w => w.Handle).ToArray();
 
 			var updatedWindows = updatedScene.Windows.ToArray();
 			for (int i = 0; i < updatedWindows.Length; i++)
@@ -73,6 +75,8 @@ namespace StageManager.Model
 			Restack();
 
 			Updated = DateTime.UtcNow;
+
+			return !Windows.Select(w => w.Handle).SequenceEqual(before);
 		}
 
 		private void Scene_SelectedChanged(object? sender, EventArgs e)

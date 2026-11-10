@@ -54,30 +54,17 @@ namespace StageManager.Model
 			if (icon is null)
 				return null;
 
-			//// TODO check memory leaks
+			// an icon is a Windows UI object, of which a process gets only 10000: the picture is copied, the icon has to go
+			using (icon)
+			{
+				var imageSource = Imaging.CreateBitmapSourceFromHIcon(
+					icon.Handle,
+					Int32Rect.Empty,
+					BitmapSizeOptions.FromEmptyOptions());
 
-			var bmp = System.Drawing.Bitmap.FromHicon(icon.Handle);
-
-			var imageSource = Imaging.CreateBitmapSourceFromHIcon(
-				icon.Handle,
-				Int32Rect.Empty,
-				BitmapSizeOptions.FromEmptyOptions());
-
-			return imageSource;
-
-			// Alternativ - vergleichen
-
-			//using (var stream = new MemoryStream())
-			//{
-			//	icon.ToBitmap().Save(stream, ImageFormat.Png);
-			//	var bitmapImage = new BitmapImage();
-			//	bitmapImage.BeginInit();
-			//	bitmapImage.StreamSource = new MemoryStream(stream.ToArray());
-			//	bitmapImage.EndInit();
-			//	bitmapImage.Freeze();
-
-			//	return bitmapImage;
-			//}
+				imageSource.Freeze();
+				return imageSource;
+			}
 		}
 
 		public ImageSource Icon => _iconSource ??= IconToImageSource((Window as WindowsWindow).ExtractIcon());

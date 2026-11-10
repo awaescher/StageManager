@@ -128,6 +128,28 @@ namespace StageManager
 			_dwmThumbnail = IntPtr.Zero;
 		}
 
+		/// <summary>
+		/// Puts the thumbnail above the other thumbnails of the window. DWM draws thumbnails in the order they were registered, the
+		/// layout of WPF does not change it. The new one is drawn before the old one goes, so nothing flickers.
+		/// </summary>
+		public void BringThumbnailToFront()
+		{
+			if (_dwmThumbnail == IntPtr.Zero)
+				return;
+
+			var old = _dwmThumbnail;
+			StartCapture();
+
+			if (_dwmThumbnail == IntPtr.Zero)
+			{
+				_dwmThumbnail = old;
+				return;
+			}
+
+			UpdateThumbnailProperties();
+			NativeMethods.DwmUnregisterThumbnail(old);
+		}
+
 		private Window FindWindow() => _window ??= Window.GetWindow(this);
 
 		private (double Width, double Height) _lastSourceSize;

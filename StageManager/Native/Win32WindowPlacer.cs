@@ -43,6 +43,35 @@ namespace StageManager.Native
 
 		public bool IsMinimized(long window) => Win32.IsIconic(new IntPtr(window));
 
+		public bool IsMaximized(long window) => Win32.IsZoomed(new IntPtr(window));
+
+		public Area? GetRestoredRect(long window) =>
+			Interop.NativeMethods.TryGetNormalPosition(new IntPtr(window), out var r) ? new Area(r.left, r.top, r.right, r.bottom) : null;
+
+		public bool Normalize(long window, Area rect)
+		{
+			if (ProcessInfo.IsHung(new IntPtr(window)))
+				return false;
+			// the placement is in workspace coordinates, they start at the work area of the monitor instead of the monitor
+			var screen = Screen.FromRectangle(new System.Drawing.Rectangle((int)rect.Left, (int)rect.Top, Math.Max(1, (int)rect.Width), Math.Max(1, (int)rect.Height)));
+			var dx = screen.WorkingArea.Left - screen.Bounds.Left;
+			var dy = screen.WorkingArea.Top - screen.Bounds.Top;
+
+			var normal = new Interop.RECT { left = (int)rect.Left - dx, top = (int)rect.Top - dy, right = (int)rect.Right - dx, bottom = (int)rect.Bottom - dy };
+			return Interop.NativeMethods.SetPlacement(new IntPtr(window), normal, maximized: false);
+		}
+
+		public bool Maximize(long window, Area restored)
+		{
+			// the placement is set synchronously, an app that hangs would block StageManager. Its window comes back unmaximized then
+			if (ProcessInfo.IsHung(new IntPtr(window)))
+				return false;
+
+			return Interop.NativeMethods.SetPlacement(new IntPtr(window),
+				new Interop.RECT { left = (int)restored.Left, top = (int)restored.Top, right = (int)restored.Right, bottom = (int)restored.Bottom },
+				maximized: true);
+		}
+
 		/// <summary>
 		/// Asynchronous, so an app that hangs cannot block StageManager. The size stays, the window keeps its z-order and is not activated.
 		/// </summary>

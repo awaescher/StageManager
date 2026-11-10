@@ -77,6 +77,7 @@ namespace StageManager
 
 			// whatever the scenes know about, nothing may stay out of the screen
 			Parking.RestoreAll();
+			WindowRescue.Run();
 
 			_desktopIcons.Stop();
 		}
@@ -104,7 +105,12 @@ namespace StageManager
 
 		private void WindowsManager_WindowDestroyed(IWindow window)
 		{
-			Parking.Forget(window.Handle);
+			// a window that only hides or cloaks itself (Windows Terminal does) still exists. StageManager forgets it, so it must not
+			// stay out of the screen: once it shows again nobody would bring it back
+			if (Win32.IsWindow(window.Handle))
+				Parking.Unpark(window.Handle);
+			else
+				Parking.Forget(window.Handle);
 
 			var removal = _registry.Remove(window.Handle.ToInt64());
 			if (removal.GroupId is not Guid id || !_sceneById.TryGetValue(id, out var scene))
@@ -142,6 +148,11 @@ namespace StageManager
 			var scene = FindSceneForWindow(window);
 			if (scene is null)
 				scene = PlaceWindow(window, companion: false).Scene;
+
+			// the window that was activated is in front: on the card, while the others fly in and once they landed.
+			// On the stage the order is read from the screen when the scene leaves it
+			if (!ReferenceEquals(scene, _current))
+				Restack(scene, ZOrder.ToFront(HandlesOf(scene), new[] { window.Handle.ToInt64() }));
 
 			await SwitchTo(scene);
 		}
@@ -229,6 +240,10 @@ namespace StageManager
 				var otherWindows = GetSceneableWindows().Except(scene?.Windows ?? Array.Empty<IWindow>()).ToArray();
 
 				var prior = _current;
+
+				// the scene that leaves keeps the order its windows lie on the screen, its card and its next return show them that way
+				if (prior is object)
+					KeepScreenOrder(prior);
 				_current = scene;
 
 				foreach (var s in _scenes)
@@ -242,10 +257,7 @@ namespace StageManager
 
 				// with an animation the windows of the scene show up when the flight lands, not before it takes off
 				if (scene is object && animated is null)
-				{
-					foreach (var w in scene.Windows)
-						WindowStrategy.Show(w);
-				}
+					ShowInOrder(scene.Windows);
 
 				foreach (var o in otherWindows)
 					WindowStrategy.Hide(o);
@@ -388,8 +400,7 @@ namespace StageManager
 					return;
 
 				landed = true;
-				foreach (var w in scene.Windows)
-					WindowStrategy.Show(w);
+				ShowInOrder(scene.Windows);
 			}
 
 			try
@@ -436,6 +447,42 @@ namespace StageManager
 				foreach (var h in GetSceneableWindows().Select(w => w.Handle))
 					NativeMethods.SetTransitionsDisabled(h, false);
 			}
+		}
+
+		private static IReadOnlyList<long> HandlesOf(Scene scene) => scene.Windows.Select(w => w.Handle.ToInt64()).ToList();
+
+		/// <summary>Gives the windows of a scene a new order, back to front. The card follows it.</summary>
+		private void Restack(Scene scene, IReadOnlyList<long> backToFront)
+		{
+			if (scene.Reorder(backToFront.Select(h => new IntPtr(h)).ToList()))
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(scene, scene.Windows.LastOrDefault(), ChangeType.Updated));
+		}
+
+		/// <summary>Takes the order in which the windows of a scene lie on the screen now. Windows that are not on the screen keep their place.</summary>
+		private void KeepScreenOrder(Scene scene)
+		{
+			var onScreen = scene.Windows
+				.Select(w => w.Handle)
+				.Where(h => Win32.IsWindowVisible(h) && !Win32.IsIconic(h) && !Parking.IsParked(h))
+				.Select(h => h.ToInt64())
+				.ToHashSet();
+
+			if (onScreen.Count < 2)
+				return;
+
+			var topToBottom = WindowStack.TopToBottom().Where(onScreen.Contains).ToList();
+			Restack(scene, ZOrder.FromScreen(HandlesOf(scene), topToBottom));
+		}
+
+		/// <summary>Shows windows and lays them on top of everything else in their order, the last one in front, as the card and the flight showed them.</summary>
+		private void ShowInOrder(IEnumerable<IWindow> backToFront)
+		{
+			var windows = backToFront.ToList();
+
+			foreach (var w in windows)
+				WindowStrategy.Show(w);
+
+			WindowStack.Restack(windows.Select(w => w.Handle));
 		}
 
 		public Task MoveWindow(Scene sourceScene, IWindow window, Scene targetScene)
@@ -541,8 +588,8 @@ namespace StageManager
 				SceneChanged?.Invoke(this, new SceneChangedEventArgs(target, moving.FirstOrDefault(), ChangeType.Updated));
 				SceneChanged?.Invoke(this, new SceneChangedEventArgs(source, moving.FirstOrDefault(), ChangeType.Removed));
 
-				foreach (var w in moving)
-					WindowStrategy.Show(w);
+				// they come on top of the stage in the order they had on their card, like they flew there
+				ShowInOrder(moving);
 
 				return Task.CompletedTask;
 			}
@@ -666,10 +713,14 @@ namespace StageManager
 
 			var snapshots = _registry.Initialize(windows.Select(w => (w.Handle.ToInt64(), GroupKeyOf(w))));
 
+			// the windows of each scene lie back to front like they do on the screen, minimized ones included: Windows keeps their place
+			var topToBottom = WindowStack.TopToBottom();
+
 			_scenes = new List<Scene>();
 			foreach (var group in snapshots)
 			{
-				var scene = new Scene(group.Id, group.Key, group.Windows.Select(h => byHandle[h]).ToArray());
+				var ordered = ZOrder.FromScreen(group.Windows, topToBottom);
+				var scene = new Scene(group.Id, group.Key, ordered.Select(h => byHandle[h]).ToArray());
 				_scenes.Add(scene);
 				_sceneById[group.Id] = scene;
 			}

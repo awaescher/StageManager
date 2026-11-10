@@ -132,8 +132,9 @@ namespace StageManager
 
 			_thisHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
 
-			// windows a killed run left out of the screen come back before anything else looks at them
+			// windows a killed run left out of the screen come back before anything else looks at them, also the ones its journal missed
 			Parking.Recover();
+			RescueWindows();
 
 			var windowsManager = new WindowsManager();
 			SceneManager = new SceneManager(windowsManager);
@@ -152,6 +153,26 @@ namespace StageManager
 			var foregroundScene = SceneManager.FindSceneForWindow(foreground);
 			if (foregroundScene is object)
 				await SceneManager.SwitchTo(foregroundScene).ConfigureAwait(true);
+		}
+
+		private static void RescueWindows(bool running = false)
+		{
+			try
+			{
+				// while running, the windows of the hidden scenes are out of the screen on purpose
+				var count = WindowRescue.Run(running ? Parking.IsParked : null);
+				if (count > 0)
+					Log.Warn($"{count} window(s) out of the screen were brought back");
+			}
+			catch (Exception ex)
+			{
+				Log.Error("Bringing back windows out of the screen failed", ex);
+			}
+		}
+
+		private void MenuItem_Rescue_Click(object sender, RoutedEventArgs e)
+		{
+			RescueWindows(running: true);
 		}
 
 		private void AddInitialScenes()
@@ -318,9 +339,32 @@ namespace StageManager
 			var right = App.Settings.Current.Sidebar.Side == SidebarSide.Right;
 
 			scenesControl.HorizontalAlignment = right ? HorizontalAlignment.Right : HorizontalAlignment.Left;
+
+			// like on macOS the icons sit on the side of the screen edge, the close button on the other one
+			IconAlignment = right ? HorizontalAlignment.Right : HorizontalAlignment.Left;
+			CloseButtonAlignment = right ? HorizontalAlignment.Left : HorizontalAlignment.Right;
 			scenesControl.Padding = right ? new Thickness(0, 0, SidebarLayout.EdgePadding, 0) : new Thickness(SidebarLayout.EdgePadding, 0, 0, 0);
 
 			PositionWindow();
+		}
+
+		public static readonly DependencyProperty IconAlignmentProperty = DependencyProperty.Register(nameof(IconAlignment),
+			typeof(HorizontalAlignment), typeof(MainWindow), new PropertyMetadata(HorizontalAlignment.Left));
+
+		public static readonly DependencyProperty CloseButtonAlignmentProperty = DependencyProperty.Register(nameof(CloseButtonAlignment),
+			typeof(HorizontalAlignment), typeof(MainWindow), new PropertyMetadata(HorizontalAlignment.Right));
+
+		/// <summary>Where the app icons sit below a card.</summary>
+		public HorizontalAlignment IconAlignment
+		{
+			get => (HorizontalAlignment)GetValue(IconAlignmentProperty);
+			set => SetValue(IconAlignmentProperty, value);
+		}
+
+		public HorizontalAlignment CloseButtonAlignment
+		{
+			get => (HorizontalAlignment)GetValue(CloseButtonAlignmentProperty);
+			set => SetValue(CloseButtonAlignmentProperty, value);
 		}
 
 		/// <summary>
@@ -341,8 +385,8 @@ namespace StageManager
 						SyncVisibilityByUpdatedTimeStamp();
 						break;
 					case ChangeType.Updated:
-						if (AllScenes.FirstOrDefault(s => s.Id == e.Scene.Id) is SceneModel toUpdate)
-							toUpdate.UpdateFromScene(e.Scene);
+						if (AllScenes.FirstOrDefault(s => s.Id == e.Scene.Id) is SceneModel toUpdate && toUpdate.UpdateFromScene(e.Scene))
+							RestackThumbnails(toUpdate);
 						break;
 					case ChangeType.Removed:
 						if (AllScenes.FirstOrDefault(s => s.Id == e.Scene.Id) is SceneModel toRemove)
@@ -356,6 +400,40 @@ namespace StageManager
 						break;
 				}
 			});
+		}
+
+		/// <summary>
+		/// The thumbnails of a card lie on top of each other like its windows, the last one in front. DWM draws them in the order they
+		/// were registered, so after the windows changed their order they are registered again, back to front. Once the card is laid out.
+		/// </summary>
+		private void RestackThumbnails(SceneModel model)
+		{
+			Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () =>
+			{
+				if (scenesControl.ItemContainerGenerator.ContainerFromItem(model) is not FrameworkElement container
+					|| FindThumbnailArea(container) is not ItemsControl area)
+					return;
+
+				foreach (var window in model.Windows)
+				{
+					if (area.ItemContainerGenerator.ContainerFromItem(window) is DependencyObject item && FindThumbnail(item) is DwmThumbnail thumbnail)
+						thumbnail.BringThumbnailToFront();
+				}
+			});
+		}
+
+		private static DwmThumbnail? FindThumbnail(DependencyObject root)
+		{
+			if (root is DwmThumbnail thumbnail)
+				return thumbnail;
+
+			for (var i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+			{
+				if (FindThumbnail(VisualTreeHelper.GetChild(root, i)) is DwmThumbnail found)
+					return found;
+			}
+
+			return null;
 		}
 
 		private void OnMousePressed(object? sender, MouseHookEventArgs e)
