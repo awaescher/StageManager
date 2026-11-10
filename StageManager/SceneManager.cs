@@ -205,6 +205,9 @@ namespace StageManager
 		/// <summary>Physical pixels per unit of the sidebar layout. Set by the sidebar.</summary>
 		public double CardScale { get; set; } = 1;
 
+		/// <summary>The sidebar window. Flying windows pass below it, a window that flies to the stage must not cover it. Set by the sidebar.</summary>
+		public IntPtr SidebarHandle { get; set; }
+
 		/// <summary>The windows of a scene that left the stage have arrived on its card, the card can show them now.</summary>
 		public event EventHandler<Scene>? CardLanded;
 
@@ -213,6 +216,12 @@ namespace StageManager
 
 		/// <summary>Windows are flying on an overlay at the moment.</summary>
 		public bool IsFlying => _overlay is not null;
+
+		/// <summary>
+		/// A switch is under way: the windows of the new scene are not on the stage yet, the ones of the old scene may be still. What is
+		/// on the screen now says nothing about what will be there.
+		/// </summary>
+		public bool IsSwitching => _suspend || _overlay is not null;
 
 		/// <param name="animate">False if the windows have been shown flying already, e.g. by dragging their card onto the stage.</param>
 		public async Task SwitchTo(Scene? scene, bool animate = true)
@@ -301,7 +310,7 @@ namespace StageManager
 			if (!FlightPlanner.Intersects(monitor, cardArea))
 				return null;
 
-			var overlay = new FlightOverlay(monitor, style);
+			var overlay = new FlightOverlay(monitor, style, SidebarHandle);
 			var involved = new List<IntPtr>();
 			var priorCardWaits = false;
 			var maxVisible = App.Settings.Current.Sidebar.MaxWindowsPerScene;
@@ -588,8 +597,10 @@ namespace StageManager
 				SceneChanged?.Invoke(this, new SceneChangedEventArgs(target, moving.FirstOrDefault(), ChangeType.Updated));
 				SceneChanged?.Invoke(this, new SceneChangedEventArgs(source, moving.FirstOrDefault(), ChangeType.Removed));
 
-				// they come on top of the stage in the order they had on their card, like they flew there
+				// they come on top of the stage in the order they had on their card, like they flew there. The front one is activated:
+				// the user just put them there to work with them, and only the foreground window is sure to stay in front of the others
 				ShowInOrder(moving);
+				moving.LastOrDefault()?.Focus();
 
 				return Task.CompletedTask;
 			}

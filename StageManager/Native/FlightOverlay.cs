@@ -32,6 +32,7 @@ namespace StageManager.Native
 
 		private readonly Area _bounds;
 		private readonly FlightStyle _style;
+		private readonly IntPtr _keepAbove;
 		private readonly Canvas _canvas = new();
 		private readonly List<Item> _items = new();
 		private readonly Stopwatch _clock = Stopwatch.StartNew();
@@ -40,10 +41,12 @@ namespace StageManager.Native
 		private TaskCompletionSource? _flying;
 		private bool _skip;
 
-		public FlightOverlay(Area monitorBounds, FlightStyle style)
+		/// <param name="keepAbove">A window that stays above the flights, e.g. the sidebar: the windows fly below it, never over it.</param>
+		public FlightOverlay(Area monitorBounds, FlightStyle style, IntPtr keepAbove = default)
 		{
 			_bounds = monitorBounds;
 			_style = style;
+			_keepAbove = keepAbove;
 
 			WindowStyle = System.Windows.WindowStyle.None;
 			AllowsTransparency = true;
@@ -67,14 +70,37 @@ namespace StageManager.Native
 				Place();
 			};
 			ContentRendered += (_, _) => Place();
+
+			// showing the window puts it on top of all topmost windows again, before it has drawn anything
+			IsVisibleChanged += (_, e) =>
+			{
+				if ((bool)e.NewValue)
+					KeepBelow();
+			};
 		}
 
 		/// <summary>Sets the exact pixel rectangle, the sizes WPF works out from device independent units can be off by a pixel.</summary>
 		private void Place()
 		{
 			_dpi = VisualTreeHelper.GetDpi(this).DpiScaleX;
-			Win32.SetWindowPos(_handle, Win32.HWND_TOPMOST, (int)_bounds.Left, (int)_bounds.Top, (int)_bounds.Width, (int)_bounds.Height,
+
+			// straight below the window that has to stay above: going to the top of all topmost windows first would cover it for a frame
+			var insertAfter = _keepAbove != IntPtr.Zero && Win32.IsWindow(_keepAbove) ? _keepAbove : Win32.HWND_TOPMOST;
+			Win32.SetWindowPos(_handle, insertAfter, (int)_bounds.Left, (int)_bounds.Top, (int)_bounds.Width, (int)_bounds.Height,
 				Win32.SetWindowPosFlags.DoNotActivate);
+		}
+
+		/// <summary>
+		/// The overlay is topmost and comes later, so Windows puts it above the other topmost windows. It goes right below the window that
+		/// has to stay above, both stay topmost. Lifting that window instead would let the overlay cover it until the next frame.
+		/// </summary>
+		private void KeepBelow()
+		{
+			if (_handle == IntPtr.Zero || _keepAbove == IntPtr.Zero || !Win32.IsWindow(_keepAbove))
+				return;
+
+			Win32.SetWindowPos(_handle, _keepAbove, 0, 0, 0, 0,
+				Win32.SetWindowPosFlags.IgnoreMove | Win32.SetWindowPosFlags.IgnoreResize | Win32.SetWindowPosFlags.DoNotActivate);
 		}
 
 		/// <summary>Prepares a window at its starting pose. Nothing moves until <see cref="Fly"/>. False if DWM gave no thumbnail for it.</summary>

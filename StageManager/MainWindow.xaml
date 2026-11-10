@@ -10,7 +10,7 @@
     mc:Ignorable="d"
     AllowsTransparency="True"
     ShowInTaskbar="False"
-    Topmost="False"
+    Topmost="True"
     WindowStyle="None"
     Title="MainWindow"
     Height="450"

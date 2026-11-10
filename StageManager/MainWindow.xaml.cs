@@ -142,6 +142,7 @@ namespace StageManager
 
 			SceneManager.CardAreaOf = CardArea;
 			SceneManager.CardScale = _dpiScale;
+			SceneManager.SidebarHandle = _thisHandle;
 			SceneManager.CardLanded += SceneManager_CardLanded;
 
 			SceneManager.SceneChanged += SceneManager_SceneChanged;
@@ -828,19 +829,12 @@ namespace StageManager
 				if (value == _mode)
 					return;
 
-				var wasTopmost = _mode == SidebarMode.Flyover;
 				_mode = value;
 
-				this.Topmost = value == SidebarMode.Flyover;
-
-				if (value == SidebarMode.Flyover)
-				{
-					if (!_dragActive && SceneManager?.IsFlying != true)
-						KeepOnTop();
-				}
-				else if (wasTopmost && _thisHandle != IntPtr.Zero)
-					Win32.SetWindowPos(_thisHandle, Win32.HWND_NOTOPMOST, 0, 0, 0, 0,
-						Win32.SetWindowPosFlags.IgnoreMove | Win32.SetWindowPosFlags.IgnoreResize | Win32.SetWindowPosFlags.DoNotActivate);
+				// the sidebar always stays above the windows, also while it sits at its place: a window of the stage that comes to the
+				// front, e.g. when it lands after a flight, must not cover it. Windows that need its place make it slide away instead
+				if (value != SidebarMode.OffScreen && !_dragActive && SceneManager?.IsFlying != true)
+					KeepOnTop();
 
 				ApplyWindowMode();
 			}
@@ -906,6 +900,11 @@ namespace StageManager
 			if (manager is null)
 				return;
 
+			// while the windows of the new scene are still parked nothing seems to cover the sidebar: it would slide in for the flight
+			// and out again once a maximized window has landed. The check after the switch decides
+			if (manager.IsSwitching)
+				return;
+
 			try
 			{
 				var geometry = _geometry;
@@ -951,11 +950,11 @@ namespace StageManager
 			Mode = _presence!.Decide(Mode, input);
 
 			// a window that came to the front since may cover it, lift it above again. Not while windows fly or a card is dragged:
-			// those overlays have to stay above the sidebar
-			if (Mode == SidebarMode.Flyover && !_dragActive && SceneManager?.IsFlying != true)
+			// those overlays have to stay above the sidebar. Once they are gone it is lifted again
+			if (Mode != SidebarMode.OffScreen && !_dragActive && SceneManager?.IsFlying != true)
 			{
 				var foreground = Win32.GetForegroundWindow();
-				if (foreground != _liftedFor)
+				if (foreground != _liftedFor || !IsTopmost())
 				{
 					_liftedFor = foreground;
 					KeepOnTop();
@@ -966,6 +965,8 @@ namespace StageManager
 				_liftedFor = IntPtr.Zero;
 			}
 		}
+
+		private bool IsTopmost() => _thisHandle == IntPtr.Zero || Win32.GetWindowExStyleLongPtr(_thisHandle).HasFlag(Win32.WS_EX.WS_EX_TOPMOST);
 
 		private IntPtr _liftedFor;
 
