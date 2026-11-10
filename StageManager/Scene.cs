@@ -47,6 +47,29 @@ namespace StageManager
 			UpdateTitle();
 		}
 
+		/// <summary>Brings the windows into a new order, back to front. Windows the order does not name keep their place at the back.</summary>
+		/// <returns>True if the order changed.</returns>
+		public bool Reorder(IReadOnlyList<IntPtr> backToFront)
+		{
+			var position = new Dictionary<IntPtr, int>();
+			for (var i = 0; i < backToFront.Count; i++)
+				position.TryAdd(backToFront[i], i);
+
+			var reordered = _windows
+				.Select((w, i) => (Window: w, Key: position.TryGetValue(w.Handle, out var p) ? p : -1, Index: i))
+				.OrderBy(x => x.Key)
+				.ThenBy(x => x.Index)
+				.Select(x => x.Window)
+				.ToList();
+
+			if (reordered.SequenceEqual(_windows))
+				return false;
+
+			_windows = reordered;
+			UpdateTitle();
+			return true;
+		}
+
 		private void UpdateTitle()
 		{
 			Title = string.Join(Environment.NewLine, Windows.Select(w => Max(20, w.Title)));

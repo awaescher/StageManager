@@ -228,7 +228,7 @@
                             Width="{Binding ThumbnailWidth}">
                             <ItemsControl
                                 VerticalAlignment="Center"
-                                HorizontalAlignment="Center"
+                                HorizontalAlignment="{Binding IconAlignment, ElementName=thisWindow}"
                                 ItemsSource="{Binding Windows}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -244,7 +244,7 @@
                                                     BlurRadius="20" />
                                             </Border.Effect>
                                             <Image
-                                                Margin="0, 0, 0, 0"
+                                                Margin="0, 0, 2, 0"
                                                 Height="30"
                                                 Source="{Binding Icon}" />
                                         </Border>
@@ -253,7 +253,7 @@
                             </ItemsControl>
                             <Button
                                 Style="{StaticResource CloseButton}"
-                                HorizontalAlignment="Right"
+                                HorizontalAlignment="{Binding CloseButtonAlignment, ElementName=thisWindow}"
                                 VerticalAlignment="Center"
                                 ToolTip="Close"
                                 Click="CloseScene_Click" />
@@ -312,6 +312,9 @@
                             Tag="Untouched"
                             Click="MenuItem_Icons_Click" />
                     </MenuItem>
+                    <MenuItem
+                        Header="Bring back windows out of the screen"
+                        Click="MenuItem_Rescue_Click" />
                     <MenuItem
                         Header="Project page"
                         Click="MenuItem_ProjectPage_Click" />

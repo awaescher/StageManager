@@ -17,6 +17,20 @@ public interface IWindowPlacer
 
 	bool IsMinimized(long window);
 
+	bool IsMaximized(long window);
+
+	/// <summary>The rectangle a maximized window gets back when it is restored, as Windows keeps it. Only handed back to <see cref="Maximize"/>.</summary>
+	Area? GetRestoredRect(long window);
+
+	/// <summary>
+	/// Takes a maximized window out of the maximized state without changing what is seen: it keeps <paramref name="rect"/>.
+	/// A maximized window cannot be moved, Windows puts it back.
+	/// </summary>
+	bool Normalize(long window, Area rect);
+
+	/// <summary>Maximizes the window again, <paramref name="restored"/> is what it gets when it is restored later.</summary>
+	bool Maximize(long window, Area restored);
+
 	/// <summary>Moves the window so that its top left corner is at the one of <paramref name="rect"/>. The size does not change.</summary>
 	bool Move(long window, Area rect, bool refreshFrame);
 
@@ -41,6 +55,12 @@ public sealed record ParkedWindow
 	public Area OriginalFrame { get; init; }
 
 	public Area Parked { get; init; }
+
+	/// <summary>The window was maximized. It is parked in the normal state and maximized again when it comes back.</summary>
+	public bool Maximized { get; init; }
+
+	/// <summary>The rectangle a maximized window gets when it is restored, null for other windows.</summary>
+	public Area? Restored { get; init; }
 }
 
 /// <summary>Remembers parked windows, so they come back even if the app was killed.</summary>
@@ -171,7 +191,13 @@ public sealed class WindowParker
 			var dx = spot.Left - rect.Left;
 			var dy = spot.Top - rect.Top;
 
-			var parked = new List<ParkedWindow> { Entry(window, processId, 0, rect, spot) };
+			// Windows does not move a maximized window, it has to leave that state first
+			var maximized = _placer.IsMaximized(window);
+			Area? restored = null;
+			if (maximized && (restored = _placer.GetRestoredRect(window)) is null)
+				return false;
+
+			var parked = new List<ParkedWindow> { Entry(window, processId, 0, rect, spot) with { Maximized = maximized, Restored = restored } };
 
 			foreach (var owned in _placer.OwnedWindows(window))
 			{
@@ -185,6 +211,13 @@ public sealed class WindowParker
 			// the journal first: if the app dies right after the move, the window has to be found again
 			_entries.AddRange(parked);
 			_journal.Save(_entries);
+
+			if (maximized && !_placer.Normalize(window, rect))
+			{
+				_entries.RemoveAll(parked.Contains);
+				_journal.Save(_entries);
+				return false;
+			}
 
 			foreach (var entry in parked)
 				_placer.Move(entry.Window, entry.Parked, refreshFrame: false);
@@ -269,6 +302,10 @@ public sealed class WindowParker
 
 		// a window that came back on its own, or that the user placed on the screen, stays where it is
 		if (_placer.GetRect(entry.Window) is Area now && _placer.Monitors().Any(m => FlightPlanner.Intersects(m, now)))
+			return;
+
+		// a maximized window is maximized again where it was, the placement brings it there. A move before it would arrive after it
+		if (entry.Maximized && entry.Restored is Area restored && _placer.Maximize(entry.Window, restored))
 			return;
 
 		_placer.Move(entry.Window, entry.Original, refreshFrame: true);

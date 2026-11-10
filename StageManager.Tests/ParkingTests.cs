@@ -133,13 +133,52 @@ public class WindowParkerTests
 
 		public bool IsMinimized(long window) => Windows.TryGetValue(window, out var w) && w.Minimized;
 
+		public HashSet<long> MaximizedWindows { get; } = new();
+
+		public Dictionary<long, Area> RestoredRects { get; } = new();
+
+		public bool Hung { get; set; }
+
+		public bool IsMaximized(long window) => MaximizedWindows.Contains(window);
+
+		public Area? GetRestoredRect(long window) => RestoredRects.TryGetValue(window, out var r) ? r : null;
+
+		public bool Normalize(long window, Area rect)
+		{
+			if (Hung || !Windows.ContainsKey(window))
+				return false;
+
+			MaximizedWindows.Remove(window);
+			Windows[window] = Windows[window] with { Rect = rect };
+			return true;
+		}
+
+		public List<(long Window, Area Restored)> Maximizes { get; } = new();
+
+		public bool Maximize(long window, Area restored)
+		{
+			if (Hung || !Windows.ContainsKey(window))
+				return false;
+
+			MaximizedWindows.Add(window);
+			RestoredRects[window] = restored;
+			Windows[window] = Windows[window] with { Rect = MaximizedRect };
+			Maximizes.Add((window, restored));
+			return true;
+		}
+
+		public static readonly Area MaximizedRect = new(-8, -8, 1928, 1048);
+
+		// Windows puts a maximized window back where it was
 		public bool Move(long window, Area rect, bool refreshFrame)
 		{
 			if (!Windows.TryGetValue(window, out var w))
 				return false;
 
-			Windows[window] = w with { Rect = rect };
 			Moves.Add((window, rect, refreshFrame));
+			if (!MaximizedWindows.Contains(window))
+				Windows[window] = w with { Rect = rect };
+
 			return true;
 		}
 
@@ -216,6 +255,10 @@ public class WindowParkerTests
 		public Area? GetRect(long window) => _inner.GetRect(window);
 		public Area? GetFrame(long window) => _inner.GetFrame(window);
 		public bool IsMinimized(long window) => _inner.IsMinimized(window);
+		public bool IsMaximized(long window) => _inner.IsMaximized(window);
+		public Area? GetRestoredRect(long window) => _inner.GetRestoredRect(window);
+		public bool Normalize(long window, Area rect) => _inner.Normalize(window, rect);
+		public bool Maximize(long window, Area restored) => _inner.Maximize(window, restored);
 		public IReadOnlyList<long> OwnedWindows(long window) => _inner.OwnedWindows(window);
 		public IReadOnlyList<Area> Monitors() => _inner.Monitors();
 
@@ -278,6 +321,76 @@ public class WindowParkerTests
 	public void An_unknown_window_is_not_parked()
 	{
 		Assert.False(Create().Park(99));
+	}
+
+	private WindowParker CreateMaximized(Area restored)
+	{
+		var p = Create();
+		_placer.Windows[1] = (100, FakePlacer.MaximizedRect, false);
+		_placer.MaximizedWindows.Add(1);
+		_placer.RestoredRects[1] = restored;
+		return p;
+	}
+
+	[Fact]
+	public void A_maximized_window_leaves_the_maximized_state_and_really_leaves_the_screen()
+	{
+		var p = CreateMaximized(Rect);
+
+		Assert.True(p.Park(1));
+
+		Assert.False(_placer.IsMaximized(1));
+		Assert.True(_placer.Windows[1].Rect.Right < 0);
+		Assert.Equal(FakePlacer.MaximizedRect.Width, _placer.Windows[1].Rect.Width);
+		Assert.True(_journal.Entries[0].Maximized);
+		Assert.Equal(Rect, _journal.Entries[0].Restored);
+	}
+
+	[Fact]
+	public void A_maximized_window_comes_back_maximized_and_keeps_its_restored_rectangle()
+	{
+		var p = CreateMaximized(Rect);
+		p.Park(1);
+
+		Assert.True(p.Unpark(1));
+
+		Assert.True(_placer.IsMaximized(1));
+		Assert.Equal(FakePlacer.MaximizedRect, _placer.Windows[1].Rect);
+		Assert.Equal((1L, Rect), _placer.Maximizes[^1]);
+	}
+
+	[Fact]
+	public void A_maximized_window_a_killed_run_left_behind_comes_back_maximized()
+	{
+		CreateMaximized(Rect).Park(1);
+
+		new WindowParker(_placer, _journal).Recover();
+
+		Assert.True(_placer.IsMaximized(1));
+		Assert.Equal(FakePlacer.MaximizedRect, _placer.Windows[1].Rect);
+	}
+
+	[Fact]
+	public void A_maximized_window_that_cannot_leave_its_state_is_not_parked()
+	{
+		var p = CreateMaximized(Rect);
+		_placer.Hung = true;
+
+		Assert.False(p.Park(1));
+
+		Assert.False(p.IsParked(1));
+		Assert.Empty(_journal.Entries);
+		Assert.Empty(_placer.Moves);
+	}
+
+	[Fact]
+	public void A_maximized_window_without_a_restored_rectangle_is_not_parked()
+	{
+		var p = CreateMaximized(Rect);
+		_placer.RestoredRects.Clear();
+
+		Assert.False(p.Park(1));
+		Assert.True(_placer.IsMaximized(1));
 	}
 
 	[Fact]
