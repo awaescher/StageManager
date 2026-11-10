@@ -136,7 +136,64 @@
                                     Click="CardMenu_Click" />
                             </ContextMenu>
                         </StackPanel.ContextMenu>
-                        <!-- Windows: stacked thumbnails, the last window is in front -->
+                        <!-- Windows: stacked thumbnails, the last window is in front. The highlight of a merge target reaches out
+                             beyond them, DWM draws the thumbnails above it. -->
+                        <Grid>
+                        <Border
+                            Margin="-7"
+                            CornerRadius="12"
+                            BorderThickness="3"
+                            IsHitTestVisible="False">
+                            <Border.Style>
+                                <Style
+                                    TargetType="Border">
+                                    <Setter
+                                        Property="Opacity"
+                                        Value="0" />
+                                    <Setter
+                                        Property="BorderBrush">
+                                        <Setter.Value>
+                                            <SolidColorBrush
+                                                Color="{x:Static SystemParameters.WindowGlassColor}" />
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter
+                                        Property="Background">
+                                        <Setter.Value>
+                                            <SolidColorBrush
+                                                Opacity="0.25"
+                                                Color="{x:Static SystemParameters.WindowGlassColor}" />
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding IsMergeTarget}"
+                                            Value="True">
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="Opacity"
+                                                            To="1"
+                                                            Duration="0:0:0.12" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                            <DataTrigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="Opacity"
+                                                            To="0"
+                                                            Duration="0:0:0.15" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.ExitActions>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
                         <ItemsControl
                             x:Name="thumbnailArea"
                             Width="{Binding ThumbnailWidth}"
@@ -163,6 +220,7 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+                        </Grid>
                         <!-- Icons and the close button. The button sits here and not on the thumbnails, because DWM draws thumbnails above all WPF content. -->
                         <Grid
                             Margin="0,4,0,24"

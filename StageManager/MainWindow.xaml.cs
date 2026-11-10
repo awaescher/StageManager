@@ -20,6 +20,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace StageManager
 {
@@ -32,7 +33,7 @@ namespace StageManager
 		private const string APP_NAME = "StageManager";
 		private IntPtr _thisHandle;
 		private TaskPoolGlobalHook _hook;
-		private WindowMode _mode;
+		private SidebarMode _mode;
 		// physical pixels, written on the UI thread only but read by the mouse hook and timer threads
 		private volatile SidebarGeometry _geometry = new(new Area(0, 0, 0, 0), 0, SidebarSide.Left);
 		private double _dpiScale = 1;
@@ -44,6 +45,8 @@ namespace StageManager
 
 		// dragging a card out of the sidebar, UI thread only
 		private readonly CardDragTracker _drag = new();
+		private readonly CardDropTargets _dropTargets = new();
+		private SceneModel? _mergeTarget;
 		private FrameworkElement? _dragElement;
 		private SceneModel? _dragCard;
 		private Area _dragCardArea;
@@ -102,11 +105,13 @@ namespace StageManager
 			App.Settings.Changed += Settings_Changed;
 			SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
 
-			StartHook();	
+			StartHook();
+			StartPresence();
 		}
 
 		protected override void OnClosed(EventArgs e)
 		{
+			_presenceTimer?.Stop();
 			App.Settings.Changed -= Settings_Changed;
 			SystemEvents.DisplaySettingsChanged -= SystemEvents_DisplaySettingsChanged;
 
@@ -303,7 +308,7 @@ namespace StageManager
 			// drop a held animation, otherwise it would override the position set below
 			BeginAnimation(LeftProperty, null);
 
-			Left = _geometry.GetLeft(Mode != WindowMode.OffScreen) / _dpiScale;
+			Left = _geometry.GetLeft(Mode != SidebarMode.OffScreen) / _dpiScale;
 			Top = _geometry.Area.Top / _dpiScale;
 			Height = _geometry.Area.Height / _dpiScale;
 		}
@@ -443,8 +448,55 @@ namespace StageManager
 			if (_dragPreview is null)
 				return;
 
+			// over another card in the sidebar: that card is the target, not the stage
+			var target = state.IsArmed ? null : FindMergeTarget(p);
+			SetMergeTarget(target);
+
 			var rect = DragPreviewLayout.CardRect(p.X, p.Y, _dragGrabOffset.X, _dragGrabOffset.Y, _dragCardArea.Width, _dragCardArea.Height, state.Progress);
-			_dragPreview.Update(rect, DragPreviewLayout.HintOpacity(state.Progress, state.IsArmed));
+			_dragPreview.Update(rect, target is object ? 0 : DragPreviewLayout.HintOpacity(state.Progress, state.IsArmed));
+		}
+
+		private SceneModel? FindMergeTarget(Point p)
+		{
+			var cards = new List<(Guid, Area)>();
+			foreach (var model in Scenes)
+			{
+				if (!model.IsVisible || ReferenceEquals(model, _dragCard))
+					continue;
+
+				if (CardBounds(model) is Area area)
+					cards.Add((model.Id, area));
+			}
+
+			var id = _dropTargets.Update(p.X, p.Y, cards);
+			return id is Guid g ? Scenes.FirstOrDefault(s => s.Id == g) : null;
+		}
+
+		/// <summary>The whole card with its icons, in physical pixels: the area a dragged card can be dropped on.</summary>
+		private Area? CardBounds(SceneModel model)
+		{
+			if (scenesControl.ItemContainerGenerator.ContainerFromItem(model) is not FrameworkElement container
+				|| VisualTreeHelper.GetChildrenCount(container) == 0
+				|| VisualTreeHelper.GetChild(container, 0) is not FrameworkElement card
+				|| card.ActualWidth <= 0 || card.ActualHeight <= 0)
+				return null;
+
+			var topLeft = card.PointToScreen(new Point(0, 0));
+			return new Area(topLeft.X, topLeft.Y, topLeft.X + card.ActualWidth * _dpiScale, topLeft.Y + card.ActualHeight * _dpiScale);
+		}
+
+		private void SetMergeTarget(SceneModel? target)
+		{
+			if (ReferenceEquals(target, _mergeTarget))
+				return;
+
+			if (_mergeTarget is object)
+				_mergeTarget.IsMergeTarget = false;
+
+			_mergeTarget = target;
+
+			if (target is object)
+				target.IsMergeTarget = true;
 		}
 
 		private void Card_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -455,6 +507,7 @@ namespace StageManager
 			e.Handled = true;
 
 			var card = _dragCard;
+			var mergeInto = _mergeTarget;
 			var result = _drag.Release();
 
 			// releasing the capture raises LostMouseCapture, the drag is over already then
@@ -471,7 +524,7 @@ namespace StageManager
 					EndCardDrag(drop: true).SafeFireAndForget(ex => Log.Error("Dropping a card failed", ex));
 					break;
 				default:
-					EndCardDrag(drop: false).SafeFireAndForget(ex => Log.Error("Returning a card failed", ex));
+					EndCardDrag(drop: false, mergeInto).SafeFireAndForget(ex => Log.Error("Returning a card failed", ex));
 					break;
 			}
 		}
@@ -537,7 +590,7 @@ namespace StageManager
 				card.CardOpacity = 0.3;
 		}
 
-		private async Task EndCardDrag(bool drop)
+		private async Task EndCardDrag(bool drop, SceneModel? mergeInto = null)
 		{
 			var preview = _dragPreview;
 			var card = _dragCard;
@@ -547,6 +600,8 @@ namespace StageManager
 			_dragPreview = null;
 			_dragCard = null;
 			_dragElement = null;
+			SetMergeTarget(null);
+			_dropTargets.Clear();
 
 			try
 			{
@@ -559,6 +614,24 @@ namespace StageManager
 				// without animations the windows only snap into place, the drag itself was feedback enough
 				if (SystemAnimation.CurrentStyle() == FlightStyle.None)
 					duration = TimeSpan.FromTicks(duration.Ticks / 3);
+
+				if (!drop && mergeInto is object && preview is object && CardArea(mergeInto.Scene) is Area targetArea)
+				{
+					// the windows fly onto the other card, to the front of its stack where they will be after the merge
+					card.CardOpacity = 0;
+					var into = TimeSpan.FromTicks(duration.Ticks * 3 / 4);
+					var first = mergeInto.Windows.Count;
+					var total = first + card.Windows.Count;
+					await Task.WhenAny(preview.Return(targetArea, into, first, total), Task.Delay(into + TimeSpan.FromMilliseconds(500))).ConfigureAwait(true);
+
+					await SceneManager.MergeScenes(card.Scene, mergeInto.Scene).ConfigureAwait(true);
+
+					// the merged card is drawn with the new windows before the flying ones go
+					NativeMethods.DwmFlush();
+					await Task.Delay(60).ConfigureAwait(true);
+					NativeMethods.DwmFlush();
+					return;
+				}
 
 				if (drop)
 				{
@@ -669,7 +742,7 @@ namespace StageManager
 
 		public IntPtr Handle => _thisHandle;
 
-		public WindowMode Mode
+		public SidebarMode Mode
 		{
 			get => _mode;
 			set
@@ -677,9 +750,19 @@ namespace StageManager
 				if (value == _mode)
 					return;
 
+				var wasTopmost = _mode == SidebarMode.Flyover;
 				_mode = value;
 
-				this.Topmost = value == WindowMode.Flyover;
+				this.Topmost = value == SidebarMode.Flyover;
+
+				if (value == SidebarMode.Flyover)
+				{
+					if (!_dragActive && SceneManager?.IsFlying != true)
+						KeepOnTop();
+				}
+				else if (wasTopmost && _thisHandle != IntPtr.Zero)
+					Win32.SetWindowPos(_thisHandle, Win32.HWND_NOTOPMOST, 0, 0, 0, 0,
+						Win32.SetWindowPosFlags.IgnoreMove | Win32.SetWindowPosFlags.IgnoreResize | Win32.SetWindowPosFlags.DoNotActivate);
 
 				ApplyWindowMode();
 			}
@@ -687,7 +770,7 @@ namespace StageManager
 
 		private void ApplyWindowMode()
 		{
-			var newLeft = _geometry.GetLeft(Mode != WindowMode.OffScreen) / _dpiScale;
+			var newLeft = _geometry.GetLeft(Mode != SidebarMode.OffScreen) / _dpiScale;
 			if (Left == newLeft)
 				return;
 
@@ -731,44 +814,91 @@ namespace StageManager
 
 		private void _hook_MouseMoved(object? sender, MouseHookEventArgs e)
 		{
+			// the hook only keeps the last position for the overlap check, it never calls into the UI: Windows silently removes
+			// a low level hook that answers too slowly, and then the screen edge stopped working
 			_mouse.X = e.Data.X;
 			_mouse.Y = e.Data.Y;
-
-			if (Mode == WindowMode.OffScreen && _geometry.IsInTriggerZone(e.Data.X))
-			{
-				Dispatcher.Invoke(() => Mode = WindowMode.Flyover);
-			}
 		}
+
+		private volatile bool _overlapped;
 
 		private void OverlapCheck(object? _)
 		{
-			var currentWindows = SceneManager.GetCurrentWindows().ToArray(); // in case the enumeration changes
-			UpdateModeByWindows(currentWindows);
+			var manager = SceneManager;
+			if (manager is null)
+				return;
+
+			try
+			{
+				var geometry = _geometry;
+				bool doesOverlap(IWindowLocation loc) => loc.State == Native.Window.WindowState.Maximized || (loc.State == Native.Window.WindowState.Normal && geometry.DoesNormalWindowOverlap(loc.X, loc.Width));
+
+				var currentWindows = manager.GetCurrentWindows().ToArray(); // in case the enumeration changes
+				_overlapped = currentWindows.Any(w => doesOverlap(w.Location));
+			}
+			catch (Exception ex)
+			{
+				Log.Error("The overlap check failed", ex);
+			}
 		}
 
-		private void UpdateModeByWindows(IEnumerable<IWindow> windows)
+		private SidebarPresence? _presence;
+		private SidebarGeometry? _presenceGeometry;
+		private readonly Stopwatch _clock = Stopwatch.StartNew();
+		private DispatcherTimer? _presenceTimer;
+		private bool _menuOpen;
+
+		private void StartPresence()
 		{
-			if (_dragActive)
+			_presenceTimer = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(30) };
+			_presenceTimer.Tick += (_, _) => UpdatePresence();
+			_presenceTimer.Start();
+		}
+
+		/// <summary>Shows, hides or lifts the sidebar. Runs on the UI thread and reads the pointer itself, it does not rely on any hook.</summary>
+		private void UpdatePresence()
+		{
+			if (!Win32.GetCursorPos(out var cursor))
 				return;
 
 			var geometry = _geometry;
-
-			bool doesOverlap(IWindowLocation loc) => loc.State == Native.Window.WindowState.Maximized || (loc.State == Native.Window.WindowState.Normal && geometry.DoesNormalWindowOverlap(loc.X, loc.Width));
-
-			var anyOverlappingWindows = windows.Any(w => doesOverlap(w.Location));
-
-			var containsMouse = geometry.IsOverSidebar(_mouse.X);
-			var setMode = Mode == WindowMode.OnScreen && !containsMouse
-							|| Mode == WindowMode.OffScreen
-							|| (Mode == WindowMode.Flyover && !containsMouse);
-
-			if (setMode)
+			if (!ReferenceEquals(geometry, _presenceGeometry))
 			{
-				Dispatcher.Invoke(() =>
-				{
-					Mode = anyOverlappingWindows ? WindowMode.OffScreen : WindowMode.OnScreen;
-				});
+				_presenceGeometry = geometry;
+				_presence = new SidebarPresence(geometry);
 			}
+
+			var hold = _dragActive || _drag.IsPressed || _menuOpen;
+			var input = new SidebarInput(cursor.X, cursor.Y, _overlapped, hold, _clock.Elapsed.TotalSeconds);
+			Mode = _presence!.Decide(Mode, input);
+
+			// a window that came to the front since may cover it, lift it above again. Not while windows fly or a card is dragged:
+			// those overlays have to stay above the sidebar
+			if (Mode == SidebarMode.Flyover && !_dragActive && SceneManager?.IsFlying != true)
+			{
+				var foreground = Win32.GetForegroundWindow();
+				if (foreground != _liftedFor)
+				{
+					_liftedFor = foreground;
+					KeepOnTop();
+				}
+			}
+			else
+			{
+				_liftedFor = IntPtr.Zero;
+			}
+		}
+
+		private IntPtr _liftedFor;
+
+		private void KeepOnTop()
+		{
+			if (_thisHandle == IntPtr.Zero)
+				return;
+
+			// Topmost alone is not enough: WPF does not set it again if it thinks it is set, and a window that becomes topmost later is above
+			Win32.SetWindowPos(_thisHandle, Win32.HWND_TOPMOST, 0, 0, 0, 0,
+				Win32.SetWindowPosFlags.IgnoreMove | Win32.SetWindowPosFlags.IgnoreResize | Win32.SetWindowPosFlags.DoNotActivate);
 		}
 
 		private void NavigateToProjectPage()
@@ -806,6 +936,7 @@ namespace StageManager
 		private void CardMenu_Opened(object sender, RoutedEventArgs e)
 		{
 			StopHook();
+			_menuOpen = true;
 			CancelCardDrag();
 
 			if (sender is not ContextMenu menu || CardOf(menu) is not SceneModel card)
@@ -837,6 +968,7 @@ namespace StageManager
 
 		private void CardMenu_Closed(object sender, RoutedEventArgs e)
 		{
+			_menuOpen = false;
 			StartHook();
 		}
 
@@ -874,6 +1006,7 @@ namespace StageManager
 
 		private void ContextMenu_Closed(object sender, RoutedEventArgs e)
 		{
+			_menuOpen = false;
 			StartHook();
 		}
 
@@ -896,6 +1029,7 @@ namespace StageManager
 			menuIconsHidden.IsChecked = icons.Mode == DesktopIconsMode.AlwaysHidden;
 			menuIconsUntouched.IsChecked = icons.Mode == DesktopIconsMode.Untouched;
 
+			_menuOpen = true;
 			StopHook();
 		}
 
@@ -924,10 +1058,4 @@ namespace StageManager
 		}
 	}
 
-	public enum WindowMode
-	{
-		OnScreen,
-		OffScreen,
-		Flyover
-	}
 }

@@ -100,11 +100,14 @@ namespace StageManager.Native
 		}
 
 		/// <summary>The windows fly back onto the card in the sidebar.</summary>
-		public Task Return(Area card, TimeSpan duration)
+		/// <param name="first">Index of the first of these windows in the stack of the card, for a card that also holds other windows.</param>
+		/// <param name="total">Number of windows in the stack of the card, 0 for just these.</param>
+		public Task Return(Area card, TimeSpan duration, int first = 0, int total = 0)
 		{
 			_overlay.ShowHint(_hintArea, HintText, 0);
-			var slots = DragPreviewLayout.Slots(card, _windowCount, _maxVisible, _scale);
-			return _overlay.FlyTo(_entries.Select(e => DragPreviewLayout.InSlot(slots[e.Slot], e.Frame.Width, e.Frame.Height)).ToArray(), duration);
+			var count = Math.Max(total, first + _windowCount);
+			var slots = DragPreviewLayout.Slots(card, count, _maxVisible, _scale);
+			return _overlay.FlyTo(_entries.Select(e => DragPreviewLayout.InSlot(slots[first + e.Slot], e.Frame.Width, e.Frame.Height)).ToArray(), duration);
 		}
 
 		public void Finish() => _overlay.Finish();
