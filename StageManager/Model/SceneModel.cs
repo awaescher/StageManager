@@ -127,6 +127,21 @@ namespace StageManager.Model
 		public double ThumbnailWidth { get; private set; } = 150;
 
 		private double _cardOpacity = 1;
+		private bool _isMergeTarget;
+
+		/// <summary>A card dragged in the sidebar is over this one: letting go merges it into this one.</summary>
+		public bool IsMergeTarget
+		{
+			get => _isMergeTarget;
+			set
+			{
+				if (_isMergeTarget == value)
+					return;
+
+				_isMergeTarget = value;
+				RaisePropertyChanged();
+			}
+		}
 
 		/// <summary>
 		/// How visible the thumbnails and icons of the card are. 0 while the windows of the card are still flying to it, dimmed while the

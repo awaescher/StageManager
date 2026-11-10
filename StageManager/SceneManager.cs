@@ -200,6 +200,9 @@ namespace StageManager
 		private Task _flight = Task.CompletedTask;
 		private FlightOverlay? _overlay;
 
+		/// <summary>Windows are flying on an overlay at the moment.</summary>
+		public bool IsFlying => _overlay is not null;
+
 		/// <param name="animate">False if the windows have been shown flying already, e.g. by dragging their card onto the stage.</param>
 		public async Task SwitchTo(Scene? scene, bool animate = true)
 		{
@@ -540,6 +543,49 @@ namespace StageManager
 
 				foreach (var w in moving)
 					WindowStrategy.Show(w);
+
+				return Task.CompletedTask;
+			}
+			finally
+			{
+				_suspend = false;
+			}
+		}
+
+		/// <summary>
+		/// Puts all windows and apps of one card into another card in the sidebar. Neither is on the stage, so no window moves.
+		/// Merging into the scene on the stage is <see cref="JoinToCurrent"/>.
+		/// </summary>
+		public Task MergeScenes(Scene source, Scene target)
+		{
+			if (source is null || target is null || source.Equals(target))
+				return Task.CompletedTask;
+
+			if (target.Equals(_current))
+				return JoinToCurrent(source);
+
+			if (source.Equals(_current))
+				return Task.CompletedTask;
+
+			try
+			{
+				_suspend = true;
+
+				if (_registry.Merge(source.Id, target.Id) is null)
+					return Task.CompletedTask;
+
+				var moving = source.Windows.ToList();
+				foreach (var w in moving)
+				{
+					source.Remove(w);
+					target.Add(w);
+				}
+
+				_scenes.Remove(source);
+				_sceneById.Remove(source.Id);
+
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(target, moving.FirstOrDefault(), ChangeType.Updated));
+				SceneChanged?.Invoke(this, new SceneChangedEventArgs(source, moving.FirstOrDefault(), ChangeType.Removed));
 
 				return Task.CompletedTask;
 			}

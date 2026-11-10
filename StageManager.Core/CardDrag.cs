@@ -1,5 +1,53 @@
 namespace StageManager.Core;
 
+/// <summary>
+/// Finds the card in the sidebar a dragged card would be merged into. A card becomes the target once the pointer is well inside it
+/// and stays the target until the pointer has clearly left it, so the highlight does not jump between neighbouring cards.
+/// </summary>
+public sealed class CardDropTargets
+{
+	/// <summary>Pixels the pointer has to be inside a card to make it the target.</summary>
+	public const double EnterInset = 10;
+
+	/// <summary>Pixels around the target the pointer may leave it before it is not the target any more.</summary>
+	public const double LeaveMargin = 14;
+
+	private Guid? _target;
+
+	public Guid? Target => _target;
+
+	/// <param name="cards">The cards in the sidebar, without the dragged one.</param>
+	public Guid? Update(double x, double y, IReadOnlyList<(Guid Id, Area Area)> cards)
+	{
+		if (_target is Guid current)
+		{
+			foreach (var (cardId, area) in cards)
+			{
+				if (cardId == current && Contains(area, x, y, -LeaveMargin))
+					return _target;
+			}
+		}
+
+		_target = null;
+		foreach (var (cardId, area) in cards)
+		{
+			if (Contains(area, x, y, EnterInset))
+			{
+				_target = cardId;
+				break;
+			}
+		}
+
+		return _target;
+	}
+
+	public void Clear() => _target = null;
+
+	private static bool Contains(Area a, double x, double y, double inset) =>
+		a.Width > 2 * inset && a.Height > 2 * inset
+		&& x >= a.Left + inset && x <= a.Right - inset && y >= a.Top + inset && y <= a.Bottom - inset;
+}
+
 public enum DragEnd
 {
 	/// <summary>The button went up without a drag: a plain click.</summary>

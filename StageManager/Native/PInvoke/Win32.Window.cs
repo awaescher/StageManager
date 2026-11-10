@@ -139,6 +139,7 @@ namespace StageManager.Native.PInvoke
 		public static extern bool ShowWindowAsync(IntPtr hWnd, SW nCmdShow);
 
         public static IntPtr HWND_TOPMOST = new IntPtr(-1);
+        public static IntPtr HWND_NOTOPMOST = new IntPtr(-2);
         public static IntPtr HWND_TOP = IntPtr.Zero;
 
 		public enum SW
@@ -243,5 +244,9 @@ namespace StageManager.Native.PInvoke
 
         [DllImport("user32.dll")]
         public static extern IntPtr WindowFromPoint(System.Drawing.Point p);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetCursorPos(out System.Drawing.Point point);
     }
 }
