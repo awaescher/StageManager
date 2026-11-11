@@ -65,8 +65,10 @@ jobs:
         fetch-depth: 0
 
     # Semantic Versioning
+    # Only pushes to main are released, a pull request is only built and tested
     - name: Bump version and push tag
       id: tag_version
+      if: github.event_name == 'push'
       uses: mathieudutour/github-tag-action@v7
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -104,6 +106,7 @@ jobs:
     # Create the release:  https://github.com/actions/create-release
     - name: Create release
       id: create_release
+      if: github.event_name == 'push'
       uses: softprops/action-gh-release@v3
       with:
         tag_name: ${{ steps.tag_version.outputs.new_tag }}
