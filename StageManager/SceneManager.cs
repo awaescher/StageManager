@@ -261,6 +261,9 @@ namespace StageManager
 		private Task _flight = Task.CompletedTask;
 		private FlightOverlay? _overlay;
 
+		/// <summary>The desktop is shown: a click on the wallpaper deselected the scene. False at start and as soon as a scene is selected.</summary>
+		public bool IsDesktopView { get; private set; }
+
 		/// <summary>Windows are flying on an overlay at the moment.</summary>
 		public bool IsFlying => _overlay is not null;
 
@@ -285,6 +288,8 @@ namespace StageManager
 
 			if (!_registry.TrySwitch(scene?.Id))
 				return;
+
+			IsDesktopView = scene is null;
 
 			var takeoff = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 

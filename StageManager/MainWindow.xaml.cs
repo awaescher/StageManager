@@ -1054,7 +1054,10 @@ namespace StageManager
 			}
 
 			var hold = _dragActive || _drag.IsPressed || _menuOpen;
-			var input = new SidebarInput(cursor.X, cursor.Y, _overlapped, hold, _clock.Elapsed.TotalSeconds, Summon: _picker.IsActive);
+			// the desktop view has no windows that could cover the sidebar, but it behaves as if they did: like on macOS the sidebar steps
+			// aside and comes back at the screen edge, so the desktop and its icons are free
+			var overlapped = _overlapped || SceneManager?.IsDesktopView == true;
+			var input = new SidebarInput(cursor.X, cursor.Y, overlapped, hold, _clock.Elapsed.TotalSeconds, Summon: _picker.IsActive);
 			Mode = _presence!.Decide(Mode, input);
 
 			// a window that came to the front since may cover it, lift it above again. Not while windows fly or a card is dragged:

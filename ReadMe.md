@@ -67,7 +67,7 @@ This is an experimental fun project. I don't have any idea whether or not this i
 |window animations|✅|
 |live dwm thumbnails|✅|
 |adjust 3D angle according to screen position|⬜|
-|flyover sidebar in desktop view mode if icons are close to the left|⬜|
+|sidebar steps aside in the desktop view and flies back in at the screen edge|✅|
 
 Contributions very welcome :heart:
 
