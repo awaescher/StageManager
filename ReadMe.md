@@ -27,7 +27,7 @@ To quit, find the app's tray icon (Windows might move it into the overflow menu)
  
 ### Requirements
  - Windows 10 version 2004 or newer
- - [.NET 11 SDK](https://dotnet.microsoft.com/en-us/download)
+ - [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download)
 
 ## To do
 
