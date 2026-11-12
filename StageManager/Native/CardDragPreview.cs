@@ -23,6 +23,8 @@ namespace StageManager.Native
 		private readonly double _scale;
 		private readonly Area _hintArea;
 
+		private static CardAlignment Alignment => CardAlignment.For(App.Settings.Current.Sidebar.Side);
+
 		private CardDragPreview(FlightOverlay overlay, List<Entry> entries, int windowCount, int maxVisible, double scale, Area hintArea)
 		{
 			_overlay = overlay;
@@ -57,7 +59,7 @@ namespace StageManager.Native
 					if (frame is not Area f || f.Width <= 0 || f.Height <= 0)
 						continue;
 
-					var pose = DragPreviewLayout.InSlot(slots[i], f.Width, f.Height);
+					var pose = DragPreviewLayout.InSlot(slots[i], f.Width, f.Height, CardAlignment.For(App.Settings.Current.Sidebar.Side));
 					if (overlay.Add(windows[i], pose, pose))
 						entries.Add(new Entry(i, f));
 				}
@@ -87,7 +89,7 @@ namespace StageManager.Native
 			var slots = DragPreviewLayout.Slots(card, _windowCount, _maxVisible, _scale);
 
 			for (var k = 0; k < _entries.Count; k++)
-				_overlay.Place(k, DragPreviewLayout.InSlot(slots[_entries[k].Slot], _entries[k].Frame.Width, _entries[k].Frame.Height));
+				_overlay.Place(k, DragPreviewLayout.InSlot(slots[_entries[k].Slot], _entries[k].Frame.Width, _entries[k].Frame.Height, Alignment));
 
 			_overlay.ShowHint(_hintArea, HintText, hintOpacity);
 		}
@@ -107,7 +109,7 @@ namespace StageManager.Native
 			_overlay.ShowHint(_hintArea, HintText, 0);
 			var count = Math.Max(total, first + _windowCount);
 			var slots = DragPreviewLayout.Slots(card, count, _maxVisible, _scale);
-			return _overlay.FlyTo(_entries.Select(e => DragPreviewLayout.InSlot(slots[first + e.Slot], e.Frame.Width, e.Frame.Height)).ToArray(), duration);
+			return _overlay.FlyTo(_entries.Select(e => DragPreviewLayout.InSlot(slots[first + e.Slot], e.Frame.Width, e.Frame.Height, Alignment)).ToArray(), duration);
 		}
 
 		public void Finish() => _overlay.Finish();

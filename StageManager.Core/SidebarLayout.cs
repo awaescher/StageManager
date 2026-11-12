@@ -24,11 +24,11 @@ public static class SidebarLayout
 	/// <summary>Space above the first and below the last card.</summary>
 	public const double VerticalMargin = 24;
 
-	/// <summary>Icon row below a thumbnail: 4 margin + 30 icon height.</summary>
-	public const double IconRowHeight = 34;
+	/// <summary>Icon row below a thumbnail: 5 margin + 28 icon height.</summary>
+	public const double IconRowHeight = 33;
 
 	/// <summary>Space below every card.</summary>
-	public const double CardGap = 24;
+	public const double CardGap = 16;
 
 	/// <summary>Space between the screen edge and the thumbnails.</summary>
 	public const double EdgePadding = 12;

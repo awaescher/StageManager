@@ -11,9 +11,9 @@ public readonly record struct Insets(double Left, double Top, double Right, doub
 public static class FlightPlanner
 {
 	/// <summary>Where a window with the given proportions shows on a card: fitted into the card and centered, without distortion.</summary>
-	public static Pose OnCard(Area card, double sourceWidth, double sourceHeight, double opacity)
+	public static Pose OnCard(Area card, double sourceWidth, double sourceHeight, double opacity, double alignX = 0.5, double alignY = 0.5)
 	{
-		var fit = AspectFit.Calculate(card.Width, card.Height, sourceWidth, sourceHeight);
+		var fit = AspectFit.Calculate(card.Width, card.Height, sourceWidth, sourceHeight, alignX, alignY);
 		return new Pose(card.Left + fit.X, card.Top + fit.Y, fit.Width, fit.Height, opacity);
 	}
 

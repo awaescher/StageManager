@@ -1,4 +1,4 @@
-﻿using StageManager.Core;
+using StageManager.Core;
 using StageManager.Native.Interop;
 using System;
 using System.Windows;
@@ -208,7 +208,8 @@ namespace StageManager
 
 			// the white backdrop and the thumbnail share the same proportions as the source window, so it is not distorted
 			var source = GetSourceSize();
-			var fit = AspectFit.Calculate(ActualWidth, ActualHeight, source.Width, source.Height);
+			var align = CardAlignment.For(App.Settings.Current.Sidebar.Side);
+			var fit = AspectFit.Calculate(ActualWidth, ActualHeight, source.Width, source.Height, align.X, align.Y);
 			UpdateBackdrop(fit);
 
 			var thumbnailRect = new RECT

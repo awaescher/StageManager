@@ -109,7 +109,7 @@ public class SidebarLayoutTests
 		Assert.Equal(200, r.ThumbnailWidth);
 		Assert.Equal(150, r.ThumbnailHeight);
 		Assert.True(r.IsLimited);
-		Assert.Equal(4, r.EffectiveMaxScenes); // 952 / (150 + 58) = 4.57
+		Assert.Equal(4, r.EffectiveMaxScenes); // 952 / (150 + 49) = 4.78
 	}
 
 	[Fact]
@@ -221,5 +221,82 @@ public class AspectFitTests
 	public void Empty_container_gives_an_empty_result()
 	{
 		Assert.Equal(new FittedRect(0, 0, 0, 0), AspectFit.Calculate(0, 100, 400, 200));
+	}
+}
+
+public class CardAlignmentTests
+{
+	[Fact]
+	public void A_wide_window_sits_on_the_bottom_edge_not_in_the_middle()
+	{
+		// 3:1 on a 160 x 100 card: 160 x 53.3, centered it would float 23 units above the icons
+		var centered = AspectFit.Calculate(160, 100, 1200, 400);
+		var bottom = AspectFit.Calculate(160, 100, 1200, 400, 0, 1);
+
+		Assert.True(centered.Y > 20);
+		Assert.Equal(100, bottom.Y + bottom.Height, 6);
+		Assert.Equal(0, bottom.X, 6);
+	}
+
+	[Fact]
+	public void A_tall_window_sits_in_the_corner_at_the_screen_edge()
+	{
+		var left = AspectFit.Calculate(160, 100, 400, 800, 0, 1);
+		var right = AspectFit.Calculate(160, 100, 400, 800, 1, 1);
+
+		Assert.Equal(0, left.X, 6);
+		Assert.Equal(160, right.X + right.Width, 6);
+		Assert.Equal(100, left.Y + left.Height, 6);
+	}
+
+	[Fact]
+	public void The_corner_follows_the_side_of_the_sidebar()
+	{
+		Assert.Equal(new CardAlignment(0, 1), CardAlignment.For(SidebarSide.Left));
+		Assert.Equal(new CardAlignment(1, 1), CardAlignment.For(SidebarSide.Right));
+	}
+
+	[Fact]
+	public void The_default_stays_centered()
+	{
+		Assert.Equal(AspectFit.Calculate(160, 100, 400, 800), AspectFit.Calculate(160, 100, 400, 800, 0.5, 0.5));
+	}
+
+	[Theory]
+	[InlineData(double.NaN)]
+	[InlineData(-3)]
+	[InlineData(7)]
+	public void An_odd_alignment_never_puts_the_window_outside_the_card(double align)
+	{
+		var r = AspectFit.Calculate(160, 100, 400, 800, align, align);
+
+		Assert.InRange(r.X, 0, 160 - r.Width + 0.0001);
+		Assert.InRange(r.Y, 0, 100 - r.Height + 0.0001);
+	}
+
+	[Fact]
+	public void Flights_end_where_the_card_shows_the_window()
+	{
+		var card = new Area(10, 100, 170, 200);
+		var align = CardAlignment.For(SidebarSide.Left);
+
+		var pose = FlightPlanner.OnCard(card, 1200, 400, 1, align.X, align.Y);
+
+		Assert.Equal(200, pose.Y + pose.Height, 6);
+		Assert.Equal(10, pose.X, 6);
+	}
+
+	[Fact]
+	public void A_stack_keeps_every_window_on_the_corner_of_its_slot()
+	{
+		var card = new Area(0, 0, 200, 120);
+		var poses = DragPreviewLayout.OnStack(card, new[] { (1600.0, 500.0), (800.0, 800.0) }, 2, 1, CardAlignment.For(SidebarSide.Left));
+		var slots = DragPreviewLayout.Slots(card, 2, 2);
+
+		for (var i = 0; i < poses.Length; i++)
+		{
+			Assert.Equal(slots[i].Y + slots[i].Height, poses[i].Y + poses[i].Height, 6);
+			Assert.Equal(slots[i].X, poses[i].X, 6);
+		}
 	}
 }

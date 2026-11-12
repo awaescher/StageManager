@@ -1,4 +1,4 @@
-﻿<Window
+<Window
     x:Class="StageManager.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -227,7 +227,7 @@
                         </Grid>
                         <!-- Icons and the close button. The button sits here and not on the thumbnails, because DWM draws thumbnails above all WPF content. -->
                         <Grid
-                            Margin="0,4,0,24"
+                            Margin="0,5,0,16"
                             Opacity="{Binding CardOpacity}"
                             Width="{Binding ThumbnailWidth}">
                             <ItemsControl
@@ -245,11 +245,13 @@
                                         <Border>
                                             <Border.Effect>
                                                 <DropShadowEffect
-                                                    BlurRadius="20" />
+                                                    BlurRadius="8"
+                                                    ShadowDepth="1"
+                                                    Opacity="0.45" />
                                             </Border.Effect>
                                             <Image
-                                                Margin="0, 0, 2, 0"
-                                                Height="30"
+                                                Margin="0, 0, 3, 0"
+                                                Height="28"
                                                 Source="{Binding Icon}" />
                                         </Border>
                                     </DataTemplate>

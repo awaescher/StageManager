@@ -42,10 +42,11 @@ public readonly record struct FittedRect(double X, double Y, double Width, doubl
 public static class AspectFit
 {
 	/// <summary>
-	/// Fits a source of the given size into a container without distortion and centers it.
-	/// Returns the full container if the source size is unknown.
+	/// Fits a source of the given size into a container without distortion. Returns the full container if the source size is unknown.
 	/// </summary>
-	public static FittedRect Calculate(double containerWidth, double containerHeight, double sourceWidth, double sourceHeight)
+	/// <param name="alignX">Where the source sits in the room that is left: 0 at the left edge, 0.5 in the middle, 1 at the right edge.</param>
+	/// <param name="alignY">0 at the top, 0.5 in the middle, 1 at the bottom.</param>
+	public static FittedRect Calculate(double containerWidth, double containerHeight, double sourceWidth, double sourceHeight, double alignX = 0.5, double alignY = 0.5)
 	{
 		if (containerWidth <= 0 || containerHeight <= 0)
 			return new FittedRect(0, 0, 0, 0);
@@ -57,6 +58,9 @@ public static class AspectFit
 		var width = sourceWidth * scale;
 		var height = sourceHeight * scale;
 
-		return new FittedRect((containerWidth - width) / 2, (containerHeight - height) / 2, width, height);
+		alignX = double.IsFinite(alignX) ? Math.Clamp(alignX, 0, 1) : 0.5;
+		alignY = double.IsFinite(alignY) ? Math.Clamp(alignY, 0, 1) : 0.5;
+
+		return new FittedRect((containerWidth - width) * alignX, (containerHeight - height) * alignY, width, height);
 	}
 }

@@ -208,19 +208,22 @@ public static class DragPreviewLayout
 	/// Where each window shows on a card in the sidebar: in its slot of the stack, fitted without distortion, like the card draws it.
 	/// Back to front. Flights start and end here, so the card and the flying windows match when one takes over from the other.
 	/// </summary>
-	public static Pose[] OnStack(Area card, IReadOnlyList<(double Width, double Height)> sources, int maxVisible, double scale = 1)
+	public static Pose[] OnStack(Area card, IReadOnlyList<(double Width, double Height)> sources, int maxVisible, double scale = 1, CardAlignment? alignment = null)
 	{
 		var slots = Slots(card, sources.Count, maxVisible, scale);
 		var poses = new Pose[sources.Count];
 
 		for (var i = 0; i < poses.Length; i++)
-			poses[i] = InSlot(slots[i], sources[i].Width, sources[i].Height);
+			poses[i] = InSlot(slots[i], sources[i].Width, sources[i].Height, alignment);
 
 		return poses;
 	}
 
-	public static Pose InSlot(Pose slot, double sourceWidth, double sourceHeight) =>
-		FlightPlanner.OnCard(new Area(slot.X, slot.Y, slot.X + slot.Width, slot.Y + slot.Height), sourceWidth, sourceHeight, slot.Opacity);
+	public static Pose InSlot(Pose slot, double sourceWidth, double sourceHeight, CardAlignment? alignment = null)
+	{
+		var align = alignment ?? CardAlignment.Centered;
+		return FlightPlanner.OnCard(new Area(slot.X, slot.Y, slot.X + slot.Width, slot.Y + slot.Height), sourceWidth, sourceHeight, slot.Opacity, align.X, align.Y);
+	}
 
 	/// <summary>How visible the hint for the stage is: a faint outline while the card leaves the sidebar, fully when letting go would drop it.</summary>
 	public static double HintOpacity(double progress, bool armed) => armed ? 1 : Math.Clamp(progress, 0, 1) * 0.35;

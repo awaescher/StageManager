@@ -374,7 +374,8 @@ namespace StageManager
 				// the card of the prior scene takes the place of the card of the new scene, both stacks are laid out on that place
 				// exactly like the sidebar draws them, so the flying windows and the card match when one takes over from the other
 				var priorWindows = (prior?.Windows ?? Enumerable.Empty<IWindow>()).ToArray();
-				var priorStack = DragPreviewLayout.OnStack(cardArea, priorWindows.Select(w => WindowGeometry.FrameSizeOf(w.Handle)).ToArray(), maxVisible, CardScale);
+				var alignment = CardAlignment.For(App.Settings.Current.Sidebar.Side);
+				var priorStack = DragPreviewLayout.OnStack(cardArea, priorWindows.Select(w => WindowGeometry.FrameSizeOf(w.Handle)).ToArray(), maxVisible, CardScale, alignment);
 
 				// the windows that leave fly where they stand to the card, the ones that come fly from the card to where they will show
 				for (var i = 0; i < priorWindows.Length; i++)
@@ -398,7 +399,7 @@ namespace StageManager
 				}
 
 				var windows = scene.Windows.ToArray();
-				var stack = DragPreviewLayout.OnStack(cardArea, windows.Select(w => WindowGeometry.FrameSizeOf(w.Handle)).ToArray(), maxVisible, CardScale);
+				var stack = DragPreviewLayout.OnStack(cardArea, windows.Select(w => WindowGeometry.FrameSizeOf(w.Handle)).ToArray(), maxVisible, CardScale, alignment);
 
 				for (var i = 0; i < windows.Length; i++)
 				{
