@@ -110,4 +110,16 @@
   <data name="Anim.StatusContents" xml:space="preserve"><value>Содержимое окна при перетаскивании</value></data>
   <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows при перетаскивании окон показывает только рамку. StageManager учитывает это и перемещает рамку. Включите, чтобы перемещать настоящие окна.</value></data>
   <data name="Anim.Status" xml:space="preserve"><value>Ваша система</value></data>
+  <data name="Apps.NoneRunning" xml:space="preserve"><value>Других запущенных приложений с окнами нет.</value></data>
+  <data name="Apps.Title" xml:space="preserve"><value>Приложения, которые StageManager не трогает</value></data>
+  <data name="Apps.Add" xml:space="preserve"><value>Исключить приложение</value></data>
+  <data name="Apps.Desc" xml:space="preserve"><value>Для их окон нет карточки на боковой панели, и они никогда не скрываются. Подходит для лаунчеров, оверлеев и приложений в трее.</value></data>
+  <data name="Apps.Filter" xml:space="preserve"><value>Приложения</value></data>
+  <data name="Card.Exclude" xml:space="preserve"><value>Исключить из StageManager</value></data>
+  <data name="Apps.Running" xml:space="preserve"><value>Запущенные приложения</value></data>
+  <data name="Card.ExcludeApp" xml:space="preserve"><value>Исключить {0} из StageManager</value></data>
+  <data name="Apps.Empty" xml:space="preserve"><value>Нет исключённых приложений.</value></data>
+  <data name="Nav.Apps" xml:space="preserve"><value>Приложения</value></data>
+  <data name="Apps.Browse" xml:space="preserve"><value>Выбрать файл приложения...</value></data>
+  <data name="Apps.RemoveOne" xml:space="preserve"><value>Снова включить это приложение</value></data>
 </root>

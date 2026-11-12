@@ -110,4 +110,16 @@
   <data name="Anim.StatusContents" xml:space="preserve"><value>Sürüklerken pencere içeriği</value></data>
   <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows, pencereler sürüklenirken yalnızca bir çerçeve gösterecek şekilde ayarlı. StageManager bunu izler ve bir çerçeve uçurur. Gerçek pencereleri uçurmak için açın.</value></data>
   <data name="Anim.Status" xml:space="preserve"><value>Sisteminiz</value></data>
+  <data name="Apps.NoneRunning" xml:space="preserve"><value>Penceresi olan başka çalışan uygulama yok.</value></data>
+  <data name="Apps.Title" xml:space="preserve"><value>StageManager&apos;ın dokunmadığı uygulamalar</value></data>
+  <data name="Apps.Add" xml:space="preserve"><value>Uygulamayı hariç tut</value></data>
+  <data name="Apps.Desc" xml:space="preserve"><value>Bu uygulamaların pencereleri kenar çubuğunda kart almaz ve hiçbir zaman gizlenmez. Başlatıcılar, yer paylaşımları ve tepsi uygulamaları için uygundur.</value></data>
+  <data name="Apps.Filter" xml:space="preserve"><value>Uygulamalar</value></data>
+  <data name="Card.Exclude" xml:space="preserve"><value>StageManager&apos;dan hariç tut</value></data>
+  <data name="Apps.Running" xml:space="preserve"><value>Çalışan uygulamalar</value></data>
+  <data name="Card.ExcludeApp" xml:space="preserve"><value>{0} uygulamasını StageManager&apos;dan hariç tut</value></data>
+  <data name="Apps.Empty" xml:space="preserve"><value>Hariç tutulan uygulama yok.</value></data>
+  <data name="Nav.Apps" xml:space="preserve"><value>Uygulamalar</value></data>
+  <data name="Apps.Browse" xml:space="preserve"><value>Uygulama dosyası seç...</value></data>
+  <data name="Apps.RemoveOne" xml:space="preserve"><value>Bu uygulamayı yeniden dahil et</value></data>
 </root>

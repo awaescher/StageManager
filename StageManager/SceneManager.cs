@@ -45,6 +45,50 @@ namespace StageManager
 			_desktopIcons.Apply(sceneActive: true);
 		}
 
+		// the list of excluded apps the windows were sorted by the last time
+		private IReadOnlyList<string> _knownExcluded = Array.Empty<string>();
+
+		/// <summary>
+		/// Applies a changed list of excluded apps right away: the windows of an app that is excluded now leave their cards and come back
+		/// to the screen if they were hidden, the windows of an app that is not excluded any more get a card.
+		/// </summary>
+		public void ApplyExcludedApps()
+		{
+			var current = App.Settings.Current.Stage.ExcludedApps.ToList();
+			var previous = _knownExcluded;
+
+			if (previous.SequenceEqual(current, StringComparer.OrdinalIgnoreCase))
+				return;
+
+			_knownExcluded = current;
+
+			if (_scenes is null)
+				return;
+
+			var (removed, added) = WindowsManager.Reevaluate(previous);
+
+			foreach (var window in removed)
+			{
+				// a hidden window is out of the screen, nobody would bring it back once it is forgotten
+				if (Parking.IsParked(window.Handle))
+					WindowStrategy.Show(window);
+
+				WindowsManager_WindowDestroyed(window);
+			}
+
+			Scene? last = null;
+			foreach (var window in added)
+			{
+				var placed = PlaceWindow(window, companion: false);
+				if (placed.Switch)
+					last = placed.Scene;
+			}
+
+			// it is on the screen already, its scene takes the stage like a scene of a window that was just opened
+			if (last is object)
+				SwitchTo(last).SafeFireAndForget(ex => Log.Error("Taking an app back in failed", ex));
+		}
+
 		/// <summary>Applies a changed desktop icon setting right away.</summary>
 		public void ApplyDesktopIconSettings() => _desktopIcons.Reapply();
 
@@ -56,6 +100,8 @@ namespace StageManager
 			// the WinEvent hooks only fire on a thread with a message loop, that is the UI thread (its managed id is not guaranteed to be 1)
 			if (System.Windows.Application.Current?.Dispatcher.CheckAccess() != true)
 				throw new NotSupportedException("Start has to be called on the main thread, otherwise events won't be fired.");
+
+			_knownExcluded = App.Settings.Current.Stage.ExcludedApps.ToList();
 
 			WindowsManager.WindowCreated += WindowsManager_WindowCreated;
 			WindowsManager.WindowUpdated += WindowsManager_WindowUpdated;
@@ -698,6 +744,20 @@ namespace StageManager
 			foreach (var w in scene.Windows.ToArray())
 				w.Close();
 		}
+
+		/// <summary>The apps of a scene that can be excluded: the entry for the list, a name to show and the executable.</summary>
+		public static IReadOnlyList<(string Entry, string Name, string? Path)> ExcludableAppsOf(Scene scene) =>
+			scene.Windows
+				.GroupBy(GroupKeyOf, StringComparer.OrdinalIgnoreCase)
+				.Select(g =>
+				{
+					var first = g.First();
+					var path = (first as WindowsWindow)?.ProcessExecutable;
+					var entry = ExcludedApps.EntryFor(path);
+					return (Entry: string.IsNullOrEmpty(entry) ? first.ProcessFileName : entry, Name: AppInfo.DisplayNameOf(path, first.ProcessName), Path: path);
+				})
+				.Where(a => !string.IsNullOrEmpty(a.Entry))
+				.ToList();
 
 		/// <summary>The apps a scene consists of, with the key that identifies them and a name to show.</summary>
 		public static IReadOnlyList<(string Key, string Name)> AppsOf(Scene scene) =>

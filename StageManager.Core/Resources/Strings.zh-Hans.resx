@@ -110,4 +110,16 @@
   <data name="Anim.StatusContents" xml:space="preserve"><value>拖动时的窗口内容</value></data>
   <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows 设置为拖动窗口时只显示边框，StageManager 也会遵循并移动边框。开启后改为移动真实窗口。</value></data>
   <data name="Anim.Status" xml:space="preserve"><value>你的系统</value></data>
+  <data name="Apps.NoneRunning" xml:space="preserve"><value>没有其他带窗口的应用在运行。</value></data>
+  <data name="Apps.Title" xml:space="preserve"><value>StageManager 不会处理的应用</value></data>
+  <data name="Apps.Add" xml:space="preserve"><value>排除应用</value></data>
+  <data name="Apps.Desc" xml:space="preserve"><value>这些应用的窗口不会在侧边栏中生成卡片，也不会被隐藏。适合启动器、悬浮窗和托盘应用。</value></data>
+  <data name="Apps.Filter" xml:space="preserve"><value>应用</value></data>
+  <data name="Card.Exclude" xml:space="preserve"><value>从 StageManager 中排除</value></data>
+  <data name="Apps.Running" xml:space="preserve"><value>正在运行的应用</value></data>
+  <data name="Card.ExcludeApp" xml:space="preserve"><value>将 {0} 从 StageManager 中排除</value></data>
+  <data name="Apps.Empty" xml:space="preserve"><value>没有被排除的应用。</value></data>
+  <data name="Nav.Apps" xml:space="preserve"><value>应用</value></data>
+  <data name="Apps.Browse" xml:space="preserve"><value>选择应用文件...</value></data>
+  <data name="Apps.RemoveOne" xml:space="preserve"><value>重新纳入此应用</value></data>
 </root>

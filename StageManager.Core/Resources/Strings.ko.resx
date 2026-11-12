@@ -110,4 +110,16 @@
   <data name="Anim.StatusContents" xml:space="preserve"><value>끌 때 창 내용</value></data>
   <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows는 창을 끌 때 프레임만 표시하도록 설정되어 있습니다. StageManager도 이를 따라 프레임을 이동합니다. 켜면 실제 창을 이동합니다.</value></data>
   <data name="Anim.Status" xml:space="preserve"><value>내 시스템</value></data>
+  <data name="Apps.NoneRunning" xml:space="preserve"><value>창이 있는 다른 앱이 실행 중이지 않습니다.</value></data>
+  <data name="Apps.Title" xml:space="preserve"><value>StageManager가 건드리지 않는 앱</value></data>
+  <data name="Apps.Add" xml:space="preserve"><value>앱 제외</value></data>
+  <data name="Apps.Desc" xml:space="preserve"><value>이 앱의 창은 사이드바에 카드가 만들어지지 않고 숨겨지지도 않습니다. 런처, 오버레이, 트레이 앱에 유용합니다.</value></data>
+  <data name="Apps.Filter" xml:space="preserve"><value>앱</value></data>
+  <data name="Card.Exclude" xml:space="preserve"><value>StageManager에서 제외</value></data>
+  <data name="Apps.Running" xml:space="preserve"><value>실행 중인 앱</value></data>
+  <data name="Card.ExcludeApp" xml:space="preserve"><value>{0}을(를) StageManager에서 제외</value></data>
+  <data name="Apps.Empty" xml:space="preserve"><value>제외한 앱이 없습니다.</value></data>
+  <data name="Nav.Apps" xml:space="preserve"><value>앱</value></data>
+  <data name="Apps.Browse" xml:space="preserve"><value>앱 파일 선택...</value></data>
+  <data name="Apps.RemoveOne" xml:space="preserve"><value>이 앱을 다시 포함</value></data>
 </root>

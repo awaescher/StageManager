@@ -46,12 +46,13 @@
                             <Ellipse
                                 x:Name="disc"
                                 Fill="#99000000" />
-                            <Path
-                                Data="M 7,7 L 15,15 M 15,7 L 7,15"
-                                Stroke="White"
-                                StrokeThickness="1.6"
-                                StrokeStartLineCap="Round"
-                                StrokeEndLineCap="Round" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                FontSize="9"
+                                Foreground="White"
+                                Text="&#xE711;" />
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger
@@ -129,6 +130,9 @@
                                 <MenuItem
                                     Tag="split"
                                     Header="{local:Loc Card.Separate}" />
+                                <MenuItem
+                                    Tag="exclude"
+                                    Header="{local:Loc Card.Exclude}" />
                                 <Separator />
                                 <MenuItem
                                     Tag="close"

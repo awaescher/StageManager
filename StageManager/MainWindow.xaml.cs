@@ -295,6 +295,7 @@ namespace StageManager
 				ApplySide();
 				SyncVisibilityByUpdatedTimeStamp();
 				SceneManager?.ApplyDesktopIconSettings();
+				SceneManager?.ApplyExcludedApps();
 				ApplyHotkeys();
 			});
 		}
@@ -1138,6 +1139,9 @@ namespace StageManager
 					case "add":
 						item.IsEnabled = canAdd;
 						break;
+					case "exclude":
+						FillExcludeMenu(item, card.Scene);
+						break;
 					case "split":
 						item.Items.Clear();
 						item.Visibility = apps.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
@@ -1150,6 +1154,51 @@ namespace StageManager
 						break;
 				}
 			}
+		}
+
+		/// <summary>
+		/// "Exclude" for the apps of a card: one app is excluded right away, with several apps the menu names each of them. The card is
+		/// gone afterwards, so it is not asked twice.
+		/// </summary>
+		private void FillExcludeMenu(MenuItem item, Scene scene)
+		{
+			var apps = SceneManager.ExcludableAppsOf(scene);
+
+			item.Items.Clear();
+			item.Visibility = apps.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+			if (apps.Count == 1)
+			{
+				item.Header = Loc.Format("Card.ExcludeApp", apps[0].Name);
+				item.Tag = "exclude";
+				item.Click -= CardMenu_Exclude_Click;
+				item.Click += CardMenu_Exclude_Click;
+				item.DataContext = apps[0].Entry;
+				return;
+			}
+
+			item.Header = Loc.Get("Card.Exclude");
+			item.DataContext = null;
+			item.Click -= CardMenu_Exclude_Click;
+
+			foreach (var (entry, name, path) in apps)
+			{
+				var sub = new MenuItem { Header = name, DataContext = entry, Icon = AppIconOf(path) };
+				sub.Click += CardMenu_Exclude_Click;
+				item.Items.Add(sub);
+			}
+		}
+
+		private static System.Windows.Controls.Image? AppIconOf(string? path) =>
+			AppInfo.IconOf(path) is ImageSource source ? new System.Windows.Controls.Image { Source = source, Width = 16, Height = 16 } : null;
+
+		private void CardMenu_Exclude_Click(object sender, RoutedEventArgs e)
+		{
+			if (sender is not MenuItem { DataContext: string entry } || entry.Length == 0)
+				return;
+
+			e.Handled = true;
+			App.Settings.Update(s => s.Stage.ExcludedApps = ExcludedApps.With(s.Stage.ExcludedApps, entry));
 		}
 
 		private void CardMenu_Closed(object sender, RoutedEventArgs e)

@@ -1,4 +1,4 @@
-﻿using StageManager.Core;
+using StageManager.Core;
 using StageManager.Native.PInvoke;
 using StageManager.Native.Window;
 using System;
@@ -158,7 +158,7 @@ namespace StageManager.Native
 			}
 		}
 
-		public bool IsCandidate()
+		public bool IsCandidate(bool ignoreExclusions = false)
 		{
 			if (!CanLayout)
 				return false;
@@ -175,7 +175,7 @@ namespace StageManager.Native
 			if (!WindowFilter.IsCandidate(new WindowFacts(Class, ProcessName, rootWindow, minimized, bounds.Width, bounds.Height)))
 				return false;
 
-			return !AppIdentity.IsListed(App.Settings.Current.Stage.ExcludedApps, _processExecutable);
+			return ignoreExclusions || !AppIdentity.IsListed(App.Settings.Current.Stage.ExcludedApps, _processExecutable);
 		}
 
 		public bool IsFocused => Win32.GetForegroundWindow() == _handle;

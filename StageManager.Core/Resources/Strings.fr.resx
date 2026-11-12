@@ -110,4 +110,16 @@
   <data name="Anim.StatusContents" xml:space="preserve"><value>Contenu des fenêtres pendant le déplacement</value></data>
   <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows n&apos;affiche qu&apos;un cadre lors du déplacement des fenêtres. StageManager le respecte et déplace un cadre. Activez cette option pour déplacer les vraies fenêtres.</value></data>
   <data name="Anim.Status" xml:space="preserve"><value>Votre système</value></data>
+  <data name="Apps.NoneRunning" xml:space="preserve"><value>Aucune autre application avec des fenêtres n&apos;est en cours d&apos;exécution.</value></data>
+  <data name="Apps.Title" xml:space="preserve"><value>Applications que StageManager laisse tranquilles</value></data>
+  <data name="Apps.Add" xml:space="preserve"><value>Exclure une application</value></data>
+  <data name="Apps.Desc" xml:space="preserve"><value>Leurs fenêtres n&apos;ont pas de carte dans la barre latérale et ne sont jamais masquées. Utile pour les lanceurs, les surcouches et les applications de la zone de notification.</value></data>
+  <data name="Apps.Filter" xml:space="preserve"><value>Applications</value></data>
+  <data name="Card.Exclude" xml:space="preserve"><value>Exclure de StageManager</value></data>
+  <data name="Apps.Running" xml:space="preserve"><value>Applications en cours d&apos;exécution</value></data>
+  <data name="Card.ExcludeApp" xml:space="preserve"><value>Exclure {0} de StageManager</value></data>
+  <data name="Apps.Empty" xml:space="preserve"><value>Aucune application exclue.</value></data>
+  <data name="Nav.Apps" xml:space="preserve"><value>Applications</value></data>
+  <data name="Apps.Browse" xml:space="preserve"><value>Choisir un fichier d&apos;application...</value></data>
+  <data name="Apps.RemoveOne" xml:space="preserve"><value>Réintégrer cette application</value></data>
 </root>

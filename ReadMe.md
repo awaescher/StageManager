@@ -12,6 +12,8 @@ Drag a card from the sidebar onto the stage to add its windows to the current sc
 
 Scenes can be switched with the keyboard: hold `Ctrl+Alt+Win` and press `Tab` for the next scene (the sidebar shows the pick), `Shift+Tab` for the previous one, or `1` to `9` for the card at that position. The scene opens when you let go of the keys, `Esc` cancels. The held keys can be changed in the settings by clicking into the field and pressing the new keys. Combinations that are already used by Windows or another app are named there.
 
+Apps that StageManager should leave alone, such as launchers or overlays, can be excluded: either on the "Apps" page of the settings (choose from the running apps or an app file, and take them off the list with the trash can) or with a right click on a card. If the card holds several apps, the menu names each of them. The windows of an excluded app get no card and are never hidden, and they are back right away when the app is included again.
+
 The menus and settings are available in English, German, Spanish, French, Italian, Portuguese, Russian, Japanese, Korean, Simplified Chinese and Turkish. StageManager follows the display language of Windows, or you choose one in the settings. New languages are a copy of `StageManager.Core/Resources/Strings.resx`: translate the values, name the file `Strings.<language>.resx` and add the language to `Languages.cs`. A test checks that every language has all texts.
 
 ## Usage
@@ -55,6 +57,7 @@ This is an experimental fun project. I don't have any idea whether or not this i
 |settings window|✅|
 |switch scenes with the keyboard (configurable keys)|✅|
 |translated user interface (11 languages, switchable in the settings)|✅|
+|exclude apps (settings page "Apps" or right click on a card)|✅|
 |bring back windows that ended up out of the screen|✅|
 |virtual desktop support (pin window)|⬜|
 |multi-monitor support|⬜|

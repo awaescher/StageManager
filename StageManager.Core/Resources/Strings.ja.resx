@@ -110,4 +110,16 @@
   <data name="Anim.StatusContents" xml:space="preserve"><value>ドラッグ中のウィンドウの内容</value></data>
   <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows はウィンドウのドラッグ中に枠だけを表示する設定です。StageManager もそれに従い、枠を移動します。オンにすると、実際のウィンドウを移動します。</value></data>
   <data name="Anim.Status" xml:space="preserve"><value>お使いのシステム</value></data>
+  <data name="Apps.NoneRunning" xml:space="preserve"><value>ウィンドウを持つ他のアプリは実行されていません。</value></data>
+  <data name="Apps.Title" xml:space="preserve"><value>StageManager が操作しないアプリ</value></data>
+  <data name="Apps.Add" xml:space="preserve"><value>アプリを除外</value></data>
+  <data name="Apps.Desc" xml:space="preserve"><value>これらのウィンドウはサイドバーにカードが作られず、隠されることもありません。ランチャー、オーバーレイ、タスクトレイのアプリに便利です。</value></data>
+  <data name="Apps.Filter" xml:space="preserve"><value>アプリ</value></data>
+  <data name="Card.Exclude" xml:space="preserve"><value>StageManager から除外</value></data>
+  <data name="Apps.Running" xml:space="preserve"><value>実行中のアプリ</value></data>
+  <data name="Card.ExcludeApp" xml:space="preserve"><value>{0} を StageManager から除外</value></data>
+  <data name="Apps.Empty" xml:space="preserve"><value>除外しているアプリはありません。</value></data>
+  <data name="Nav.Apps" xml:space="preserve"><value>アプリ</value></data>
+  <data name="Apps.Browse" xml:space="preserve"><value>アプリのファイルを選択...</value></data>
+  <data name="Apps.RemoveOne" xml:space="preserve"><value>このアプリを再び対象にする</value></data>
 </root>

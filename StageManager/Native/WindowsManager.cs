@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using StageManager.Core;
 using StageManager.Native.PInvoke;
 using StageManager.Native.Window;
 
@@ -218,11 +219,7 @@ namespace StageManager.Native
 
 				if (window.IsCandidate())
 				{
-					window.WindowFocused += (sender) => HandleWindowFocused(sender);
-					window.WindowUpdated += (sender) => HandleWindowUpdated(sender);
-					window.WindowClosed += (sender) => HandleWindowClosed(sender);
-
-					_windows[handle] = window;
+					Track(window);
 
 					if (emitEvent)
 					{
@@ -230,6 +227,61 @@ namespace StageManager.Native
 					}
 				}
 			}
+		}
+
+		private void Track(WindowsWindow window)
+		{
+			window.WindowFocused += (sender) => HandleWindowFocused(sender);
+			window.WindowUpdated += (sender) => HandleWindowUpdated(sender);
+			window.WindowClosed += (sender) => HandleWindowClosed(sender);
+
+			_windows[window.Handle] = window;
+		}
+
+		/// <summary>
+		/// Applies a changed list of excluded apps to the windows that exist: the ones of apps that are excluded now are no longer tracked,
+		/// the ones of apps that are not excluded any more are tracked. No events are raised, the caller decides what happens to the windows.
+		/// </summary>
+		/// <param name="previous">The list of excluded apps before the change.</param>
+		public (List<IWindow> Removed, List<IWindow> Added) Reevaluate(IReadOnlyList<string> previous)
+		{
+			var removed = new List<IWindow>();
+			var added = new List<IWindow>();
+
+			if (!_active)
+				return (removed, added);
+
+			var excluded = App.Settings.Current.Stage.ExcludedApps;
+
+			foreach (var window in _windows.Values.ToList())
+			{
+				if (!AppIdentity.IsListed(excluded, window.ProcessExecutable))
+					continue;
+
+				_windows.Remove(window.Handle);
+				removed.Add(window);
+			}
+
+			Win32.EnumWindows((handle, param) =>
+			{
+				if (_windows.ContainsKey(handle) || handle == _currentProcessWindowHandle || !Win32Helper.IsAppWindow(handle))
+					return true;
+
+				var window = new WindowsWindow(handle);
+				if (window.ProcessId < 0 || window.ProcessId == _currentProcessId)
+					return true;
+
+				// only the apps that were excluded and are not any more: other windows have their own ways in
+				if (AppIdentity.IsListed(previous, window.ProcessExecutable) && window.IsCandidate())
+				{
+					Track(window);
+					added.Add(window);
+				}
+
+				return true;
+			}, IntPtr.Zero);
+
+			return (removed, added);
 		}
 
 		private void UnregisterWindow(IntPtr handle)

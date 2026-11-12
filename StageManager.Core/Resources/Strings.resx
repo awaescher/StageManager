@@ -110,4 +110,16 @@
   <data name="Anim.StatusContents" xml:space="preserve"><value>Window contents while dragging</value></data>
   <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows is set to show only a frame while windows are dragged. StageManager follows that and flies a frame. Turn this on to fly the real windows instead.</value></data>
   <data name="Anim.Status" xml:space="preserve"><value>Your system</value></data>
+  <data name="Apps.NoneRunning" xml:space="preserve"><value>No other apps with windows are running.</value></data>
+  <data name="Apps.Title" xml:space="preserve"><value>Apps StageManager leaves alone</value></data>
+  <data name="Apps.Add" xml:space="preserve"><value>Exclude an app</value></data>
+  <data name="Apps.Desc" xml:space="preserve"><value>Their windows get no card in the sidebar and are never hidden. Good for launchers, overlays and tray apps.</value></data>
+  <data name="Apps.Filter" xml:space="preserve"><value>Apps</value></data>
+  <data name="Card.Exclude" xml:space="preserve"><value>Exclude from StageManager</value></data>
+  <data name="Apps.Running" xml:space="preserve"><value>Running apps</value></data>
+  <data name="Card.ExcludeApp" xml:space="preserve"><value>Exclude {0} from StageManager</value></data>
+  <data name="Apps.Empty" xml:space="preserve"><value>No apps excluded.</value></data>
+  <data name="Nav.Apps" xml:space="preserve"><value>Apps</value></data>
+  <data name="Apps.Browse" xml:space="preserve"><value>Choose an app file...</value></data>
+  <data name="Apps.RemoveOne" xml:space="preserve"><value>Include this app again</value></data>
 </root>

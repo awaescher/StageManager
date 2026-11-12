@@ -110,4 +110,16 @@
   <data name="Anim.StatusContents" xml:space="preserve"><value>Fensterinhalt beim Ziehen</value></data>
   <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows zeigt beim Ziehen von Fenstern nur einen Rahmen. StageManager folgt dem und lässt einen Rahmen fliegen. Mit diesem Schalter fliegen stattdessen die echten Fenster.</value></data>
   <data name="Anim.Status" xml:space="preserve"><value>Dein System</value></data>
+  <data name="Apps.NoneRunning" xml:space="preserve"><value>Es laufen keine weiteren Apps mit Fenstern.</value></data>
+  <data name="Apps.Title" xml:space="preserve"><value>Apps, die StageManager in Ruhe lässt</value></data>
+  <data name="Apps.Add" xml:space="preserve"><value>App ausschließen</value></data>
+  <data name="Apps.Desc" xml:space="preserve"><value>Ihre Fenster bekommen keine Karte in der Seitenleiste und werden nie ausgeblendet. Gut für Launcher, Overlays und Tray-Apps.</value></data>
+  <data name="Apps.Filter" xml:space="preserve"><value>Apps</value></data>
+  <data name="Card.Exclude" xml:space="preserve"><value>Von StageManager ausschließen</value></data>
+  <data name="Apps.Running" xml:space="preserve"><value>Laufende Apps</value></data>
+  <data name="Card.ExcludeApp" xml:space="preserve"><value>{0} von StageManager ausschließen</value></data>
+  <data name="Apps.Empty" xml:space="preserve"><value>Keine Apps ausgeschlossen.</value></data>
+  <data name="Nav.Apps" xml:space="preserve"><value>Apps</value></data>
+  <data name="Apps.Browse" xml:space="preserve"><value>App-Datei auswählen...</value></data>
+  <data name="Apps.RemoveOne" xml:space="preserve"><value>Diese App wieder einbeziehen</value></data>
 </root>

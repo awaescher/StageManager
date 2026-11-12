@@ -1,4 +1,5 @@
 using StageManager.Core;
+using StageManager.Native;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,9 @@ namespace StageManager
 		private static readonly int[] SceneCounts = { 1, 2, 3, 4, 5, 6, 7, 8, 10, 12 };
 		private static readonly int[] SidebarWidths = { 180, 200, 240, 280, 320, 400, 480 };
 		private static readonly (int Width, int Height)[] ThumbnailSizes = { (128, 80), (160, 100), (192, 120), (240, 150), (288, 180) };
+		/// <summary>An app in one of the lists: what the user sees of it.</summary>
+		private sealed record AppRow(string Entry, string Name, string Detail, ImageSource? Icon);
+
 		private static readonly double[] Speeds = { 0.5, 0.75, 1.0, 1.5, 2.0, 3.0 };
 
 		private static SettingsWindow? _instance;
@@ -82,6 +86,7 @@ namespace StageManager
 			pageSidebar.Visibility = tag == "sidebar" ? Visibility.Visible : Visibility.Collapsed;
 			pageAnimations.Visibility = tag == "animations" ? Visibility.Visible : Visibility.Collapsed;
 			pageKeyboard.Visibility = tag == "keyboard" ? Visibility.Visible : Visibility.Collapsed;
+			pageApps.Visibility = tag == "apps" ? Visibility.Visible : Visibility.Collapsed;
 			pageIcons.Visibility = tag == "icons" ? Visibility.Visible : Visibility.Collapsed;
 		}
 
@@ -192,6 +197,7 @@ namespace StageManager
 				UpdateAnimationInfo();
 				UpdateLayoutInfo();
 				UpdateHotkeyInfo();
+				LoadExcludedApps();
 			}
 			finally
 			{
@@ -550,6 +556,134 @@ namespace StageManager
 				Margin = new Thickness(0, 10, 0, 0),
 				Foreground = (Brush)FindResource("TextFillColorSecondaryBrush")
 			});
+		}
+
+		// the apps that are left alone. The list holds file names, what is shown is the name and the icon of the app if it is running
+
+		private void LoadExcludedApps()
+		{
+			var entries = Settings.Current.Stage.ExcludedApps;
+			var running = RunningByFileName();
+
+			var rows = entries
+				.Select(entry => RowFor(entry, running))
+				.OrderBy(r => r.Name, StringComparer.CurrentCultureIgnoreCase)
+				.ToList();
+
+			var selected = appsList.SelectedItems.OfType<AppRow>().Select(r => r.Entry).ToHashSet(StringComparer.OrdinalIgnoreCase);
+			appsList.ItemsSource = rows;
+
+			foreach (var row in rows.Where(r => selected.Contains(r.Entry)))
+				appsList.SelectedItems.Add(row);
+
+			appsEmpty.Visibility = rows.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+		}
+
+		private static Dictionary<string, RunningApp> RunningByFileName()
+		{
+			try
+			{
+				return AppInfo.Running()
+					.GroupBy(a => a.FileName, StringComparer.OrdinalIgnoreCase)
+					.ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+			}
+			catch (Exception ex)
+			{
+				Log.Warn($"The running apps could not be listed: {ex.Message}");
+				return new Dictionary<string, RunningApp>(StringComparer.OrdinalIgnoreCase);
+			}
+		}
+
+		private static AppRow RowFor(string entry, IReadOnlyDictionary<string, RunningApp> running)
+		{
+			var fileName = ExcludedApps.EntryFor(entry);
+			var match = running.TryGetValue(fileName, out var app) ? app
+				: running.Values.FirstOrDefault(a => ExcludedApps.Contains(new[] { entry }, a.Path));
+
+			if (match is not null)
+				return new AppRow(entry, match.Name, match.Path, AppInfo.IconOf(match.Path));
+
+			// an app that is not running: Windows still knows where it is installed
+			var path = entry.Contains('\\') || entry.Contains('/') ? entry : AppInfo.ResolvePath(entry);
+			var name = path is null ? fileName : AppInfo.DisplayNameOf(path, fileName);
+			return new AppRow(entry, name, path ?? "", AppInfo.IconOf(path));
+		}
+
+		private void AppsList_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+		{
+			if (e.Key == System.Windows.Input.Key.Delete && appsList.SelectedItems.Count > 0)
+			{
+				e.Handled = true;
+				Include(appsList.SelectedItems.OfType<AppRow>().Select(r => r.Entry).ToList());
+			}
+		}
+
+		/// <summary>The trash can of a row.</summary>
+		private void AppsDelete_Click(object sender, RoutedEventArgs e)
+		{
+			e.Handled = true;
+
+			if (sender is FrameworkElement { DataContext: AppRow row })
+				Include(new List<string> { row.Entry });
+		}
+
+		/// <summary>Takes apps off the list: StageManager manages their windows again.</summary>
+		private void Include(IReadOnlyList<string> entries)
+		{
+			if (entries.Count == 0)
+				return;
+
+			Change(s =>
+			{
+				foreach (var entry in entries)
+					s.Stage.ExcludedApps = ExcludedApps.Without(s.Stage.ExcludedApps, entry);
+			});
+		}
+
+		private void AppsAdd_Click(object sender, RoutedEventArgs e)
+		{
+			var excluded = Settings.Current.Stage.ExcludedApps;
+			var apps = RunningByFileName().Values
+				.Where(a => !ExcludedApps.Contains(excluded, a.Path))
+				.Select(a => new AppRow(ExcludedApps.EntryFor(a.Path), a.Name, a.Path, AppInfo.IconOf(a.Path)))
+				.ToList();
+
+			appsRunning.ItemsSource = apps;
+			appsRunning.SelectedItem = null;
+			appsRunningEmpty.Visibility = apps.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+			appsPicker.IsOpen = true;
+		}
+
+		private void AppsRunning_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (appsRunning.SelectedItem is not AppRow row)
+				return;
+
+			appsPicker.IsOpen = false;
+			Exclude(row.Entry);
+		}
+
+		private void AppsBrowse_Click(object sender, RoutedEventArgs e)
+		{
+			appsPicker.IsOpen = false;
+
+			var dialog = new Microsoft.Win32.OpenFileDialog
+			{
+				Title = Loc.Get("Apps.Browse"),
+				Filter = Loc.Get("Apps.Filter") + "|*.exe",
+				CheckFileExists = true
+			};
+
+			if (dialog.ShowDialog(this) == true)
+				Exclude(ExcludedApps.EntryFor(dialog.FileName));
+		}
+
+		private void Exclude(string entry)
+		{
+			if (string.IsNullOrWhiteSpace(entry))
+				return;
+
+			Change(s => s.Stage.ExcludedApps = ExcludedApps.With(s.Stage.ExcludedApps, entry));
 		}
 
 		private void Reset_Click(object sender, RoutedEventArgs e)

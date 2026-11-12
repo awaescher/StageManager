@@ -110,4 +110,16 @@
   <data name="Anim.StatusContents" xml:space="preserve"><value>Contenido de la ventana al arrastrar</value></data>
   <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows muestra solo un marco al arrastrar ventanas. StageManager lo respeta y mueve un marco. Actívalo para mover las ventanas reales.</value></data>
   <data name="Anim.Status" xml:space="preserve"><value>Tu sistema</value></data>
+  <data name="Apps.NoneRunning" xml:space="preserve"><value>No hay otras aplicaciones con ventanas en ejecución.</value></data>
+  <data name="Apps.Title" xml:space="preserve"><value>Aplicaciones que StageManager deja en paz</value></data>
+  <data name="Apps.Add" xml:space="preserve"><value>Excluir una aplicación</value></data>
+  <data name="Apps.Desc" xml:space="preserve"><value>Sus ventanas no tienen tarjeta en la barra lateral y nunca se ocultan. Útil para lanzadores, superposiciones y aplicaciones de la bandeja.</value></data>
+  <data name="Apps.Filter" xml:space="preserve"><value>Aplicaciones</value></data>
+  <data name="Card.Exclude" xml:space="preserve"><value>Excluir de StageManager</value></data>
+  <data name="Apps.Running" xml:space="preserve"><value>Aplicaciones en ejecución</value></data>
+  <data name="Card.ExcludeApp" xml:space="preserve"><value>Excluir {0} de StageManager</value></data>
+  <data name="Apps.Empty" xml:space="preserve"><value>No hay aplicaciones excluidas.</value></data>
+  <data name="Nav.Apps" xml:space="preserve"><value>Aplicaciones</value></data>
+  <data name="Apps.Browse" xml:space="preserve"><value>Elegir un archivo de aplicación...</value></data>
+  <data name="Apps.RemoveOne" xml:space="preserve"><value>Volver a incluir esta aplicación</value></data>
 </root>

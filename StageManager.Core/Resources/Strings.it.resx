@@ -110,4 +110,16 @@
   <data name="Anim.StatusContents" xml:space="preserve"><value>Contenuto della finestra durante il trascinamento</value></data>
   <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows mostra solo una cornice durante il trascinamento delle finestre. StageManager lo rispetta e fa volare una cornice. Attiva per far volare le finestre vere.</value></data>
   <data name="Anim.Status" xml:space="preserve"><value>Il tuo sistema</value></data>
+  <data name="Apps.NoneRunning" xml:space="preserve"><value>Non ci sono altre app con finestre in esecuzione.</value></data>
+  <data name="Apps.Title" xml:space="preserve"><value>App che StageManager lascia stare</value></data>
+  <data name="Apps.Add" xml:space="preserve"><value>Escludi un&apos;app</value></data>
+  <data name="Apps.Desc" xml:space="preserve"><value>Le loro finestre non hanno una scheda nella barra laterale e non vengono mai nascoste. Utile per launcher, overlay e app dell&apos;area di notifica.</value></data>
+  <data name="Apps.Filter" xml:space="preserve"><value>App</value></data>
+  <data name="Card.Exclude" xml:space="preserve"><value>Escludi da StageManager</value></data>
+  <data name="Apps.Running" xml:space="preserve"><value>App in esecuzione</value></data>
+  <data name="Card.ExcludeApp" xml:space="preserve"><value>Escludi {0} da StageManager</value></data>
+  <data name="Apps.Empty" xml:space="preserve"><value>Nessuna app esclusa.</value></data>
+  <data name="Nav.Apps" xml:space="preserve"><value>App</value></data>
+  <data name="Apps.Browse" xml:space="preserve"><value>Scegli un file di app...</value></data>
+  <data name="Apps.RemoveOne" xml:space="preserve"><value>Reincludi questa app</value></data>
 </root>
