@@ -152,6 +152,7 @@ namespace StageManager
 
 			SceneManager.CardAreaOf = CardArea;
 			SceneManager.CardScale = _dpiScale;
+			SceneManager.CardHeightOf = CardHeightOf;
 			SceneManager.SidebarHandle = _thisHandle;
 			SceneManager.CardLanded += SceneManager_CardLanded;
 
@@ -242,6 +243,8 @@ namespace StageManager
 		private void SceneManager_CurrentSceneSelectionChanged(object? sender, CurrentSceneSelectionChangedEventArgs args)
 		{
 			var currentModel = args.Current is null ? null : Scenes.FirstOrDefault(m => m.Id == args.Current.Id);
+
+			_removedCurrentScene?.RefreshShape();
 
 			if (currentModel is object)
 			{
@@ -422,9 +425,15 @@ namespace StageManager
 				ApplyLayout(scene);
 		}
 
+		/// <summary>How tall the card of a scene is, in physical pixels, measured from the windows as they are now.</summary>
+		private double CardHeightOf(Scene scene) =>
+			CardShape.Height(_layout.ThumbnailWidth, _layout.ThumbnailHeight,
+				scene.Windows.Select(w => WindowGeometry.FrameSizeOf(w.Handle)).ToArray(),
+				App.Settings.Current.Sidebar.MaxWindowsPerScene) * _dpiScale;
+
 		private void ApplyLayout(SceneModel? scene)
 		{
-			scene?.ApplyLayout(_layout.ThumbnailWidth, _layout.ThumbnailHeight, App.Settings.Current.Sidebar.MaxWindowsPerScene);
+			scene?.ApplyLayout(_layout.ThumbnailWidth, _layout.ThumbnailHeight, App.Settings.Current.Sidebar.MaxWindowsPerScene, _layout.CardGap);
 		}
 
 		private void PositionWindow()

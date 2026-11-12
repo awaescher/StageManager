@@ -262,8 +262,8 @@ namespace StageManager
 			var shown = Math.Min(sidebar.MaxScenes, layout.EffectiveMaxScenes);
 			var cardWidth = layout.ThumbnailWidth * scale;
 			var cardHeight = layout.ThumbnailHeight * scale;
-			var step = (layout.ThumbnailHeight + SidebarLayout.IconRowHeight + SidebarLayout.CardGap) * scale;
-			var total = shown * step - SidebarLayout.CardGap * scale;
+			var step = (layout.ThumbnailHeight + SidebarLayout.IconRowHeight + layout.CardGap) * scale;
+			var total = shown * step - layout.CardGap * scale;
 			var top = Math.Max(2, (height - total) / 2);
 			var cardLeft = right
 				? width - (SidebarLayout.EdgePadding * scale) - cardWidth

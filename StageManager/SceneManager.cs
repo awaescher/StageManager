@@ -249,6 +249,9 @@ namespace StageManager
 		/// <summary>Screen rectangle of the thumbnail area of a card in physical pixels, null if the card is not on screen. Set by the sidebar.</summary>
 		public Func<Scene, Area?>? CardAreaOf { get; set; }
 
+		/// <summary>How tall the card of a scene is in physical pixels. Cards are as tall as their windows. Set by the sidebar.</summary>
+		public Func<Scene, double>? CardHeightOf { get; set; }
+
 		/// <summary>Physical pixels per unit of the sidebar layout. Set by the sidebar.</summary>
 		public double CardScale { get; set; } = 1;
 
@@ -375,7 +378,16 @@ namespace StageManager
 				// exactly like the sidebar draws them, so the flying windows and the card match when one takes over from the other
 				var priorWindows = (prior?.Windows ?? Enumerable.Empty<IWindow>()).ToArray();
 				var alignment = CardAlignment.For(App.Settings.Current.Sidebar.Side);
-				var priorStack = DragPreviewLayout.OnStack(cardArea, priorWindows.Select(w => WindowGeometry.FrameSizeOf(w.Handle)).ToArray(), maxVisible, CardScale, alignment);
+				// the card of the scene that leaves may be taller or lower than the one that comes. The stack of the sidebar is centered, so the
+				// new card ends up around the same center
+				var priorArea = cardArea;
+				if (prior is object && CardHeightOf?.Invoke(prior) is double priorHeight && priorHeight > 0)
+				{
+					var middle = (cardArea.Top + cardArea.Bottom) / 2;
+					priorArea = new Area(cardArea.Left, middle - priorHeight / 2, cardArea.Right, middle + priorHeight / 2);
+				}
+
+				var priorStack = DragPreviewLayout.OnStack(priorArea, priorWindows.Select(w => WindowGeometry.FrameSizeOf(w.Handle)).ToArray(), maxVisible, CardScale, alignment);
 
 				// the windows that leave fly where they stand to the card, the ones that come fly from the card to where they will show
 				for (var i = 0; i < priorWindows.Length; i++)

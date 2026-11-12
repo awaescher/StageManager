@@ -201,7 +201,7 @@
                         <ItemsControl
                             x:Name="thumbnailArea"
                             Width="{Binding ThumbnailWidth}"
-                            Height="{Binding ThumbnailHeight}"
+                            Height="{Binding CardHeight}"
                             Opacity="{Binding CardOpacity}"
                             local:DwmThumbnail.ThumbnailOpacity="{Binding CardOpacity}"
                             ItemsSource="{Binding Windows}">
@@ -227,7 +227,7 @@
                         </Grid>
                         <!-- Icons and the close button. The button sits here and not on the thumbnails, because DWM draws thumbnails above all WPF content. -->
                         <Grid
-                            Margin="0,5,0,16"
+                            Margin="{Binding IconsMargin}"
                             Opacity="{Binding CardOpacity}"
                             Width="{Binding ThumbnailWidth}">
                             <ItemsControl

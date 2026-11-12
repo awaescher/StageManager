@@ -13,7 +13,8 @@ public sealed record SidebarLayoutResult(
 	double ThumbnailHeight,
 	double SidebarWidth,
 	int EffectiveMaxScenes,
-	bool IsLimited);
+	bool IsLimited,
+	double CardGap = SidebarLayout.MinCardGap);
 
 /// <summary>
 /// Calculates how large the thumbnails can be so that the wanted number of scenes fits into the height of the screen.
@@ -27,8 +28,11 @@ public static class SidebarLayout
 	/// <summary>Icon row below a thumbnail: 5 margin + 28 icon height.</summary>
 	public const double IconRowHeight = 33;
 
-	/// <summary>Space below every card.</summary>
-	public const double CardGap = 16;
+	/// <summary>The least space below every card. Where the screen has room left, the space grows up to <see cref="MaxCardGap"/>.</summary>
+	public const double MinCardGap = 32;
+
+	/// <summary>The most space below a card. Beyond it the cards stay together and the stack is centered, like on macOS.</summary>
+	public const double MaxCardGap = 72;
 
 	/// <summary>Space between the screen edge and the thumbnails.</summary>
 	public const double EdgePadding = 12;
@@ -57,7 +61,7 @@ public static class SidebarLayout
 			? Math.Clamp(input.Aspect, SidebarSettings.MinAspect, SidebarSettings.MaxAspect)
 			: SidebarSettings.DefaultAspect;
 		var available = Math.Max(0, input.AreaHeight - 2 * VerticalMargin);
-		var chrome = IconRowHeight + CardGap;
+		var chrome = IconRowHeight + MinCardGap;
 
 		double width;
 		double height;
@@ -97,6 +101,9 @@ public static class SidebarLayout
 			? input.FixedSidebarWidth
 			: Math.Clamp(width + EdgePadding + ShadowRoom, SidebarSettings.MinWidth, SidebarSettings.MaxWidth);
 
-		return new SidebarLayoutResult(width, height, sidebarWidth, effective, effective < requested);
+		// room that is left once the cards are as large as they get is shared out between them, but never less than the minimum
+		var gap = Math.Clamp(available / effective - height - IconRowHeight, MinCardGap, MaxCardGap);
+
+		return new SidebarLayoutResult(width, height, sidebarWidth, effective, effective < requested, gap);
 	}
 }

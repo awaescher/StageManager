@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using StageManager.Core;
+using StageManager.Native;
 
 namespace StageManager.Model
 {
@@ -183,14 +184,29 @@ namespace StageManager.Model
 			}
 		}
 
+		/// <summary>The most a card can be tall, what the layout of the sidebar works out. A card with flat windows is lower.</summary>
 		public double ThumbnailHeight { get; private set; } = 100;
+
+		/// <summary>How tall the card is: as tall as its frontmost windows, so the space between two cards is the same everywhere.</summary>
+		public double CardHeight { get; private set; } = 100;
+
+		/// <summary>Space below the icons of the card, up to the next card.</summary>
+		public double CardGap { get; private set; } = SidebarLayout.MinCardGap;
+
+		public System.Windows.Thickness IconsMargin => new(0, 5, 0, CardGap);
 
 		/// <summary>
 		/// Sets the card size and arranges the thumbnails of the windows as a stack. Called again whenever the layout or the windows change.
 		/// </summary>
-		public void ApplyLayout(double thumbnailWidth, double thumbnailHeight, int maxVisibleWindows)
+		public void ApplyLayout(double thumbnailWidth, double thumbnailHeight, int maxVisibleWindows, double cardGap = SidebarLayout.MinCardGap)
 		{
 			_maxVisibleWindows = maxVisibleWindows;
+
+			if (CardGap != cardGap)
+			{
+				CardGap = cardGap;
+				RaisePropertyChanged(nameof(IconsMargin));
+			}
 
 			if (ThumbnailWidth != thumbnailWidth || ThumbnailHeight != thumbnailHeight)
 			{
@@ -203,9 +219,21 @@ namespace StageManager.Model
 			Restack();
 		}
 
+		/// <summary>Reads the sizes of the windows again. A card comes back to the sidebar after its windows were used on the stage.</summary>
+		public void RefreshShape() => Restack();
+
 		private void Restack()
 		{
-			var slots = ThumbnailStack.Calculate(ThumbnailWidth, ThumbnailHeight, Windows.Count, _maxVisibleWindows);
+			var sizes = Windows.Select(w => WindowGeometry.FrameSizeOf(w.Handle)).ToArray();
+			var height = CardShape.Height(ThumbnailWidth, ThumbnailHeight, sizes, _maxVisibleWindows);
+
+			if (Math.Abs(height - CardHeight) > 0.01)
+			{
+				CardHeight = height;
+				RaisePropertyChanged(nameof(CardHeight));
+			}
+
+			var slots = ThumbnailStack.Calculate(ThumbnailWidth, CardHeight, Windows.Count, _maxVisibleWindows);
 
 			for (int i = 0; i < slots.Length; i++)
 				Windows[i].ApplySlot(slots[i]);

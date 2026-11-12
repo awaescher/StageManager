@@ -27,7 +27,7 @@ public class SidebarLayoutTests
 	public void Wanted_scenes_fit_into_the_height(double height, int scenes)
 	{
 		var r = Calc(height, scenes);
-		var used = r.EffectiveMaxScenes * (r.ThumbnailHeight + SidebarLayout.IconRowHeight + SidebarLayout.CardGap) + 2 * SidebarLayout.VerticalMargin;
+		var used = r.EffectiveMaxScenes * (r.ThumbnailHeight + SidebarLayout.IconRowHeight + r.CardGap) + 2 * SidebarLayout.VerticalMargin;
 
 		Assert.True(used <= height + 0.001, $"{used} > {height}");
 	}
@@ -109,7 +109,7 @@ public class SidebarLayoutTests
 		Assert.Equal(200, r.ThumbnailWidth);
 		Assert.Equal(150, r.ThumbnailHeight);
 		Assert.True(r.IsLimited);
-		Assert.Equal(4, r.EffectiveMaxScenes); // 952 / (150 + 49) = 4.78
+		Assert.Equal(4, r.EffectiveMaxScenes); // 952 / (150 + 65) = 4.43
 	}
 
 	[Fact]
@@ -298,5 +298,156 @@ public class CardAlignmentTests
 			Assert.Equal(slots[i].Y + slots[i].Height, poses[i].Y + poses[i].Height, 6);
 			Assert.Equal(slots[i].X, poses[i].X, 6);
 		}
+	}
+}
+
+public class CardGapTests
+{
+	private static SidebarLayoutResult Calc(double height, int scenes, double fixedW = 0, double fixedH = 0) =>
+		SidebarLayout.Calculate(new SidebarLayoutInput(height, scenes, 1.6, 0, fixedW, fixedH));
+
+	[Theory]
+	[InlineData(600, 6)]
+	[InlineData(800, 8)]
+	[InlineData(1000, 12)]
+	[InlineData(500, 12)]
+	public void The_space_between_cards_is_never_less_than_the_minimum(double height, int scenes)
+	{
+		Assert.True(Calc(height, scenes).CardGap >= SidebarLayout.MinCardGap);
+	}
+
+	[Fact]
+	public void Where_the_cards_cannot_grow_any_more_the_space_between_them_does()
+	{
+		// one scene on a tall screen: the card is at its largest, the room left goes into the space, up to the maximum
+		var r = Calc(2000, 6);
+
+		Assert.True(r.CardGap > SidebarLayout.MinCardGap);
+		Assert.True(r.CardGap <= SidebarLayout.MaxCardGap);
+	}
+
+	[Fact]
+	public void A_very_tall_screen_does_not_pull_the_cards_apart_forever()
+	{
+		var r = Calc(6000, 2);
+
+		Assert.Equal(SidebarLayout.MaxCardGap, r.CardGap);
+	}
+
+	[Fact]
+	public void When_the_cards_fill_the_screen_the_space_is_the_minimum()
+	{
+		// the cards take what there is, nothing is left over
+		var r = Calc(1000, 6);
+
+		Assert.InRange(r.CardGap, SidebarLayout.MinCardGap, SidebarLayout.MinCardGap + 1);
+	}
+
+	[Fact]
+	public void A_fixed_thumbnail_size_leaves_room_which_becomes_space()
+	{
+		var r = Calc(1400, 3, fixedW: 192, fixedH: 120);
+
+		Assert.True(r.CardGap > SidebarLayout.MinCardGap);
+		Assert.Equal(3, r.EffectiveMaxScenes);
+	}
+
+	[Theory]
+	[InlineData(700, 4)]
+	[InlineData(1000, 6)]
+	[InlineData(1400, 3)]
+	[InlineData(2000, 12)]
+	public void Cards_and_space_still_fit_into_the_height(double height, int scenes)
+	{
+		var r = Calc(height, scenes);
+		var used = r.EffectiveMaxScenes * (r.ThumbnailHeight + SidebarLayout.IconRowHeight + r.CardGap) + 2 * SidebarLayout.VerticalMargin;
+
+		Assert.True(used <= height + 0.001, $"{used} > {height}");
+	}
+}
+
+public class CardShapeTests
+{
+	[Fact]
+	public void A_flat_window_makes_a_low_card()
+	{
+		// 3:1 in a card of 160 x 100: the window is 53 high, the card is as high as the window
+		var h = CardShape.Height(160, 100, new[] { (1200.0, 400.0) }, 3);
+
+		Assert.Equal(160 / 3.0, h, 3);
+	}
+
+	[Fact]
+	public void A_window_with_the_proportions_of_the_card_makes_a_full_card()
+	{
+		Assert.Equal(100, CardShape.Height(160, 100, new[] { (1600.0, 1000.0) }, 3), 6);
+	}
+
+	[Fact]
+	public void A_tall_window_is_never_taller_than_the_card_may_be()
+	{
+		Assert.Equal(100, CardShape.Height(160, 100, new[] { (400.0, 1600.0) }, 3), 6);
+	}
+
+	[Fact]
+	public void A_stack_is_as_tall_as_its_tallest_visible_window_plus_the_steps()
+	{
+		var flat = (1600.0, 400.0);
+		var tall = (800.0, 800.0);
+
+		var h = CardShape.Height(200, 120, new[] { tall, flat }, 2);
+
+		// the steps of a stack of 2 take 8 from the slot: 192 x 112; the tall window is 112 high, plus the step
+		Assert.Equal(120, h, 6);
+	}
+
+	[Fact]
+	public void Windows_beyond_the_visible_stack_do_not_make_the_card_taller()
+	{
+		var h = CardShape.Height(160, 100, new[] { (400.0, 1600.0), (1200.0, 400.0) }, 1);
+
+		Assert.Equal(160 / 3.0, h, 3);
+	}
+
+	[Fact]
+	public void A_very_flat_window_still_leaves_a_card_you_can_hit()
+	{
+		var h = CardShape.Height(160, 100, new[] { (4000.0, 100.0) }, 3);
+
+		Assert.Equal(CardShape.MinHeight, h);
+	}
+
+	[Fact]
+	public void Windows_of_unknown_size_fill_the_card()
+	{
+		Assert.Equal(100, CardShape.Height(160, 100, new[] { (0.0, 0.0) }, 3), 6);
+	}
+
+	[Fact]
+	public void A_card_without_windows_keeps_the_given_height()
+	{
+		Assert.Equal(100, CardShape.Height(160, 100, Array.Empty<(double, double)>(), 3));
+	}
+
+	[Theory]
+	[InlineData(0)]
+	[InlineData(-5)]
+	[InlineData(double.NaN)]
+	public void A_card_without_a_usable_maximum_gives_it_back(double max)
+	{
+		var h = CardShape.Height(160, max, new[] { (1600.0, 1000.0) }, 3);
+
+		Assert.True(double.IsNaN(max) ? double.IsNaN(h) : h == max);
+	}
+
+	[Fact]
+	public void The_slots_of_a_low_card_end_at_its_bottom_edge()
+	{
+		var h = CardShape.Height(160, 100, new[] { (1200.0, 400.0) }, 3);
+		var slot = Assert.Single(ThumbnailStack.Calculate(160, h, 1, 3));
+		var fit = AspectFit.Calculate(slot.Width, slot.Height, 1200, 400, 0, 1);
+
+		Assert.Equal(h, fit.Y + fit.Height, 6);
+		Assert.Equal(0, fit.Y, 6);
 	}
 }
