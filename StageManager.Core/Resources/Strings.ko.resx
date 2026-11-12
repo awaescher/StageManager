@@ -69,9 +69,6 @@
   <data name="Anim.Speed" xml:space="preserve"><value>속도</value></data>
   <data name="Anim.SpeedDesc" xml:space="preserve"><value>창이 움직이는 속도입니다.</value></data>
   <data name="Anim.Normal" xml:space="preserve"><value>보통</value></data>
-  <data name="Anim.Frames" xml:space="preserve"><value>창 대신 프레임 이동</value></data>
-  <data name="Anim.FramesDesc" xml:space="preserve"><value>Windows가 창을 끌 때 프레임만 표시하는 경우에만 적용됩니다.</value></data>
-  <data name="Anim.Info" xml:space="preserve"><value>Windows: 애니메이션 {0}, 끌 때 창 내용 {1}.</value></data>
   <data name="Anim.On" xml:space="preserve"><value>켜짐</value></data>
   <data name="Anim.Off" xml:space="preserve"><value>꺼짐</value></data>
   <data name="Anim.Shown" xml:space="preserve"><value>표시</value></data>
@@ -107,4 +104,10 @@
   <data name="Icons.Untouched" xml:space="preserve"><value>변경하지 않음</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>StageManager 종료 시 아이콘 복원</value></data>
   <data name="Icons.RestoreDesc" xml:space="preserve"><value>StageManager를 시작하기 전의 상태로 아이콘을 되돌립니다.</value></data>
+  <data name="Anim.StatusResult" xml:space="preserve"><value>StageManager 동작</value></data>
+  <data name="Anim.Force" xml:space="preserve"><value>창 내용도 항상 애니메이션으로 표시</value></data>
+  <data name="Anim.StatusAnimations" xml:space="preserve"><value>Windows 애니메이션</value></data>
+  <data name="Anim.StatusContents" xml:space="preserve"><value>끌 때 창 내용</value></data>
+  <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows는 창을 끌 때 프레임만 표시하도록 설정되어 있습니다. StageManager도 이를 따라 프레임을 이동합니다. 켜면 실제 창을 이동합니다.</value></data>
+  <data name="Anim.Status" xml:space="preserve"><value>내 시스템</value></data>
 </root>

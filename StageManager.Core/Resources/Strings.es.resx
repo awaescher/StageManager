@@ -69,9 +69,6 @@
   <data name="Anim.Speed" xml:space="preserve"><value>Velocidad</value></data>
   <data name="Anim.SpeedDesc" xml:space="preserve"><value>Con qué rapidez vuelan las ventanas.</value></data>
   <data name="Anim.Normal" xml:space="preserve"><value>Normal</value></data>
-  <data name="Anim.Frames" xml:space="preserve"><value>Mover un marco en lugar de las ventanas</value></data>
-  <data name="Anim.FramesDesc" xml:space="preserve"><value>Solo si Windows muestra únicamente un marco al arrastrar ventanas.</value></data>
-  <data name="Anim.Info" xml:space="preserve"><value>Windows: animaciones {0}, contenido de la ventana al arrastrar {1}.</value></data>
   <data name="Anim.On" xml:space="preserve"><value>activadas</value></data>
   <data name="Anim.Off" xml:space="preserve"><value>desactivadas</value></data>
   <data name="Anim.Shown" xml:space="preserve"><value>visible</value></data>
@@ -107,4 +104,10 @@
   <data name="Icons.Untouched" xml:space="preserve"><value>No cambiar nunca</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Restaurar los iconos al salir de StageManager</value></data>
   <data name="Icons.RestoreDesc" xml:space="preserve"><value>Devuelve los iconos al estado que tenían antes de iniciar StageManager.</value></data>
+  <data name="Anim.StatusResult" xml:space="preserve"><value>StageManager mueve</value></data>
+  <data name="Anim.Force" xml:space="preserve"><value>Animar el contenido de las ventanas de todos modos</value></data>
+  <data name="Anim.StatusAnimations" xml:space="preserve"><value>Animaciones de Windows</value></data>
+  <data name="Anim.StatusContents" xml:space="preserve"><value>Contenido de la ventana al arrastrar</value></data>
+  <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows muestra solo un marco al arrastrar ventanas. StageManager lo respeta y mueve un marco. Actívalo para mover las ventanas reales.</value></data>
+  <data name="Anim.Status" xml:space="preserve"><value>Tu sistema</value></data>
 </root>

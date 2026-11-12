@@ -69,9 +69,6 @@
   <data name="Anim.Speed" xml:space="preserve"><value>Geschwindigkeit</value></data>
   <data name="Anim.SpeedDesc" xml:space="preserve"><value>Wie schnell die Fenster fliegen.</value></data>
   <data name="Anim.Normal" xml:space="preserve"><value>Normal</value></data>
-  <data name="Anim.Frames" xml:space="preserve"><value>Einen Rahmen statt der Fenster fliegen lassen</value></data>
-  <data name="Anim.FramesDesc" xml:space="preserve"><value>Nur wenn Windows beim Ziehen von Fenstern nur einen Rahmen zeigt.</value></data>
-  <data name="Anim.Info" xml:space="preserve"><value>Windows: Animationen {0}, Fensterinhalt beim Ziehen {1}.</value></data>
   <data name="Anim.On" xml:space="preserve"><value>an</value></data>
   <data name="Anim.Off" xml:space="preserve"><value>aus</value></data>
   <data name="Anim.Shown" xml:space="preserve"><value>angezeigt</value></data>
@@ -107,4 +104,10 @@
   <data name="Icons.Untouched" xml:space="preserve"><value>Nie ändern</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Symbole beim Beenden von StageManager wiederherstellen</value></data>
   <data name="Icons.RestoreDesc" xml:space="preserve"><value>Bringt die Symbole in den Zustand zurück, den sie vor dem Start von StageManager hatten.</value></data>
+  <data name="Anim.StatusResult" xml:space="preserve"><value>StageManager lässt fliegen</value></data>
+  <data name="Anim.Force" xml:space="preserve"><value>Fensterinhalte trotzdem animieren</value></data>
+  <data name="Anim.StatusAnimations" xml:space="preserve"><value>Windows-Animationen</value></data>
+  <data name="Anim.StatusContents" xml:space="preserve"><value>Fensterinhalt beim Ziehen</value></data>
+  <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows zeigt beim Ziehen von Fenstern nur einen Rahmen. StageManager folgt dem und lässt einen Rahmen fliegen. Mit diesem Schalter fliegen stattdessen die echten Fenster.</value></data>
+  <data name="Anim.Status" xml:space="preserve"><value>Dein System</value></data>
 </root>

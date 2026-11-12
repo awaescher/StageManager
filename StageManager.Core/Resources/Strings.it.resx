@@ -69,9 +69,6 @@
   <data name="Anim.Speed" xml:space="preserve"><value>Velocità</value></data>
   <data name="Anim.SpeedDesc" xml:space="preserve"><value>Quanto velocemente volano le finestre.</value></data>
   <data name="Anim.Normal" xml:space="preserve"><value>Normale</value></data>
-  <data name="Anim.Frames" xml:space="preserve"><value>Fai volare una cornice al posto delle finestre</value></data>
-  <data name="Anim.FramesDesc" xml:space="preserve"><value>Solo se Windows mostra soltanto una cornice durante il trascinamento delle finestre.</value></data>
-  <data name="Anim.Info" xml:space="preserve"><value>Windows: animazioni {0}, contenuto della finestra durante il trascinamento {1}.</value></data>
   <data name="Anim.On" xml:space="preserve"><value>attive</value></data>
   <data name="Anim.Off" xml:space="preserve"><value>disattivate</value></data>
   <data name="Anim.Shown" xml:space="preserve"><value>visibile</value></data>
@@ -107,4 +104,10 @@
   <data name="Icons.Untouched" xml:space="preserve"><value>Non modificare mai</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Ripristina le icone all&apos;uscita da StageManager</value></data>
   <data name="Icons.RestoreDesc" xml:space="preserve"><value>Riporta le icone allo stato che avevano prima dell&apos;avvio di StageManager.</value></data>
+  <data name="Anim.StatusResult" xml:space="preserve"><value>StageManager fa volare</value></data>
+  <data name="Anim.Force" xml:space="preserve"><value>Anima comunque il contenuto delle finestre</value></data>
+  <data name="Anim.StatusAnimations" xml:space="preserve"><value>Animazioni di Windows</value></data>
+  <data name="Anim.StatusContents" xml:space="preserve"><value>Contenuto della finestra durante il trascinamento</value></data>
+  <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows mostra solo una cornice durante il trascinamento delle finestre. StageManager lo rispetta e fa volare una cornice. Attiva per far volare le finestre vere.</value></data>
+  <data name="Anim.Status" xml:space="preserve"><value>Il tuo sistema</value></data>
 </root>

@@ -69,9 +69,6 @@
   <data name="Anim.Speed" xml:space="preserve"><value>Hız</value></data>
   <data name="Anim.SpeedDesc" xml:space="preserve"><value>Pencerelerin ne kadar hızlı uçacağı.</value></data>
   <data name="Anim.Normal" xml:space="preserve"><value>Normal</value></data>
-  <data name="Anim.Frames" xml:space="preserve"><value>Pencereler yerine bir çerçeve uçur</value></data>
-  <data name="Anim.FramesDesc" xml:space="preserve"><value>Yalnızca Windows pencereler sürüklenirken sadece bir çerçeve gösteriyorsa.</value></data>
-  <data name="Anim.Info" xml:space="preserve"><value>Windows: animasyonlar {0}, sürüklerken pencere içeriği {1}.</value></data>
   <data name="Anim.On" xml:space="preserve"><value>açık</value></data>
   <data name="Anim.Off" xml:space="preserve"><value>kapalı</value></data>
   <data name="Anim.Shown" xml:space="preserve"><value>gösteriliyor</value></data>
@@ -107,4 +104,10 @@
   <data name="Icons.Untouched" xml:space="preserve"><value>Hiç değiştirme</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>StageManager&apos;dan çıkarken simgeleri geri yükle</value></data>
   <data name="Icons.RestoreDesc" xml:space="preserve"><value>Simgeleri StageManager başlamadan önceki durumlarına döndürür.</value></data>
+  <data name="Anim.StatusResult" xml:space="preserve"><value>StageManager şunu uçurur</value></data>
+  <data name="Anim.Force" xml:space="preserve"><value>Pencere içeriklerini yine de canlandır</value></data>
+  <data name="Anim.StatusAnimations" xml:space="preserve"><value>Windows animasyonları</value></data>
+  <data name="Anim.StatusContents" xml:space="preserve"><value>Sürüklerken pencere içeriği</value></data>
+  <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows, pencereler sürüklenirken yalnızca bir çerçeve gösterecek şekilde ayarlı. StageManager bunu izler ve bir çerçeve uçurur. Gerçek pencereleri uçurmak için açın.</value></data>
+  <data name="Anim.Status" xml:space="preserve"><value>Sisteminiz</value></data>
 </root>

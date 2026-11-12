@@ -69,9 +69,6 @@
   <data name="Anim.Speed" xml:space="preserve"><value>Скорость</value></data>
   <data name="Anim.SpeedDesc" xml:space="preserve"><value>Как быстро летят окна.</value></data>
   <data name="Anim.Normal" xml:space="preserve"><value>Обычная</value></data>
-  <data name="Anim.Frames" xml:space="preserve"><value>Перемещать рамку вместо окон</value></data>
-  <data name="Anim.FramesDesc" xml:space="preserve"><value>Только если Windows при перетаскивании показывает лишь рамку окна.</value></data>
-  <data name="Anim.Info" xml:space="preserve"><value>Windows: анимация {0}, содержимое окна при перетаскивании {1}.</value></data>
   <data name="Anim.On" xml:space="preserve"><value>включена</value></data>
   <data name="Anim.Off" xml:space="preserve"><value>выключена</value></data>
   <data name="Anim.Shown" xml:space="preserve"><value>показывается</value></data>
@@ -107,4 +104,10 @@
   <data name="Icons.Untouched" xml:space="preserve"><value>Не изменять</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Восстанавливать значки при выходе из StageManager</value></data>
   <data name="Icons.RestoreDesc" xml:space="preserve"><value>Возвращает значки в состояние, в котором они были до запуска StageManager.</value></data>
+  <data name="Anim.StatusResult" xml:space="preserve"><value>StageManager перемещает</value></data>
+  <data name="Anim.Force" xml:space="preserve"><value>Всё равно анимировать содержимое окон</value></data>
+  <data name="Anim.StatusAnimations" xml:space="preserve"><value>Анимация Windows</value></data>
+  <data name="Anim.StatusContents" xml:space="preserve"><value>Содержимое окна при перетаскивании</value></data>
+  <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows при перетаскивании окон показывает только рамку. StageManager учитывает это и перемещает рамку. Включите, чтобы перемещать настоящие окна.</value></data>
+  <data name="Anim.Status" xml:space="preserve"><value>Ваша система</value></data>
 </root>

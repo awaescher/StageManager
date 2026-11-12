@@ -43,6 +43,12 @@ public static class AnimationPolicy
 	/// </summary>
 	public static FlightStyle DecideDragPreview(AnimationSettings settings, SystemAnimationState system) =>
 		settings.FrameIfWindowContentIsOff && !system.DragFullWindows ? FlightStyle.Frames : FlightStyle.Windows;
+
+	/// <summary>
+	/// True if the user has a choice between frames and windows: only where Windows shows frames while windows are dragged.
+	/// Where Windows shows the windows, there is nothing to choose and nothing to explain.
+	/// </summary>
+	public static bool OffersContentChoice(SystemAnimationState system) => !system.DragFullWindows;
 }
 
 /// <summary>Time and easing of a flight.</summary>

@@ -14,8 +14,9 @@ using System.Windows.Media;
 namespace StageManager.Native
 {
 	/// <summary>
-	/// A transparent window over a whole display that lets every click through. The windows of a scene fly on it between the
-	/// sidebar and the stage: either as DWM thumbnails (which DWM draws from the live or last picture of the window) or as frames.
+	/// The windows of a scene fly between the sidebar and the stage: either as DWM thumbnails on a transparent window over a whole display
+	/// that lets every click through, or as frames like the ones Windows draws when a window is dragged without its contents. Frames are
+	/// plain little windows that are only moved, the window over the display then stays as small as it can be.
 	/// </summary>
 	public sealed class FlightOverlay : System.Windows.Window
 	{
@@ -26,7 +27,7 @@ namespace StageManager.Native
 			public Pose Current { get; set; }
 			public IntPtr Thumbnail { get; set; }
 			public RECT? Source { get; set; }
-			public Border? Frame { get; set; }
+			public FrameOutline? Frame { get; set; }
 			public Flight? Flight { get; set; }
 		}
 
@@ -40,6 +41,7 @@ namespace StageManager.Native
 		private double _dpi = 1;
 		private TaskCompletionSource? _flying;
 		private bool _skip;
+		private bool _fullSize;
 
 		/// <param name="keepAbove">A window that stays above the flights, e.g. the sidebar: the windows fly below it, never over it.</param>
 		public FlightOverlay(Area monitorBounds, FlightStyle style, IntPtr keepAbove = default)
@@ -56,10 +58,12 @@ namespace StageManager.Native
 			Topmost = true;
 			ResizeMode = System.Windows.ResizeMode.NoResize;
 			Content = _canvas;
+			// frames need no surface to draw on, only the hint of a dragged card does: until then the window is a dot
+			_fullSize = style == FlightStyle.Windows;
 			Left = monitorBounds.Left;
 			Top = monitorBounds.Top;
-			Width = monitorBounds.Width;
-			Height = monitorBounds.Height;
+			Width = _fullSize ? monitorBounds.Width : 1;
+			Height = _fullSize ? monitorBounds.Height : 1;
 
 			SourceInitialized += (_, _) =>
 			{
@@ -86,8 +90,9 @@ namespace StageManager.Native
 
 			// straight below the window that has to stay above: going to the top of all topmost windows first would cover it for a frame
 			var insertAfter = _keepAbove != IntPtr.Zero && Win32.IsWindow(_keepAbove) ? _keepAbove : Win32.HWND_TOPMOST;
-			Win32.SetWindowPos(_handle, insertAfter, (int)_bounds.Left, (int)_bounds.Top, (int)_bounds.Width, (int)_bounds.Height,
-				Win32.SetWindowPosFlags.DoNotActivate);
+			var width = _fullSize ? (int)_bounds.Width : 1;
+			var height = _fullSize ? (int)_bounds.Height : 1;
+			Win32.SetWindowPos(_handle, insertAfter, (int)_bounds.Left, (int)_bounds.Top, width, height, Win32.SetWindowPosFlags.DoNotActivate);
 		}
 
 		/// <summary>
@@ -101,6 +106,9 @@ namespace StageManager.Native
 
 			Win32.SetWindowPos(_handle, _keepAbove, 0, 0, 0, 0,
 				Win32.SetWindowPosFlags.IgnoreMove | Win32.SetWindowPosFlags.IgnoreResize | Win32.SetWindowPosFlags.DoNotActivate);
+
+			foreach (var item in _items)
+				item.Frame?.PlaceBelow(_keepAbove);
 		}
 
 		/// <summary>Prepares a window at its starting pose. Nothing moves until <see cref="Fly"/>. False if DWM gave no thumbnail for it.</summary>
@@ -118,17 +126,16 @@ namespace StageManager.Native
 			}
 			else
 			{
-				// accent colored with a shadow, so it shows on light and dark backgrounds alike
-				var accent = SystemParameters.WindowGlassColor;
-				item.Frame = new Border
+				try
 				{
-					CornerRadius = new CornerRadius(8),
-					BorderThickness = new Thickness(3),
-					BorderBrush = new SolidColorBrush(Color.FromArgb(235, accent.R, accent.G, accent.B)),
-					Background = new SolidColorBrush(Color.FromArgb(48, accent.R, accent.G, accent.B)),
-					Effect = new System.Windows.Media.Effects.DropShadowEffect { BlurRadius = 14, ShadowDepth = 0, Opacity = 0.55, Color = Colors.Black }
-				};
-				_canvas.Children.Add(item.Frame);
+					item.Frame = new FrameOutline();
+					item.Frame.PlaceBelow(_keepAbove);
+				}
+				catch (Exception ex)
+				{
+					Log.Error("The frame could not be created", ex);
+					return false;
+				}
 			}
 
 			_items.Add(item);
@@ -144,6 +151,14 @@ namespace StageManager.Native
 		/// </summary>
 		public async Task WhenOnScreen()
 		{
+			// frames are windows of their own, DWM shows them with the next composition
+			if (_style != FlightStyle.Windows)
+			{
+				NativeMethods.DwmFlush();
+				NativeMethods.DwmFlush();
+				return;
+			}
+
 			var rendered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 			EventHandler? handler = null;
 			handler = (_, _) =>
@@ -195,6 +210,8 @@ namespace StageManager.Native
 		{
 			if (_hint is null)
 			{
+				GrowToFullSize();
+
 				var accent = SystemParameters.WindowGlassColor;
 				var label = new Border
 				{
@@ -238,6 +255,20 @@ namespace StageManager.Native
 
 			_hintOpacity = opacity;
 			_hint.BeginAnimation(OpacityProperty, new System.Windows.Media.Animation.DoubleAnimation(opacity, TimeSpan.FromMilliseconds(140)));
+		}
+
+		/// <summary>The hint needs the whole display to be drawn on.</summary>
+		private void GrowToFullSize()
+		{
+			if (_fullSize)
+				return;
+
+			_fullSize = true;
+			Width = _bounds.Width;
+			Height = _bounds.Height;
+
+			if (_handle != IntPtr.Zero)
+				Place();
 		}
 
 		public Task Fly(TimeSpan duration)
@@ -302,11 +333,8 @@ namespace StageManager.Native
 			}
 			else if (item.Frame is not null)
 			{
-				Canvas.SetLeft(item.Frame, left / _dpi);
-				Canvas.SetTop(item.Frame, top / _dpi);
-				item.Frame.Width = Math.Max(0, pose.Width / _dpi);
-				item.Frame.Height = Math.Max(0, pose.Height / _dpi);
-				item.Frame.Opacity = pose.Opacity;
+				// a frame is a window of the screen, not of the overlay: it takes screen coordinates
+				item.Frame.Update(pose.X, pose.Y, pose.Width, pose.Height, pose.Opacity, Math.Max(2, (int)Math.Round(3 * _dpi)));
 			}
 		}
 
@@ -320,6 +348,9 @@ namespace StageManager.Native
 
 			foreach (var item in _items.Where(i => i.Thumbnail != IntPtr.Zero))
 				NativeMethods.DwmUnregisterThumbnail(item.Thumbnail);
+
+			foreach (var item in _items)
+				item.Frame?.Dispose();
 
 			_items.Clear();
 			_flying?.TrySetResult();

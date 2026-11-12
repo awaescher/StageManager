@@ -69,9 +69,6 @@
   <data name="Anim.Speed" xml:space="preserve"><value>Velocidade</value></data>
   <data name="Anim.SpeedDesc" xml:space="preserve"><value>Com que rapidez as janelas voam.</value></data>
   <data name="Anim.Normal" xml:space="preserve"><value>Normal</value></data>
-  <data name="Anim.Frames" xml:space="preserve"><value>Mover uma moldura em vez das janelas</value></data>
-  <data name="Anim.FramesDesc" xml:space="preserve"><value>Somente se o Windows mostrar apenas uma moldura ao arrastar janelas.</value></data>
-  <data name="Anim.Info" xml:space="preserve"><value>Windows: animações {0}, conteúdo da janela ao arrastar {1}.</value></data>
   <data name="Anim.On" xml:space="preserve"><value>ativadas</value></data>
   <data name="Anim.Off" xml:space="preserve"><value>desativadas</value></data>
   <data name="Anim.Shown" xml:space="preserve"><value>visível</value></data>
@@ -107,4 +104,10 @@
   <data name="Icons.Untouched" xml:space="preserve"><value>Nunca alterar</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Restaurar os ícones ao sair do StageManager</value></data>
   <data name="Icons.RestoreDesc" xml:space="preserve"><value>Devolve os ícones ao estado em que estavam antes de o StageManager iniciar.</value></data>
+  <data name="Anim.StatusResult" xml:space="preserve"><value>O StageManager move</value></data>
+  <data name="Anim.Force" xml:space="preserve"><value>Animar o conteúdo das janelas mesmo assim</value></data>
+  <data name="Anim.StatusAnimations" xml:space="preserve"><value>Animações do Windows</value></data>
+  <data name="Anim.StatusContents" xml:space="preserve"><value>Conteúdo da janela ao arrastar</value></data>
+  <data name="Anim.ForceDesc" xml:space="preserve"><value>O Windows mostra só uma moldura ao arrastar janelas. O StageManager respeita isso e move uma moldura. Ative para mover as janelas reais.</value></data>
+  <data name="Anim.Status" xml:space="preserve"><value>Seu sistema</value></data>
 </root>

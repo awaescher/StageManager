@@ -69,9 +69,6 @@
   <data name="Anim.Speed" xml:space="preserve"><value>Vitesse</value></data>
   <data name="Anim.SpeedDesc" xml:space="preserve"><value>La rapidité avec laquelle les fenêtres se déplacent.</value></data>
   <data name="Anim.Normal" xml:space="preserve"><value>Normale</value></data>
-  <data name="Anim.Frames" xml:space="preserve"><value>Déplacer un cadre au lieu des fenêtres</value></data>
-  <data name="Anim.FramesDesc" xml:space="preserve"><value>Uniquement si Windows n&apos;affiche qu&apos;un cadre lors du déplacement des fenêtres.</value></data>
-  <data name="Anim.Info" xml:space="preserve"><value>Windows : animations {0}, contenu des fenêtres pendant le déplacement {1}.</value></data>
   <data name="Anim.On" xml:space="preserve"><value>activées</value></data>
   <data name="Anim.Off" xml:space="preserve"><value>désactivées</value></data>
   <data name="Anim.Shown" xml:space="preserve"><value>affiché</value></data>
@@ -107,4 +104,10 @@
   <data name="Icons.Untouched" xml:space="preserve"><value>Ne jamais modifier</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Restaurer les icônes à la fermeture de StageManager</value></data>
   <data name="Icons.RestoreDesc" xml:space="preserve"><value>Remet les icônes dans l&apos;état où elles étaient avant le démarrage de StageManager.</value></data>
+  <data name="Anim.StatusResult" xml:space="preserve"><value>StageManager déplace</value></data>
+  <data name="Anim.Force" xml:space="preserve"><value>Animer quand même le contenu des fenêtres</value></data>
+  <data name="Anim.StatusAnimations" xml:space="preserve"><value>Animations de Windows</value></data>
+  <data name="Anim.StatusContents" xml:space="preserve"><value>Contenu des fenêtres pendant le déplacement</value></data>
+  <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows n&apos;affiche qu&apos;un cadre lors du déplacement des fenêtres. StageManager le respecte et déplace un cadre. Activez cette option pour déplacer les vraies fenêtres.</value></data>
+  <data name="Anim.Status" xml:space="preserve"><value>Votre système</value></data>
 </root>

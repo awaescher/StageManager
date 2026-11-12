@@ -478,19 +478,27 @@
                                 SelectionChanged="AnimationSpeed_SelectionChanged" />
                         </local:SettingsRow>
                         <local:SettingsRow
-                            Title="{local:Loc Anim.Frames}"
-                            Description="{local:Loc Anim.FramesDesc}">
+                            x:Name="animationForceRow"
+                            Title="{local:Loc Anim.Force}"
+                            Description="{local:Loc Anim.ForceDesc}">
                             <ToggleButton
-                                x:Name="animationFrames"
+                                x:Name="animationForce"
                                 Style="{StaticResource Switch}"
-                                AutomationProperties.Name="{local:Loc Anim.Frames}"
-                                Click="AnimationFrames_Click" />
+                                AutomationProperties.Name="{local:Loc Anim.Force}"
+                                Click="AnimationForce_Click" />
                         </local:SettingsRow>
-                        <TextBlock
-                            x:Name="animationInfo"
-                            Style="{StaticResource Muted}"
-                            Margin="4,12,0,0" />
-                    </StackPanel>
+                        <Border
+                            Style="{StaticResource Card}"
+                            Margin="0,12,0,0">
+                            <StackPanel>
+                                <TextBlock
+                                    FontWeight="SemiBold"
+                                    Text="{local:Loc Anim.Status}"
+                                    Margin="0,0,0,8" />
+                                <Grid
+                                    x:Name="animationStatus" />
+                            </StackPanel>
+                        </Border>                    </StackPanel>
                 </ScrollViewer>
 
                 <ScrollViewer

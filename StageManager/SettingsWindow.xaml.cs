@@ -181,7 +181,8 @@ namespace StageManager
 				Fill(animationSpeed, Speeds.Append(current.Animations.Speed).Distinct().OrderBy(s => s)
 					.Select(s => new Choice<double>(s == 1.0 ? Loc.Get("Anim.Normal") : $"{s:0.##}x", s)));
 				Select(animationSpeed, current.Animations.Speed);
-				animationFrames.IsChecked = current.Animations.FrameIfWindowContentIsOff;
+				// the setting says "frame if Windows shows frames", the switch says the opposite: animate the contents anyway
+				animationForce.IsChecked = !current.Animations.FrameIfWindowContentIsOff;
 
 				hotkeysEnabled.IsChecked = current.Hotkeys.Enabled;
 				hotkeyKeys.IsEnabled = current.Hotkeys.Enabled;
@@ -371,20 +372,59 @@ namespace StageManager
 			var system = Native.SystemAnimation.Read();
 			var style = AnimationPolicy.Decide(Settings.Current.Animations, system);
 
-			var effect = style switch
+			// where Windows shows the windows while dragging, there is nothing to choose
+			animationForceRow.Visibility = AnimationPolicy.OffersContentChoice(system) ? Visibility.Visible : Visibility.Collapsed;
+
+			var result = style switch
 			{
 				FlightStyle.Windows => Loc.Get("Anim.EffectWindows"),
 				FlightStyle.Frames => Loc.Get("Anim.EffectFrames"),
 				_ => Loc.Get("Anim.EffectNone")
 			};
 
-			var info = Loc.Format("Anim.Info",
-				Loc.Get(system.AnimationsEnabled ? "Anim.On" : "Anim.Off"),
-				Loc.Get(system.DragFullWindows ? "Anim.Shown" : "Anim.HiddenFrame"));
+			var rows = new (string Label, string Value, string? Tone)[]
+			{
+				(Loc.Get("Anim.StatusAnimations"), Loc.Get(system.AnimationsEnabled ? "Anim.On" : "Anim.Off"), system.AnimationsEnabled ? "ok" : "off"),
+				(Loc.Get("Anim.StatusContents"), Loc.Get(system.DragFullWindows ? "Anim.Shown" : "Anim.HiddenFrame"), system.DragFullWindows ? "ok" : "off"),
+				(Loc.Get("Anim.StatusResult"), result, style == FlightStyle.None ? "off" : "ok")
+			};
 
-			animationInfo.Text = $"{info} {effect}";
+			animationStatus.Children.Clear();
+			animationStatus.RowDefinitions.Clear();
+			animationStatus.ColumnDefinitions.Clear();
+			animationStatus.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+			animationStatus.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.4, GridUnitType.Star) });
+
+			for (var i = 0; i < rows.Length; i++)
+			{
+				animationStatus.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+				var label = new TextBlock
+				{
+					Text = rows[i].Label,
+					Margin = new Thickness(0, 5, 12, 5),
+					TextWrapping = TextWrapping.Wrap,
+					Foreground = (Brush)FindResource("TextFillColorSecondaryBrush")
+				};
+				Grid.SetRow(label, i);
+				animationStatus.Children.Add(label);
+
+				var dot = new Ellipse
+				{
+					Width = 8,
+					Height = 8,
+					Margin = new Thickness(0, 0, 8, 0),
+					VerticalAlignment = VerticalAlignment.Center,
+					Fill = (Brush)FindResource(rows[i].Tone == "ok" ? "SystemFillColorSuccessBrush" : "SystemFillColorNeutralBrush")
+				};
+				var value = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 5, 0, 5) };
+				value.Children.Add(dot);
+				value.Children.Add(new TextBlock { Text = rows[i].Value, TextWrapping = TextWrapping.Wrap, MaxWidth = 300 });
+				Grid.SetRow(value, i);
+				Grid.SetColumn(value, 1);
+				animationStatus.Children.Add(value);
+			}
 		}
-
 		private void AnimationMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			if (animationMode.SelectedItem is Choice<AnimationMode> c)
@@ -397,10 +437,10 @@ namespace StageManager
 				Change(s => s.Animations.Speed = c.Value);
 		}
 
-		private void AnimationFrames_Click(object sender, RoutedEventArgs e)
+		private void AnimationForce_Click(object sender, RoutedEventArgs e)
 		{
-			var frames = animationFrames.IsChecked == true;
-			Change(s => s.Animations.FrameIfWindowContentIsOff = frames);
+			var force = animationForce.IsChecked == true;
+			Change(s => s.Animations.FrameIfWindowContentIsOff = !force);
 		}
 
 		private void HotkeysEnabled_Click(object sender, RoutedEventArgs e)

@@ -69,9 +69,6 @@
   <data name="Anim.Speed" xml:space="preserve"><value>Speed</value></data>
   <data name="Anim.SpeedDesc" xml:space="preserve"><value>How fast the windows fly.</value></data>
   <data name="Anim.Normal" xml:space="preserve"><value>Normal</value></data>
-  <data name="Anim.Frames" xml:space="preserve"><value>Fly a frame instead of the windows</value></data>
-  <data name="Anim.FramesDesc" xml:space="preserve"><value>Only if Windows shows just a frame while windows are dragged.</value></data>
-  <data name="Anim.Info" xml:space="preserve"><value>Windows: animations {0}, window content while dragging {1}.</value></data>
   <data name="Anim.On" xml:space="preserve"><value>on</value></data>
   <data name="Anim.Off" xml:space="preserve"><value>off</value></data>
   <data name="Anim.Shown" xml:space="preserve"><value>shown</value></data>
@@ -107,4 +104,10 @@
   <data name="Icons.Untouched" xml:space="preserve"><value>Never change</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Restore the icons when StageManager exits</value></data>
   <data name="Icons.RestoreDesc" xml:space="preserve"><value>Brings the icons back to the state they had before StageManager started.</value></data>
+  <data name="Anim.StatusResult" xml:space="preserve"><value>StageManager flies</value></data>
+  <data name="Anim.Force" xml:space="preserve"><value>Animate window contents anyway</value></data>
+  <data name="Anim.StatusAnimations" xml:space="preserve"><value>Windows animations</value></data>
+  <data name="Anim.StatusContents" xml:space="preserve"><value>Window contents while dragging</value></data>
+  <data name="Anim.ForceDesc" xml:space="preserve"><value>Windows is set to show only a frame while windows are dragged. StageManager follows that and flies a frame. Turn this on to fly the real windows instead.</value></data>
+  <data name="Anim.Status" xml:space="preserve"><value>Your system</value></data>
 </root>
