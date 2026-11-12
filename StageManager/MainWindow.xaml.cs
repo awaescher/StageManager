@@ -32,7 +32,7 @@ namespace StageManager
 		private const int TIMERINTERVAL_MILLISECONDS = 500;
 		private const string APP_NAME = "StageManager";
 		private IntPtr _thisHandle;
-		private TaskPoolGlobalHook _hook;
+		private TaskPoolGlobalHook? _hook;
 		private SidebarMode _mode;
 		// physical pixels, written on the UI thread only but read by the mouse hook and timer threads
 		private volatile SidebarGeometry _geometry = new(new Area(0, 0, 0, 0), 0, SidebarSide.Left);
@@ -964,6 +964,10 @@ namespace StageManager
 
 		private void StartHook()
 		{
+			// a second hook would run next to the first and never be stopped
+			if (_hook is not null)
+				return;
+
 			_hook = new TaskPoolGlobalHook();
 
 			_hook.MousePressed += OnMousePressed;
@@ -975,13 +979,18 @@ namespace StageManager
 
 		private void StopHook()
 		{
-			_hook.MousePressed -= OnMousePressed;
-			_hook.MouseReleased -= OnMouseReleased;
-			_hook.MouseMoved -= _hook_MouseMoved;
+			var hook = _hook;
+			if (hook is null)
+				return;
+
+			_hook = null;
+			hook.MousePressed -= OnMousePressed;
+			hook.MouseReleased -= OnMouseReleased;
+			hook.MouseMoved -= _hook_MouseMoved;
 
 			try
 			{
-				_hook.Dispose();
+				hook.Dispose();
 			}
 			catch (HookException)
 			{
@@ -1125,7 +1134,6 @@ namespace StageManager
 
 		private void CardMenu_Opened(object sender, RoutedEventArgs e)
 		{
-			StopHook();
 			_menuOpen = true;
 			CancelCardDrag();
 
@@ -1207,7 +1215,6 @@ namespace StageManager
 		private void CardMenu_Closed(object sender, RoutedEventArgs e)
 		{
 			_menuOpen = false;
-			StartHook();
 		}
 
 		private void CardMenu_Click(object sender, RoutedEventArgs e)
@@ -1245,7 +1252,6 @@ namespace StageManager
 		private void ContextMenu_Closed(object sender, RoutedEventArgs e)
 		{
 			_menuOpen = false;
-			StartHook();
 		}
 
 		private void ContextMenu_Opened(object sender, RoutedEventArgs e)
@@ -1268,7 +1274,6 @@ namespace StageManager
 			menuIconsUntouched.IsChecked = icons.Mode == DesktopIconsMode.Untouched;
 
 			_menuOpen = true;
-			StopHook();
 		}
 
 		private static readonly int[] SceneCountChoices = { 2, 3, 4, 5, 6, 8, 10, 12 };

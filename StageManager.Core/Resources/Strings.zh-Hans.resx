@@ -122,4 +122,5 @@
   <data name="Icons.Manage" xml:space="preserve"><value>自动：场景处于活动状态时隐藏，单击桌面时显示</value></data>
   <data name="Tray.IconsAutomatic" xml:space="preserve"><value>自动（单击桌面时显示）</value></data>
   <data name="Icons.ModeDesc" xml:space="preserve"><value>StageManager 何时隐藏桌面上的图标。与 macOS 一样，单击桌面会把所有窗口移到一旁并显示图标。</value></data>
+  <data name="App.AlreadyRunning" xml:space="preserve"><value>StageManager 已在运行。请在通知区域查找它的图标。</value></data>
 </root>

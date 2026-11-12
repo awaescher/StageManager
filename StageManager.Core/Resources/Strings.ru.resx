@@ -122,4 +122,5 @@
   <data name="Icons.Manage" xml:space="preserve"><value>Автоматически: скрыты, пока активна сцена, и показываются после щелчка по рабочему столу</value></data>
   <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Автоматически (показ по щелчку на рабочем столе)</value></data>
   <data name="Icons.ModeDesc" xml:space="preserve"><value>Когда StageManager скрывает значки на рабочем столе. Как в macOS, щелчок по рабочему столу отодвигает все окна и показывает значки.</value></data>
+  <data name="App.AlreadyRunning" xml:space="preserve"><value>StageManager уже запущен. Его значок находится в области уведомлений.</value></data>
 </root>

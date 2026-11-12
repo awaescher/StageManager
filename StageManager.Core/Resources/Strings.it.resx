@@ -122,4 +122,5 @@
   <data name="Icons.Manage" xml:space="preserve"><value>Automatico: nascoste mentre una scena è attiva, visibili dopo un clic sul desktop</value></data>
   <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatico (visibili dopo un clic sul desktop)</value></data>
   <data name="Icons.ModeDesc" xml:space="preserve"><value>Quando StageManager nasconde le icone del desktop. Come su macOS, un clic sul desktop sposta da parte tutte le finestre e le mostra.</value></data>
+  <data name="App.AlreadyRunning" xml:space="preserve"><value>StageManager è già in esecuzione. Cerca la sua icona nell&apos;area di notifica.</value></data>
 </root>

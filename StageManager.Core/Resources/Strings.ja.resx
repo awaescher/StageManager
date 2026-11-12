@@ -122,4 +122,5 @@
   <data name="Icons.Manage" xml:space="preserve"><value>自動: シーンがアクティブな間は非表示、デスクトップをクリックすると表示</value></data>
   <data name="Tray.IconsAutomatic" xml:space="preserve"><value>自動 (デスクトップをクリックすると表示)</value></data>
   <data name="Icons.ModeDesc" xml:space="preserve"><value>StageManager がデスクトップのアイコンを隠すタイミングです。macOS と同様に、デスクトップをクリックするとすべてのウィンドウが脇へ寄り、アイコンが表示されます。</value></data>
+  <data name="App.AlreadyRunning" xml:space="preserve"><value>StageManager はすでに実行中です。通知領域のアイコンを探してください。</value></data>
 </root>

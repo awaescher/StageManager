@@ -122,4 +122,5 @@
   <data name="Icons.Manage" xml:space="preserve"><value>Automático: ocultos mientras una escena está activa, visibles al hacer clic en el escritorio</value></data>
   <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automático (visibles al hacer clic en el escritorio)</value></data>
   <data name="Icons.ModeDesc" xml:space="preserve"><value>Cuándo oculta StageManager los iconos del escritorio. Como en macOS, un clic en el escritorio aparta todas las ventanas y los muestra.</value></data>
+  <data name="App.AlreadyRunning" xml:space="preserve"><value>StageManager ya se está ejecutando. Busca su icono en el área de notificaciones.</value></data>
 </root>

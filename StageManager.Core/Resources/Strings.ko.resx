@@ -122,4 +122,5 @@
   <data name="Icons.Manage" xml:space="preserve"><value>자동: 장면이 활성화된 동안 숨기고, 바탕 화면을 클릭하면 표시</value></data>
   <data name="Tray.IconsAutomatic" xml:space="preserve"><value>자동 (바탕 화면 클릭 시 표시)</value></data>
   <data name="Icons.ModeDesc" xml:space="preserve"><value>StageManager가 바탕 화면의 아이콘을 숨기는 시점입니다. macOS처럼 바탕 화면을 클릭하면 모든 창이 옆으로 비켜나고 아이콘이 표시됩니다.</value></data>
+  <data name="App.AlreadyRunning" xml:space="preserve"><value>StageManager가 이미 실행 중입니다. 알림 영역에서 아이콘을 찾아 보세요.</value></data>
 </root>

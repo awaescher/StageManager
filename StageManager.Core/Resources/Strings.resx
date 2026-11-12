@@ -122,4 +122,5 @@
   <data name="Icons.Manage" xml:space="preserve"><value>Automatic: hidden while a scene is active, shown when you click the desktop</value></data>
   <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatic (shown when clicking the desktop)</value></data>
   <data name="Icons.ModeDesc" xml:space="preserve"><value>When StageManager hides the icons on your desktop. Like on macOS, a click on the desktop steps all windows aside and shows them.</value></data>
+  <data name="App.AlreadyRunning" xml:space="preserve"><value>StageManager is running already. Look for its icon in the notification area.</value></data>
 </root>

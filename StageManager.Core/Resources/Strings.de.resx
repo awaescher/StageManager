@@ -122,4 +122,5 @@
   <data name="Icons.Manage" xml:space="preserve"><value>Automatisch: ausgeblendet, solange eine Szene aktiv ist, sichtbar nach einem Klick auf den Desktop</value></data>
   <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatisch (sichtbar nach Klick auf den Desktop)</value></data>
   <data name="Icons.ModeDesc" xml:space="preserve"><value>Wann StageManager die Symbole auf dem Desktop ausblendet. Wie beim Mac schiebt ein Klick auf den Desktop alle Fenster beiseite und zeigt sie.</value></data>
+  <data name="App.AlreadyRunning" xml:space="preserve"><value>StageManager läuft bereits. Das Symbol findest du im Infobereich der Taskleiste.</value></data>
 </root>

@@ -122,4 +122,5 @@
   <data name="Icons.Manage" xml:space="preserve"><value>Automatique : masquées tant qu&apos;une scène est active, visibles après un clic sur le bureau</value></data>
   <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatique (visibles après un clic sur le bureau)</value></data>
   <data name="Icons.ModeDesc" xml:space="preserve"><value>Quand StageManager masque les icônes du bureau. Comme sur macOS, un clic sur le bureau écarte toutes les fenêtres et les affiche.</value></data>
+  <data name="App.AlreadyRunning" xml:space="preserve"><value>StageManager est déjà en cours d&apos;exécution. Cherchez son icône dans la zone de notification.</value></data>
 </root>

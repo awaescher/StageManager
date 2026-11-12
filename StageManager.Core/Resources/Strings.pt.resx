@@ -122,4 +122,5 @@
   <data name="Icons.Manage" xml:space="preserve"><value>Automático: ocultos enquanto uma cena estiver ativa, visíveis ao clicar na área de trabalho</value></data>
   <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automático (visíveis ao clicar na área de trabalho)</value></data>
   <data name="Icons.ModeDesc" xml:space="preserve"><value>Quando o StageManager oculta os ícones da área de trabalho. Como no macOS, um clique na área de trabalho afasta todas as janelas e mostra os ícones.</value></data>
+  <data name="App.AlreadyRunning" xml:space="preserve"><value>O StageManager já está em execução. Procure o ícone dele na área de notificação.</value></data>
 </root>
