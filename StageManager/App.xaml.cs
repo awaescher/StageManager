@@ -13,6 +13,9 @@ namespace StageManager
 	{
 		public static SettingsService Settings { get; } = new SettingsService(new SettingsStore(Path.Combine(AppPaths.DataDirectory, "settings.json"), Log.Warn));
 
+		/// <summary>The hotkeys of the running app, null if it is not started yet or already closed.</summary>
+		public static StageManager.Native.HotkeyManager? Hotkeys { get; set; }
+
 		public App()
 		{
 			AppDomain.CurrentDomain.UnhandledException += (_, e) =>

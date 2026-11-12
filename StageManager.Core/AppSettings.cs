@@ -118,6 +118,25 @@ public sealed class StageSettings
 			.ToList();
 }
 
+public sealed class HotkeySettings
+{
+	public bool Enabled { get; set; } = true;
+
+	/// <summary>
+	/// The keys that are held while a scene is picked, e.g. "Ctrl+Alt+Win". Tab picks the next scene, Shift+Tab the previous one,
+	/// a digit the card at that position of the sidebar.
+	/// </summary>
+	public string Keys { get; set; } = HotkeyText.Format(HotkeyText.Default);
+
+	internal void Normalize()
+	{
+		if (!HotkeyText.TryParse(Keys, out var modifiers))
+			modifiers = HotkeyText.Default;
+
+		Keys = HotkeyText.Format(modifiers);
+	}
+}
+
 public enum HideStrategy
 {
 	/// <summary>Other windows are moved out of the screen. They keep the picture the sidebar shows of them.</summary>
@@ -151,6 +170,8 @@ public sealed class AppSettings
 
 	public AnimationSettings Animations { get; set; } = new();
 
+	public HotkeySettings Hotkeys { get; set; } = new();
+
 	/// <summary>
 	/// Replaces missing or out-of-range values with usable ones, so that a hand-edited file can never break the app.
 	/// </summary>
@@ -162,6 +183,8 @@ public sealed class AppSettings
 		Stage ??= new StageSettings();
 		Stage.Normalize();
 		Animations ??= new AnimationSettings();
+		Hotkeys ??= new HotkeySettings();
+		Hotkeys.Normalize();
 
 		if (!Enum.IsDefined(HideStrategy))
 			HideStrategy = HideStrategy.Park;

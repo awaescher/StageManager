@@ -132,6 +132,7 @@ namespace StageManager.Model
 
 		private double _cardOpacity = 1;
 		private bool _isMergeTarget;
+		private bool _isPicked;
 
 		/// <summary>A card dragged in the sidebar is over this one: letting go merges it into this one.</summary>
 		public bool IsMergeTarget
@@ -144,8 +145,26 @@ namespace StageManager.Model
 
 				_isMergeTarget = value;
 				RaisePropertyChanged();
+				RaisePropertyChanged(nameof(IsHighlighted));
 			}
 		}
+
+		/// <summary>The scene the held hotkey has picked: letting go of the keys switches to it.</summary>
+		public bool IsPicked
+		{
+			get => _isPicked;
+			set
+			{
+				if (_isPicked == value)
+					return;
+
+				_isPicked = value;
+				RaisePropertyChanged();
+				RaisePropertyChanged(nameof(IsHighlighted));
+			}
+		}
+
+		public bool IsHighlighted => _isMergeTarget || _isPicked;
 
 		/// <summary>
 		/// How visible the thumbnails and icons of the card are. 0 while the windows of the card are still flying to it, dimmed while the

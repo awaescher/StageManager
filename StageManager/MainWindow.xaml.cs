@@ -57,6 +57,12 @@ namespace StageManager
 
 		public bool EnableWindowDropToScene = false;
 
+		// switching scenes with the keyboard, UI thread only
+		private HotkeyManager? _hotkeys;
+		private readonly ScenePicker _picker = new();
+		private SceneModel? _pickedModel;
+		private HotkeyModifiers _hotkeyKeys = HotkeyText.Default;
+
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -107,6 +113,7 @@ namespace StageManager
 
 			StartHook();
 			StartPresence();
+			StartHotkeys();
 		}
 
 		protected override void OnClosed(EventArgs e)
@@ -114,6 +121,9 @@ namespace StageManager
 			_presenceTimer?.Stop();
 			App.Settings.Changed -= Settings_Changed;
 			SystemEvents.DisplaySettingsChanged -= SystemEvents_DisplaySettingsChanged;
+
+			App.Hotkeys = null;
+			_hotkeys?.Dispose();
 
 			StopHook();
 
@@ -285,7 +295,100 @@ namespace StageManager
 				ApplySide();
 				SyncVisibilityByUpdatedTimeStamp();
 				SceneManager?.ApplyDesktopIconSettings();
+				ApplyHotkeys();
 			});
+		}
+
+		private void StartHotkeys()
+		{
+			_hotkeys = new HotkeyManager();
+			_hotkeys.Triggered += Hotkeys_Triggered;
+			App.Hotkeys = _hotkeys;
+			ApplyHotkeys();
+		}
+
+		private void ApplyHotkeys()
+		{
+			var settings = App.Settings.Current.Hotkeys;
+
+			if (!HotkeyText.TryParse(settings.Keys, out var keys))
+				keys = HotkeyText.Default;
+
+			if (!settings.Enabled || keys != _hotkeyKeys)
+				CancelPick();
+
+			_hotkeyKeys = keys;
+			_hotkeys?.Apply(settings.Enabled, keys);
+		}
+
+		/// <summary>The cards in the order of the sidebar, without the ones that are only managed but not shown.</summary>
+		private List<SceneModel> SidebarCards() => Scenes.Where(m => m.IsVisible).ToList();
+
+		private void Hotkeys_Triggered(object? sender, HotkeyAction action)
+		{
+			if (SceneManager is null || _dragActive || _drag.IsPressed)
+				return;
+
+			if (action.Kind == HotkeyActionKind.Number)
+			{
+				CancelPick();
+				var cards = SidebarCards();
+				if (action.Number <= cards.Count)
+					SwitchToCard(cards[action.Number - 1]);
+				return;
+			}
+
+			// the most recently used first, like Alt+Tab: the first Tab goes to the scene before this one
+			var candidates = SidebarCards().OrderByDescending(m => m.Updated).Select(m => m.Id).ToList();
+			var picked = _picker.Step(candidates, backwards: action.Kind == HotkeyActionKind.Previous);
+			SetPicked(picked is Guid id ? Scenes.FirstOrDefault(m => m.Id == id) : null);
+		}
+
+		private void SwitchToCard(SceneModel card)
+		{
+			SceneManager.SwitchTo(card.Scene).SafeFireAndForget(ex => Log.Error("Switching with the keyboard failed", ex));
+		}
+
+		private void SetPicked(SceneModel? model)
+		{
+			if (ReferenceEquals(model, _pickedModel))
+				return;
+
+			if (_pickedModel is object)
+				_pickedModel.IsPicked = false;
+
+			_pickedModel = model;
+
+			if (model is object)
+				model.IsPicked = true;
+		}
+
+		private void CancelPick()
+		{
+			_picker.End();
+			SetPicked(null);
+		}
+
+		/// <summary>Letting go of the held keys switches to the picked scene, Escape cancels.</summary>
+		private void UpdatePicking()
+		{
+			if (!_picker.IsActive)
+				return;
+
+			if (HeldKeys.IsEscapeDown())
+			{
+				CancelPick();
+				return;
+			}
+
+			if (HeldKeys.AreDown(_hotkeyKeys))
+				return;
+
+			var model = _pickedModel;
+			CancelPick();
+
+			if (model is object && Scenes.Contains(model))
+				SwitchToCard(model);
 		}
 
 		private void SystemEvents_DisplaySettingsChanged(object? sender, EventArgs e)
@@ -928,7 +1031,11 @@ namespace StageManager
 		private void StartPresence()
 		{
 			_presenceTimer = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(30) };
-			_presenceTimer.Tick += (_, _) => UpdatePresence();
+			_presenceTimer.Tick += (_, _) =>
+			{
+				UpdatePicking();
+				UpdatePresence();
+			};
 			_presenceTimer.Start();
 		}
 
@@ -946,7 +1053,7 @@ namespace StageManager
 			}
 
 			var hold = _dragActive || _drag.IsPressed || _menuOpen;
-			var input = new SidebarInput(cursor.X, cursor.Y, _overlapped, hold, _clock.Elapsed.TotalSeconds);
+			var input = new SidebarInput(cursor.X, cursor.Y, _overlapped, hold, _clock.Elapsed.TotalSeconds, Summon: _picker.IsActive);
 			Mode = _presence!.Decide(Mode, input);
 
 			// a window that came to the front since may cover it, lift it above again. Not while windows fly or a card is dragged:

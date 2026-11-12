@@ -7,7 +7,8 @@
     SizeToContent="Height"
     ResizeMode="NoResize"
     WindowStartupLocation="CenterScreen"
-    ShowInTaskbar="True">
+    ShowInTaskbar="True"
+    xmlns:local="clr-namespace:StageManager">
     <Window.Resources>
         <Style
             x:Key="Heading"
@@ -215,6 +216,43 @@
         <TextBlock
             x:Name="animationInfo"
             Style="{StaticResource Hint}" />
+
+        <TextBlock
+            Style="{StaticResource Heading}"
+            Text="Keyboard" />
+        <CheckBox
+            x:Name="hotkeysEnabled"
+            Click="HotkeysEnabled_Click">
+            <TextBlock
+                TextWrapping="Wrap"
+                Text="Switch scenes with the keyboard" />
+        </CheckBox>
+        <Grid
+            Margin="0,4,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition
+                    Width="170" />
+                <ColumnDefinition
+                    Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Style="{StaticResource Label}"
+                Text="Hold these keys" />
+            <local:HotkeyBox
+                x:Name="hotkeyKeys"
+                Grid.Column="1"
+                KeysChosen="HotkeyKeys_KeysChosen"
+                CaptureStarted="HotkeyKeys_CaptureStarted"
+                CaptureEnded="HotkeyKeys_CaptureEnded" />
+        </Grid>
+        <TextBlock
+            x:Name="hotkeyInfo"
+            Style="{StaticResource Hint}" />
+        <TextBlock
+            x:Name="hotkeyWarning"
+            Style="{StaticResource Hint}"
+            Foreground="DarkOrange"
+            Visibility="Collapsed" />
 
         <TextBlock
             Style="{StaticResource Heading}"

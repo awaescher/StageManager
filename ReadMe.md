@@ -10,6 +10,8 @@ This prototype groups applications by their executable. By switching between so 
 
 Drag a card from the sidebar onto the stage to add its windows to the current scene, or onto another card to merge both. Shift+click does the same as dragging onto the stage. The sidebar can sit on the left or the right side of the screen.
 
+Scenes can be switched with the keyboard: hold `Ctrl+Alt+Win` and press `Tab` for the next scene (the sidebar shows the pick), `Shift+Tab` for the previous one, or `1` to `9` for the card at that position. The scene opens when you let go of the keys, `Esc` cancels. The held keys can be changed in the settings by clicking into the field and pressing the new keys. Combinations that are already used by Windows or another app are named there.
+
 ## Usage
 
 Download and run the executable from the [Releases tab](https://github.com/awaescher/StageManager/releases/) or 
@@ -49,6 +51,7 @@ This is an experimental fun project. I don't have any idea whether or not this i
 |keep the stacking order of the windows of a scene|✅|
 |sidebar on the left or the right|✅|
 |settings window|✅|
+|switch scenes with the keyboard (configurable keys)|✅|
 |bring back windows that ended up out of the screen|✅|
 |virtual desktop support (pin window)|⬜|
 |multi-monitor support|⬜|

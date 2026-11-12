@@ -167,7 +167,7 @@
                                     </Setter>
                                     <Style.Triggers>
                                         <DataTrigger
-                                            Binding="{Binding IsMergeTarget}"
+                                            Binding="{Binding IsHighlighted}"
                                             Value="True">
                                             <DataTrigger.EnterActions>
                                                 <BeginStoryboard>

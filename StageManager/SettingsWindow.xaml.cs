@@ -61,10 +61,23 @@ namespace StageManager
 			Fill(animationSpeed, new[] { 0.5, 0.75, 1.0, 1.5, 2.0, 3.0 }
 				.Select(s => new Choice<double>(s == 1.0 ? "Normal" : $"{s:0.##}x", s)));
 
-			Loaded += (_, _) => Settings.Changed += Settings_Changed;
+			Loaded += (_, _) =>
+			{
+				Settings.Changed += Settings_Changed;
+
+				if (App.Hotkeys is object)
+					App.Hotkeys.ConflictsChanged += Hotkeys_ConflictsChanged;
+			};
 			Closed += (_, _) =>
 			{
 				Settings.Changed -= Settings_Changed;
+
+				if (App.Hotkeys is object)
+				{
+					App.Hotkeys.ConflictsChanged -= Hotkeys_ConflictsChanged;
+					App.Hotkeys.Suspended = false;
+				}
+
 				_instance = null;
 			};
 
@@ -149,6 +162,12 @@ namespace StageManager
 				Fill(animationSpeed, speeds);
 				Select(animationSpeed, current.Animations.Speed);
 				animationFrames.IsChecked = current.Animations.FrameIfWindowContentIsOff;
+
+				hotkeysEnabled.IsChecked = current.Hotkeys.Enabled;
+				hotkeyKeys.IsEnabled = current.Hotkeys.Enabled;
+				if (HotkeyText.TryParse(current.Hotkeys.Keys, out var keys))
+					hotkeyKeys.Keys = keys;
+				UpdateHotkeyInfo();
 
 				UpdateAnimationInfo();
 
@@ -277,6 +296,64 @@ namespace StageManager
 		{
 			var frames = animationFrames.IsChecked == true;
 			Change(s => s.Animations.FrameIfWindowContentIsOff = frames);
+		}
+
+		private void HotkeysEnabled_Click(object sender, RoutedEventArgs e)
+		{
+			var enabled = hotkeysEnabled.IsChecked == true;
+			Change(s => s.Hotkeys.Enabled = enabled);
+		}
+
+		private void HotkeyKeys_KeysChosen(object? sender, HotkeyModifiers keys)
+		{
+			Change(s => s.Hotkeys.Keys = HotkeyText.Format(keys));
+			UpdateHotkeyInfo();
+		}
+
+		// the registered keys would swallow the combination the user is about to press
+		private void HotkeyKeys_CaptureStarted(object? sender, EventArgs e)
+		{
+			if (App.Hotkeys is object)
+				App.Hotkeys.Suspended = true;
+		}
+
+		private void HotkeyKeys_CaptureEnded(object? sender, EventArgs e)
+		{
+			if (App.Hotkeys is object)
+				App.Hotkeys.Suspended = false;
+
+			UpdateHotkeyInfo();
+		}
+
+		private void Hotkeys_ConflictsChanged(object? sender, EventArgs e)
+		{
+			Dispatcher.BeginInvoke(UpdateHotkeyInfo);
+		}
+
+		private void UpdateHotkeyInfo()
+		{
+			var settings = Settings.Current.Hotkeys;
+
+			if (!HotkeyText.TryParse(settings.Keys, out var keys))
+				keys = HotkeyText.Default;
+
+			var text = HotkeyText.Format(keys);
+			hotkeyInfo.Text = settings.Enabled
+				? $"Hold {text} and press Tab for the next scene, Shift+Tab for the previous one, or 1...9 for the card at that position. The scene opens when you let go, Esc cancels."
+				: "The keyboard shortcuts are off.";
+
+			var lines = new List<string>();
+
+			if (settings.Enabled)
+			{
+				lines.AddRange(App.Hotkeys?.Conflicts ?? Array.Empty<string>());
+
+				if (HotkeyAdvice.Warning(keys) is string warning)
+					lines.Add(warning);
+			}
+
+			hotkeyWarning.Visibility = lines.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+			hotkeyWarning.Text = string.Join(Environment.NewLine, lines);
 		}
 
 		private void Reset_Click(object sender, RoutedEventArgs e)
