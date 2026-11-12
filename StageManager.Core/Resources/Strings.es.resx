@@ -17,7 +17,6 @@
   <data name="Tray.SidebarPosition" xml:space="preserve"><value>Posición de la barra lateral</value></data>
   <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>Escenas en la barra lateral</value></data>
   <data name="Tray.DesktopIcons" xml:space="preserve"><value>Iconos del escritorio</value></data>
-  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automático (ocultar mientras una escena está activa)</value></data>
   <data name="Tray.IconsHidden" xml:space="preserve"><value>Siempre ocultos</value></data>
   <data name="Tray.IconsUntouched" xml:space="preserve"><value>No cambiar nunca</value></data>
   <data name="Tray.Rescue" xml:space="preserve"><value>Recuperar ventanas fuera de la pantalla</value></data>
@@ -98,8 +97,6 @@
   <data name="Warn.AltAlone" xml:space="preserve"><value>Alt solo quita Alt+1...9 a muchas aplicaciones. Añade otra tecla.</value></data>
   <data name="Warn.CtrlAlt" xml:space="preserve"><value>Ctrl+Alt es AltGr en muchos teclados: Ctrl+Alt+números escribe entonces caracteres como { [ ] }.</value></data>
   <data name="Icons.Mode" xml:space="preserve"><value>Iconos del escritorio</value></data>
-  <data name="Icons.ModeDesc" xml:space="preserve"><value>Cuándo oculta StageManager los iconos del escritorio.</value></data>
-  <data name="Icons.Manage" xml:space="preserve"><value>Automático: ocultar mientras una escena está activa y mostrar en la vista del escritorio</value></data>
   <data name="Icons.Hidden" xml:space="preserve"><value>Siempre ocultos</value></data>
   <data name="Icons.Untouched" xml:space="preserve"><value>No cambiar nunca</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Restaurar los iconos al salir de StageManager</value></data>
@@ -122,4 +119,7 @@
   <data name="Nav.Apps" xml:space="preserve"><value>Aplicaciones</value></data>
   <data name="Apps.Browse" xml:space="preserve"><value>Elegir un archivo de aplicación...</value></data>
   <data name="Apps.RemoveOne" xml:space="preserve"><value>Volver a incluir esta aplicación</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>Automático: ocultos mientras una escena está activa, visibles al hacer clic en el escritorio</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automático (visibles al hacer clic en el escritorio)</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>Cuándo oculta StageManager los iconos del escritorio. Como en macOS, un clic en el escritorio aparta todas las ventanas y los muestra.</value></data>
 </root>

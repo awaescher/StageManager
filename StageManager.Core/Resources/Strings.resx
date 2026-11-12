@@ -17,7 +17,6 @@
   <data name="Tray.SidebarPosition" xml:space="preserve"><value>Sidebar position</value></data>
   <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>Scenes in sidebar</value></data>
   <data name="Tray.DesktopIcons" xml:space="preserve"><value>Desktop icons</value></data>
-  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatic (hide while a scene is active)</value></data>
   <data name="Tray.IconsHidden" xml:space="preserve"><value>Always hidden</value></data>
   <data name="Tray.IconsUntouched" xml:space="preserve"><value>Never change</value></data>
   <data name="Tray.Rescue" xml:space="preserve"><value>Bring back windows out of the screen</value></data>
@@ -98,8 +97,6 @@
   <data name="Warn.AltAlone" xml:space="preserve"><value>Alt alone takes Alt+1...9 from many apps. Add another key.</value></data>
   <data name="Warn.CtrlAlt" xml:space="preserve"><value>Ctrl+Alt is AltGr on many keyboards: Ctrl+Alt+digits then types characters such as { [ ] }.</value></data>
   <data name="Icons.Mode" xml:space="preserve"><value>Desktop icons</value></data>
-  <data name="Icons.ModeDesc" xml:space="preserve"><value>When StageManager hides the icons on your desktop.</value></data>
-  <data name="Icons.Manage" xml:space="preserve"><value>Automatic: hide while a scene is active, show in the desktop view</value></data>
   <data name="Icons.Hidden" xml:space="preserve"><value>Always hidden</value></data>
   <data name="Icons.Untouched" xml:space="preserve"><value>Never change</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Restore the icons when StageManager exits</value></data>
@@ -122,4 +119,7 @@
   <data name="Nav.Apps" xml:space="preserve"><value>Apps</value></data>
   <data name="Apps.Browse" xml:space="preserve"><value>Choose an app file...</value></data>
   <data name="Apps.RemoveOne" xml:space="preserve"><value>Include this app again</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>Automatic: hidden while a scene is active, shown when you click the desktop</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatic (shown when clicking the desktop)</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>When StageManager hides the icons on your desktop. Like on macOS, a click on the desktop steps all windows aside and shows them.</value></data>
 </root>

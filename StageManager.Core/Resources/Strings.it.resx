@@ -17,7 +17,6 @@
   <data name="Tray.SidebarPosition" xml:space="preserve"><value>Posizione della barra laterale</value></data>
   <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>Scene nella barra laterale</value></data>
   <data name="Tray.DesktopIcons" xml:space="preserve"><value>Icone del desktop</value></data>
-  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatico (nascondi mentre una scena è attiva)</value></data>
   <data name="Tray.IconsHidden" xml:space="preserve"><value>Sempre nascoste</value></data>
   <data name="Tray.IconsUntouched" xml:space="preserve"><value>Non modificare mai</value></data>
   <data name="Tray.Rescue" xml:space="preserve"><value>Riporta le finestre fuori dallo schermo</value></data>
@@ -98,8 +97,6 @@
   <data name="Warn.AltAlone" xml:space="preserve"><value>Alt da solo toglie Alt+1...9 a molte app. Aggiungi un altro tasto.</value></data>
   <data name="Warn.CtrlAlt" xml:space="preserve"><value>Ctrl+Alt su molte tastiere è AltGr: Ctrl+Alt+cifre scrive allora caratteri come { [ ] }.</value></data>
   <data name="Icons.Mode" xml:space="preserve"><value>Icone del desktop</value></data>
-  <data name="Icons.ModeDesc" xml:space="preserve"><value>Quando StageManager nasconde le icone del desktop.</value></data>
-  <data name="Icons.Manage" xml:space="preserve"><value>Automatico: nascondi mentre una scena è attiva, mostra nella vista desktop</value></data>
   <data name="Icons.Hidden" xml:space="preserve"><value>Sempre nascoste</value></data>
   <data name="Icons.Untouched" xml:space="preserve"><value>Non modificare mai</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Ripristina le icone all&apos;uscita da StageManager</value></data>
@@ -122,4 +119,7 @@
   <data name="Nav.Apps" xml:space="preserve"><value>App</value></data>
   <data name="Apps.Browse" xml:space="preserve"><value>Scegli un file di app...</value></data>
   <data name="Apps.RemoveOne" xml:space="preserve"><value>Reincludi questa app</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>Automatico: nascoste mentre una scena è attiva, visibili dopo un clic sul desktop</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatico (visibili dopo un clic sul desktop)</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>Quando StageManager nasconde le icone del desktop. Come su macOS, un clic sul desktop sposta da parte tutte le finestre e le mostra.</value></data>
 </root>

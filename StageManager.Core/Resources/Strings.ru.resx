@@ -17,7 +17,6 @@
   <data name="Tray.SidebarPosition" xml:space="preserve"><value>Положение боковой панели</value></data>
   <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>Сцен на боковой панели</value></data>
   <data name="Tray.DesktopIcons" xml:space="preserve"><value>Значки рабочего стола</value></data>
-  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Автоматически (скрывать, пока активна сцена)</value></data>
   <data name="Tray.IconsHidden" xml:space="preserve"><value>Всегда скрыты</value></data>
   <data name="Tray.IconsUntouched" xml:space="preserve"><value>Не изменять</value></data>
   <data name="Tray.Rescue" xml:space="preserve"><value>Вернуть окна, оказавшиеся за пределами экрана</value></data>
@@ -98,8 +97,6 @@
   <data name="Warn.AltAlone" xml:space="preserve"><value>Один Alt отнимает Alt+1...9 у многих приложений. Добавьте ещё одну клавишу.</value></data>
   <data name="Warn.CtrlAlt" xml:space="preserve"><value>Ctrl+Alt на многих клавиатурах — это AltGr: Ctrl+Alt+цифры тогда вводят символы вроде { [ ] }.</value></data>
   <data name="Icons.Mode" xml:space="preserve"><value>Значки рабочего стола</value></data>
-  <data name="Icons.ModeDesc" xml:space="preserve"><value>Когда StageManager скрывает значки на рабочем столе.</value></data>
-  <data name="Icons.Manage" xml:space="preserve"><value>Автоматически: скрывать, пока активна сцена, и показывать в режиме рабочего стола</value></data>
   <data name="Icons.Hidden" xml:space="preserve"><value>Всегда скрыты</value></data>
   <data name="Icons.Untouched" xml:space="preserve"><value>Не изменять</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Восстанавливать значки при выходе из StageManager</value></data>
@@ -122,4 +119,7 @@
   <data name="Nav.Apps" xml:space="preserve"><value>Приложения</value></data>
   <data name="Apps.Browse" xml:space="preserve"><value>Выбрать файл приложения...</value></data>
   <data name="Apps.RemoveOne" xml:space="preserve"><value>Снова включить это приложение</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>Автоматически: скрыты, пока активна сцена, и показываются после щелчка по рабочему столу</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Автоматически (показ по щелчку на рабочем столе)</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>Когда StageManager скрывает значки на рабочем столе. Как в macOS, щелчок по рабочему столу отодвигает все окна и показывает значки.</value></data>
 </root>

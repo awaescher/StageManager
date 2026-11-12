@@ -17,7 +17,6 @@
   <data name="Tray.SidebarPosition" xml:space="preserve"><value>Posição da barra lateral</value></data>
   <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>Cenas na barra lateral</value></data>
   <data name="Tray.DesktopIcons" xml:space="preserve"><value>Ícones da área de trabalho</value></data>
-  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automático (ocultar enquanto uma cena estiver ativa)</value></data>
   <data name="Tray.IconsHidden" xml:space="preserve"><value>Sempre ocultos</value></data>
   <data name="Tray.IconsUntouched" xml:space="preserve"><value>Nunca alterar</value></data>
   <data name="Tray.Rescue" xml:space="preserve"><value>Trazer de volta janelas fora da tela</value></data>
@@ -98,8 +97,6 @@
   <data name="Warn.AltAlone" xml:space="preserve"><value>Alt sozinho tira Alt+1...9 de muitos aplicativos. Adicione outra tecla.</value></data>
   <data name="Warn.CtrlAlt" xml:space="preserve"><value>Ctrl+Alt é AltGr em muitos teclados: Ctrl+Alt+números digita então caracteres como { [ ] }.</value></data>
   <data name="Icons.Mode" xml:space="preserve"><value>Ícones da área de trabalho</value></data>
-  <data name="Icons.ModeDesc" xml:space="preserve"><value>Quando o StageManager oculta os ícones da área de trabalho.</value></data>
-  <data name="Icons.Manage" xml:space="preserve"><value>Automático: ocultar enquanto uma cena estiver ativa e mostrar na visão da área de trabalho</value></data>
   <data name="Icons.Hidden" xml:space="preserve"><value>Sempre ocultos</value></data>
   <data name="Icons.Untouched" xml:space="preserve"><value>Nunca alterar</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Restaurar os ícones ao sair do StageManager</value></data>
@@ -122,4 +119,7 @@
   <data name="Nav.Apps" xml:space="preserve"><value>Aplicativos</value></data>
   <data name="Apps.Browse" xml:space="preserve"><value>Escolher um arquivo de aplicativo...</value></data>
   <data name="Apps.RemoveOne" xml:space="preserve"><value>Incluir este aplicativo novamente</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>Automático: ocultos enquanto uma cena estiver ativa, visíveis ao clicar na área de trabalho</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automático (visíveis ao clicar na área de trabalho)</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>Quando o StageManager oculta os ícones da área de trabalho. Como no macOS, um clique na área de trabalho afasta todas as janelas e mostra os ícones.</value></data>
 </root>

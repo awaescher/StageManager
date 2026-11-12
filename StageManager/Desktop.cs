@@ -22,16 +22,6 @@ namespace StageManager
 		static extern IntPtr GetDesktopWindow();
 
 		private const int WM_COMMAND = 0x111;
-		private IntPtr _desktopViewHandle;
-
-		public void TrySetDesktopView(IntPtr handle)
-		{
-			var buffer = new StringBuilder(255);
-			Win32.GetClassName(handle, buffer, buffer.Capacity + 1);
-			if (buffer.ToString() == "WorkerW")
-				_desktopViewHandle = handle;
-		}
-
 		public bool GetDesktopIconsVisible()
 		{
 			// pinvoke suggestions from StackOverflow are not working reliably, so we read the registry directly
@@ -84,9 +74,5 @@ namespace StageManager
 			}
 			return hShellViewWin;
 		}
-
-		public bool HasDesktopView => _desktopViewHandle != IntPtr.Zero;
-
-		public IntPtr DesktopViewHandle => _desktopViewHandle;
 	}
 }

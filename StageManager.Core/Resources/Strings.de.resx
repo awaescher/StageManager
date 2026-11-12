@@ -17,7 +17,6 @@
   <data name="Tray.SidebarPosition" xml:space="preserve"><value>Position der Seitenleiste</value></data>
   <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>Szenen in der Seitenleiste</value></data>
   <data name="Tray.DesktopIcons" xml:space="preserve"><value>Desktopsymbole</value></data>
-  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatisch (ausblenden, solange eine Szene aktiv ist)</value></data>
   <data name="Tray.IconsHidden" xml:space="preserve"><value>Immer ausgeblendet</value></data>
   <data name="Tray.IconsUntouched" xml:space="preserve"><value>Nie ändern</value></data>
   <data name="Tray.Rescue" xml:space="preserve"><value>Fenster außerhalb des Bildschirms zurückholen</value></data>
@@ -98,8 +97,6 @@
   <data name="Warn.AltAlone" xml:space="preserve"><value>Alt allein nimmt vielen Apps Alt+1...9 weg. Eine weitere Taste ergänzen.</value></data>
   <data name="Warn.CtrlAlt" xml:space="preserve"><value>Strg+Alt ist auf vielen Tastaturen AltGr: Strg+Alt+Ziffern schreibt dann Zeichen wie { [ ] }.</value></data>
   <data name="Icons.Mode" xml:space="preserve"><value>Desktopsymbole</value></data>
-  <data name="Icons.ModeDesc" xml:space="preserve"><value>Wann StageManager die Symbole auf dem Desktop ausblendet.</value></data>
-  <data name="Icons.Manage" xml:space="preserve"><value>Automatisch: ausblenden, solange eine Szene aktiv ist, in der Desktopansicht zeigen</value></data>
   <data name="Icons.Hidden" xml:space="preserve"><value>Immer ausgeblendet</value></data>
   <data name="Icons.Untouched" xml:space="preserve"><value>Nie ändern</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Symbole beim Beenden von StageManager wiederherstellen</value></data>
@@ -122,4 +119,7 @@
   <data name="Nav.Apps" xml:space="preserve"><value>Apps</value></data>
   <data name="Apps.Browse" xml:space="preserve"><value>App-Datei auswählen...</value></data>
   <data name="Apps.RemoveOne" xml:space="preserve"><value>Diese App wieder einbeziehen</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>Automatisch: ausgeblendet, solange eine Szene aktiv ist, sichtbar nach einem Klick auf den Desktop</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatisch (sichtbar nach Klick auf den Desktop)</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>Wann StageManager die Symbole auf dem Desktop ausblendet. Wie beim Mac schiebt ein Klick auf den Desktop alle Fenster beiseite und zeigt sie.</value></data>
 </root>

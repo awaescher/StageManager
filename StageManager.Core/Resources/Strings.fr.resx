@@ -17,7 +17,6 @@
   <data name="Tray.SidebarPosition" xml:space="preserve"><value>Position de la barre latérale</value></data>
   <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>Scènes dans la barre latérale</value></data>
   <data name="Tray.DesktopIcons" xml:space="preserve"><value>Icônes du bureau</value></data>
-  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatique (masquer tant qu&apos;une scène est active)</value></data>
   <data name="Tray.IconsHidden" xml:space="preserve"><value>Toujours masquées</value></data>
   <data name="Tray.IconsUntouched" xml:space="preserve"><value>Ne jamais modifier</value></data>
   <data name="Tray.Rescue" xml:space="preserve"><value>Récupérer les fenêtres hors de l&apos;écran</value></data>
@@ -98,8 +97,6 @@
   <data name="Warn.AltAlone" xml:space="preserve"><value>Alt seul prend Alt+1...9 à de nombreuses applications. Ajoutez une autre touche.</value></data>
   <data name="Warn.CtrlAlt" xml:space="preserve"><value>Ctrl+Alt correspond à AltGr sur de nombreux claviers : Ctrl+Alt+chiffres saisit alors des caractères comme { [ ] }.</value></data>
   <data name="Icons.Mode" xml:space="preserve"><value>Icônes du bureau</value></data>
-  <data name="Icons.ModeDesc" xml:space="preserve"><value>Quand StageManager masque les icônes du bureau.</value></data>
-  <data name="Icons.Manage" xml:space="preserve"><value>Automatique : masquer tant qu&apos;une scène est active, afficher dans la vue du bureau</value></data>
   <data name="Icons.Hidden" xml:space="preserve"><value>Toujours masquées</value></data>
   <data name="Icons.Untouched" xml:space="preserve"><value>Ne jamais modifier</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>Restaurer les icônes à la fermeture de StageManager</value></data>
@@ -122,4 +119,7 @@
   <data name="Nav.Apps" xml:space="preserve"><value>Applications</value></data>
   <data name="Apps.Browse" xml:space="preserve"><value>Choisir un fichier d&apos;application...</value></data>
   <data name="Apps.RemoveOne" xml:space="preserve"><value>Réintégrer cette application</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>Automatique : masquées tant qu&apos;une scène est active, visibles après un clic sur le bureau</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatique (visibles après un clic sur le bureau)</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>Quand StageManager masque les icônes du bureau. Comme sur macOS, un clic sur le bureau écarte toutes les fenêtres et les affiche.</value></data>
 </root>

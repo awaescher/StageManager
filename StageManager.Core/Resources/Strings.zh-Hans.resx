@@ -17,7 +17,6 @@
   <data name="Tray.SidebarPosition" xml:space="preserve"><value>侧边栏位置</value></data>
   <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>侧边栏中的场景数</value></data>
   <data name="Tray.DesktopIcons" xml:space="preserve"><value>桌面图标</value></data>
-  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>自动（场景处于活动状态时隐藏）</value></data>
   <data name="Tray.IconsHidden" xml:space="preserve"><value>始终隐藏</value></data>
   <data name="Tray.IconsUntouched" xml:space="preserve"><value>从不更改</value></data>
   <data name="Tray.Rescue" xml:space="preserve"><value>找回屏幕外的窗口</value></data>
@@ -98,8 +97,6 @@
   <data name="Warn.AltAlone" xml:space="preserve"><value>仅使用 Alt 会占用许多应用的 Alt+1...9。请再添加一个按键。</value></data>
   <data name="Warn.CtrlAlt" xml:space="preserve"><value>在许多键盘上，Ctrl+Alt 就是 AltGr：此时 Ctrl+Alt+数字会输入 { [ ] } 之类的字符。</value></data>
   <data name="Icons.Mode" xml:space="preserve"><value>桌面图标</value></data>
-  <data name="Icons.ModeDesc" xml:space="preserve"><value>StageManager 何时隐藏桌面上的图标。</value></data>
-  <data name="Icons.Manage" xml:space="preserve"><value>自动：场景处于活动状态时隐藏，在桌面视图中显示</value></data>
   <data name="Icons.Hidden" xml:space="preserve"><value>始终隐藏</value></data>
   <data name="Icons.Untouched" xml:space="preserve"><value>从不更改</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>退出 StageManager 时恢复图标</value></data>
@@ -122,4 +119,7 @@
   <data name="Nav.Apps" xml:space="preserve"><value>应用</value></data>
   <data name="Apps.Browse" xml:space="preserve"><value>选择应用文件...</value></data>
   <data name="Apps.RemoveOne" xml:space="preserve"><value>重新纳入此应用</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>自动：场景处于活动状态时隐藏，单击桌面时显示</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>自动（单击桌面时显示）</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>StageManager 何时隐藏桌面上的图标。与 macOS 一样，单击桌面会把所有窗口移到一旁并显示图标。</value></data>
 </root>

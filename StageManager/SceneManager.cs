@@ -142,11 +142,12 @@ namespace StageManager
 			if (_suspend)
 				return;
 
-			if (!_desktop.HasDesktopView)
-				_desktop.TrySetDesktopView(e);
+			// a click on the wallpaper gives the focus to the desktop: like on macOS the windows step aside and the desktop shows
+			var className = new System.Text.StringBuilder(256);
+			Win32.GetClassName(e, className, className.Capacity);
 
-			if (_desktop.HasDesktopView && _desktop.DesktopViewHandle == e)
-				SwitchTo(null).SafeFireAndForget();
+			if (DesktopView.IsDesktopClass(className.ToString()))
+				SwitchTo(null).SafeFireAndForget(ex => Log.Error("Showing the desktop failed", ex));
 		}
 
 		private void WindowsManager_WindowDestroyed(IWindow window)

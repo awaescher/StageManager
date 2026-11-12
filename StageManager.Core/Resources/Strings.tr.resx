@@ -17,7 +17,6 @@
   <data name="Tray.SidebarPosition" xml:space="preserve"><value>Kenar çubuğu konumu</value></data>
   <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>Kenar çubuğundaki sahneler</value></data>
   <data name="Tray.DesktopIcons" xml:space="preserve"><value>Masaüstü simgeleri</value></data>
-  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Otomatik (bir sahne etkinken gizle)</value></data>
   <data name="Tray.IconsHidden" xml:space="preserve"><value>Her zaman gizli</value></data>
   <data name="Tray.IconsUntouched" xml:space="preserve"><value>Hiç değiştirme</value></data>
   <data name="Tray.Rescue" xml:space="preserve"><value>Ekran dışındaki pencereleri geri getir</value></data>
@@ -98,8 +97,6 @@
   <data name="Warn.AltAlone" xml:space="preserve"><value>Tek başına Alt, birçok uygulamadan Alt+1...9 kısayollarını alır. Bir tuş daha ekleyin.</value></data>
   <data name="Warn.CtrlAlt" xml:space="preserve"><value>Birçok klavyede Ctrl+Alt, AltGr tuşudur: Ctrl+Alt+rakamlar bu durumda { [ ] } gibi karakterler yazar.</value></data>
   <data name="Icons.Mode" xml:space="preserve"><value>Masaüstü simgeleri</value></data>
-  <data name="Icons.ModeDesc" xml:space="preserve"><value>StageManager&apos;ın masaüstündeki simgeleri ne zaman gizleyeceği.</value></data>
-  <data name="Icons.Manage" xml:space="preserve"><value>Otomatik: bir sahne etkinken gizle, masaüstü görünümünde göster</value></data>
   <data name="Icons.Hidden" xml:space="preserve"><value>Her zaman gizli</value></data>
   <data name="Icons.Untouched" xml:space="preserve"><value>Hiç değiştirme</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>StageManager&apos;dan çıkarken simgeleri geri yükle</value></data>
@@ -122,4 +119,7 @@
   <data name="Nav.Apps" xml:space="preserve"><value>Uygulamalar</value></data>
   <data name="Apps.Browse" xml:space="preserve"><value>Uygulama dosyası seç...</value></data>
   <data name="Apps.RemoveOne" xml:space="preserve"><value>Bu uygulamayı yeniden dahil et</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>Otomatik: bir sahne etkinken gizli, masaüstüne tıklayınca görünür</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Otomatik (masaüstüne tıklayınca görünür)</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>StageManager&apos;ın masaüstündeki simgeleri ne zaman gizleyeceği. macOS&apos;taki gibi masaüstüne tıklamak tüm pencereleri kenara çeker ve simgeleri gösterir.</value></data>
 </root>

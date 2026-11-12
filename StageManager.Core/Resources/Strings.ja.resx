@@ -17,7 +17,6 @@
   <data name="Tray.SidebarPosition" xml:space="preserve"><value>サイドバーの位置</value></data>
   <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>サイドバーのシーン数</value></data>
   <data name="Tray.DesktopIcons" xml:space="preserve"><value>デスクトップアイコン</value></data>
-  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>自動 (シーンがアクティブな間は非表示)</value></data>
   <data name="Tray.IconsHidden" xml:space="preserve"><value>常に非表示</value></data>
   <data name="Tray.IconsUntouched" xml:space="preserve"><value>変更しない</value></data>
   <data name="Tray.Rescue" xml:space="preserve"><value>画面外のウィンドウを戻す</value></data>
@@ -98,8 +97,6 @@
   <data name="Warn.AltAlone" xml:space="preserve"><value>Alt だけにすると、多くのアプリの Alt+1...9 を奪います。別のキーを追加してください。</value></data>
   <data name="Warn.CtrlAlt" xml:space="preserve"><value>多くのキーボードで Ctrl+Alt は AltGr です。Ctrl+Alt+数字で { [ ] } などの文字が入力されます。</value></data>
   <data name="Icons.Mode" xml:space="preserve"><value>デスクトップアイコン</value></data>
-  <data name="Icons.ModeDesc" xml:space="preserve"><value>StageManager がデスクトップのアイコンを隠すタイミングです。</value></data>
-  <data name="Icons.Manage" xml:space="preserve"><value>自動: シーンがアクティブな間は隠し、デスクトップ表示では表示する</value></data>
   <data name="Icons.Hidden" xml:space="preserve"><value>常に非表示</value></data>
   <data name="Icons.Untouched" xml:space="preserve"><value>変更しない</value></data>
   <data name="Icons.Restore" xml:space="preserve"><value>StageManager の終了時にアイコンを元に戻す</value></data>
@@ -122,4 +119,7 @@
   <data name="Nav.Apps" xml:space="preserve"><value>アプリ</value></data>
   <data name="Apps.Browse" xml:space="preserve"><value>アプリのファイルを選択...</value></data>
   <data name="Apps.RemoveOne" xml:space="preserve"><value>このアプリを再び対象にする</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>自動: シーンがアクティブな間は非表示、デスクトップをクリックすると表示</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>自動 (デスクトップをクリックすると表示)</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>StageManager がデスクトップのアイコンを隠すタイミングです。macOS と同様に、デスクトップをクリックするとすべてのウィンドウが脇へ寄り、アイコンが表示されます。</value></data>
 </root>
