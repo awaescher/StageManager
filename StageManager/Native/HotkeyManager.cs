@@ -79,11 +79,13 @@ namespace StageManager.Native
 
 		public event EventHandler<HotkeyAction>? Triggered;
 
-		/// <summary>Raised when the lines of <see cref="Conflicts"/> changed.</summary>
+		/// <summary>Raised when <see cref="Failed"/> changed.</summary>
 		public event EventHandler? ConflictsChanged;
 
-		/// <summary>One line for each combination that could not be taken, empty if all work.</summary>
-		public IReadOnlyList<string> Conflicts { get; private set; } = Array.Empty<string>();
+		/// <summary>The actions whose keys could not be taken, empty if all work.</summary>
+		public IReadOnlyList<HotkeyAction> Failed { get; private set; } = Array.Empty<HotkeyAction>();
+
+		public HotkeyModifiers Keys => _keys;
 
 		/// <summary>While the user records new keys the registered ones must not swallow them.</summary>
 		public bool Suspended
@@ -132,10 +134,9 @@ namespace StageManager.Native
 				}
 			}
 
-			var conflicts = HotkeyAdvice.Conflicts(_keys, failed);
-			if (!conflicts.SequenceEqual(Conflicts))
+			if (!failed.SequenceEqual(Failed))
 			{
-				Conflicts = conflicts;
+				Failed = failed;
 				ConflictsChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}

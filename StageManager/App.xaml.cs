@@ -1,4 +1,4 @@
-﻿using StageManager.Core;
+using StageManager.Core;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -34,6 +34,9 @@ namespace StageManager
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			Log.Info($"Starting StageManager (data directory: {AppPaths.DataDirectory})");
+
+			Loc.Follow(Settings);
+
 			base.OnStartup(e);
 		}
 

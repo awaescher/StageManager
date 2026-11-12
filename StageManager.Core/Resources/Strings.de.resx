@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Common.Left" xml:space="preserve"><value>Links</value></data>
+  <data name="Common.Right" xml:space="preserve"><value>Rechts</value></data>
+  <data name="Key.Ctrl" xml:space="preserve"><value>Strg</value></data>
+  <data name="Key.Alt" xml:space="preserve"><value>Alt</value></data>
+  <data name="Key.Shift" xml:space="preserve"><value>Umschalt</value></data>
+  <data name="Key.Win" xml:space="preserve"><value>Win</value></data>
+  <data name="Key.Tab" xml:space="preserve"><value>Tab</value></data>
+  <data name="Key.Esc" xml:space="preserve"><value>Esc</value></data>
+  <data name="Tray.Settings" xml:space="preserve"><value>Einstellungen...</value></data>
+  <data name="Tray.StartWithWindows" xml:space="preserve"><value>Mit Windows starten</value></data>
+  <data name="Tray.SidebarPosition" xml:space="preserve"><value>Position der Seitenleiste</value></data>
+  <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>Szenen in der Seitenleiste</value></data>
+  <data name="Tray.DesktopIcons" xml:space="preserve"><value>Desktopsymbole</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatisch (ausblenden, solange eine Szene aktiv ist)</value></data>
+  <data name="Tray.IconsHidden" xml:space="preserve"><value>Immer ausgeblendet</value></data>
+  <data name="Tray.IconsUntouched" xml:space="preserve"><value>Nie ändern</value></data>
+  <data name="Tray.Rescue" xml:space="preserve"><value>Fenster außerhalb des Bildschirms zurückholen</value></data>
+  <data name="Tray.ProjectPage" xml:space="preserve"><value>Projektseite</value></data>
+  <data name="Tray.Quit" xml:space="preserve"><value>Beenden</value></data>
+  <data name="Card.AddToStage" xml:space="preserve"><value>Zur Bühne hinzufügen</value></data>
+  <data name="Card.Separate" xml:space="preserve"><value>Aus der Gruppe lösen</value></data>
+  <data name="Card.Close" xml:space="preserve"><value>Schließen</value></data>
+  <data name="Settings.Title" xml:space="preserve"><value>StageManager-Einstellungen</value></data>
+  <data name="Settings.Applied" xml:space="preserve"><value>Änderungen werden sofort übernommen.</value></data>
+  <data name="Settings.Reset" xml:space="preserve"><value>Auf Standard zurücksetzen</value></data>
+  <data name="Nav.General" xml:space="preserve"><value>Allgemein</value></data>
+  <data name="Nav.Sidebar" xml:space="preserve"><value>Seitenleiste</value></data>
+  <data name="Nav.Animations" xml:space="preserve"><value>Animationen</value></data>
+  <data name="Nav.Keyboard" xml:space="preserve"><value>Tastatur</value></data>
+  <data name="Nav.DesktopIcons" xml:space="preserve"><value>Desktopsymbole</value></data>
+  <data name="General.Language" xml:space="preserve"><value>Sprache</value></data>
+  <data name="General.LanguageDesc" xml:space="preserve"><value>Die Sprache der Menüs und Einstellungen.</value></data>
+  <data name="Language.System" xml:space="preserve"><value>Wie Windows</value></data>
+  <data name="General.Autostart" xml:space="preserve"><value>Mit Windows starten</value></data>
+  <data name="General.AutostartDesc" xml:space="preserve"><value>StageManager startet beim Anmelden.</value></data>
+  <data name="General.Hide" xml:space="preserve"><value>Andere Fenster ausblenden durch</value></data>
+  <data name="General.HideDesc" xml:space="preserve"><value>Wird ein Fenster aus dem Bildschirm geschoben, bleibt sein Bild in der Seitenleiste erhalten. Minimierte Fenster von Browsern und WebView-Apps verlieren es.</value></data>
+  <data name="Hide.Park" xml:space="preserve"><value>Aus dem Bildschirm schieben (empfohlen)</value></data>
+  <data name="Hide.Minimize" xml:space="preserve"><value>Minimieren</value></data>
+  <data name="Sidebar.Preview" xml:space="preserve"><value>Vorschau</value></data>
+  <data name="Sidebar.Position" xml:space="preserve"><value>Position</value></data>
+  <data name="Sidebar.PositionDesc" xml:space="preserve"><value>Der Bildschirmrand, an dem die Seitenleiste sitzt.</value></data>
+  <data name="Sidebar.Scenes" xml:space="preserve"><value>Szenen in der Seitenleiste</value></data>
+  <data name="Sidebar.ScenesDesc" xml:space="preserve"><value>Wie viele Szenen gleichzeitig angezeigt werden.</value></data>
+  <data name="Sidebar.WindowsPerScene" xml:space="preserve"><value>Fenster pro Szene</value></data>
+  <data name="Sidebar.WindowsPerSceneDesc" xml:space="preserve"><value>Fenster einer Szene, die als gestapelte Vorschaubilder erscheinen. Alle weiteren sieht man nur als Symbole.</value></data>
+  <data name="Sidebar.NoStack" xml:space="preserve"><value>1 (kein Stapel)</value></data>
+  <data name="Sidebar.ThumbnailSize" xml:space="preserve"><value>Größe der Vorschaubilder</value></data>
+  <data name="Sidebar.ThumbnailSizeDesc" xml:space="preserve"><value>Automatisch passt sie an die Anzahl der Szenen an.</value></data>
+  <data name="Sidebar.AutoThumbnail" xml:space="preserve"><value>Automatisch (an die Anzahl der Szenen anpassen)</value></data>
+  <data name="Sidebar.Width" xml:space="preserve"><value>Breite der Seitenleiste</value></data>
+  <data name="Sidebar.WidthDesc" xml:space="preserve"><value>Automatisch passt sie an die Vorschaubilder an.</value></data>
+  <data name="Sidebar.AutoWidth" xml:space="preserve"><value>Automatisch (an die Vorschaubilder anpassen)</value></data>
+  <data name="Sidebar.DragToStage" xml:space="preserve"><value>Karten auf die Bühne ziehen</value></data>
+  <data name="Sidebar.DragToStageDesc" xml:space="preserve"><value>Eine Karte auf die Bühne ziehen, um ihre Apps hinzuzufügen.</value></data>
+  <data name="Sidebar.PreviewInfo" xml:space="preserve"><value>Vorschaubilder {0} x {1}, Seitenleiste {2} breit, berechnet für eine Bildschirmhöhe von {3}.</value></data>
+  <data name="Sidebar.Limited" xml:space="preserve"><value>Bei dieser Größe passen nur {0} von {1} Szenen auf diesen Bildschirm. Die übrigen bleiben verwaltet, werden aber nicht in der Seitenleiste angezeigt.</value></data>
+  <data name="Anim.Mode" xml:space="preserve"><value>Szenenwechsel animieren</value></data>
+  <data name="Anim.ModeDesc" xml:space="preserve"><value>Wie sich die Fenster beim Wechsel der Szene bewegen.</value></data>
+  <data name="Anim.Follow" xml:space="preserve"><value>Windows folgen (Standard)</value></data>
+  <data name="Anim.Always" xml:space="preserve"><value>Immer</value></data>
+  <data name="Anim.Never" xml:space="preserve"><value>Nie</value></data>
+  <data name="Anim.Speed" xml:space="preserve"><value>Geschwindigkeit</value></data>
+  <data name="Anim.SpeedDesc" xml:space="preserve"><value>Wie schnell die Fenster fliegen.</value></data>
+  <data name="Anim.Normal" xml:space="preserve"><value>Normal</value></data>
+  <data name="Anim.Frames" xml:space="preserve"><value>Einen Rahmen statt der Fenster fliegen lassen</value></data>
+  <data name="Anim.FramesDesc" xml:space="preserve"><value>Nur wenn Windows beim Ziehen von Fenstern nur einen Rahmen zeigt.</value></data>
+  <data name="Anim.Info" xml:space="preserve"><value>Windows: Animationen {0}, Fensterinhalt beim Ziehen {1}.</value></data>
+  <data name="Anim.On" xml:space="preserve"><value>an</value></data>
+  <data name="Anim.Off" xml:space="preserve"><value>aus</value></data>
+  <data name="Anim.Shown" xml:space="preserve"><value>angezeigt</value></data>
+  <data name="Anim.HiddenFrame" xml:space="preserve"><value>ausgeblendet (nur Rahmen)</value></data>
+  <data name="Anim.EffectWindows" xml:space="preserve"><value>Die Fenster fliegen zwischen der Seitenleiste und der Bühne.</value></data>
+  <data name="Anim.EffectFrames" xml:space="preserve"><value>Ein Rahmen fliegt anstelle der Fenster.</value></data>
+  <data name="Anim.EffectNone" xml:space="preserve"><value>Szenen wechseln ohne Animation.</value></data>
+  <data name="Keyboard.Enable" xml:space="preserve"><value>Szenen mit der Tastatur wechseln</value></data>
+  <data name="Keyboard.EnableDesc" xml:space="preserve"><value>Die Tasten unten gedrückt halten und Tab oder eine Ziffer drücken.</value></data>
+  <data name="Keyboard.Keys" xml:space="preserve"><value>Diese Tasten halten</value></data>
+  <data name="Keyboard.KeysDesc" xml:space="preserve"><value>In das Feld klicken, dann die gewünschten Tasten gedrückt halten.</value></data>
+  <data name="Keyboard.Capture" xml:space="preserve"><value>Tasten drücken und halten...</value></data>
+  <data name="Keyboard.OnlyModifiers" xml:space="preserve"><value>Nur {0}, {1} oder {2} halten. {3} und 1...9 ergänzt StageManager.</value></data>
+  <data name="Keyboard.Next" xml:space="preserve"><value>Nächste Szene</value></data>
+  <data name="Keyboard.Previous" xml:space="preserve"><value>Vorherige Szene</value></data>
+  <data name="Keyboard.Card" xml:space="preserve"><value>Karte an dieser Position</value></data>
+  <data name="Keyboard.Release" xml:space="preserve"><value>Die Szene öffnet sich, wenn man die Tasten loslässt.</value></data>
+  <data name="Keyboard.Cancel" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="Keyboard.Off" xml:space="preserve"><value>Die Tastenkürzel sind aus.</value></data>
+  <data name="Keyboard.Conflict" xml:space="preserve"><value>Bereits belegt: {0} ({1})</value></data>
+  <data name="Owner.Unknown" xml:space="preserve"><value>Windows oder eine andere App</value></data>
+  <data name="Owner.WindowSwitcher" xml:space="preserve"><value>Windows-Fensterwechsel</value></data>
+  <data name="Owner.TaskView" xml:space="preserve"><value>Windows-Aufgabenansicht</value></data>
+  <data name="Owner.Taskbar" xml:space="preserve"><value>Apps in der Windows-Taskleiste</value></data>
+  <data name="Owner.TaskbarJumpLists" xml:space="preserve"><value>Sprunglisten der Windows-Taskleiste</value></data>
+  <data name="Warn.CtrlAlone" xml:space="preserve"><value>Strg allein nimmt Browsern und Editoren Strg+Tab und Strg+1...9 weg. Eine weitere Taste ergänzen.</value></data>
+  <data name="Warn.AltAlone" xml:space="preserve"><value>Alt allein nimmt vielen Apps Alt+1...9 weg. Eine weitere Taste ergänzen.</value></data>
+  <data name="Warn.CtrlAlt" xml:space="preserve"><value>Strg+Alt ist auf vielen Tastaturen AltGr: Strg+Alt+Ziffern schreibt dann Zeichen wie { [ ] }.</value></data>
+  <data name="Icons.Mode" xml:space="preserve"><value>Desktopsymbole</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>Wann StageManager die Symbole auf dem Desktop ausblendet.</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>Automatisch: ausblenden, solange eine Szene aktiv ist, in der Desktopansicht zeigen</value></data>
+  <data name="Icons.Hidden" xml:space="preserve"><value>Immer ausgeblendet</value></data>
+  <data name="Icons.Untouched" xml:space="preserve"><value>Nie ändern</value></data>
+  <data name="Icons.Restore" xml:space="preserve"><value>Symbole beim Beenden von StageManager wiederherstellen</value></data>
+  <data name="Icons.RestoreDesc" xml:space="preserve"><value>Bringt die Symbole in den Zustand zurück, den sie vor dem Start von StageManager hatten.</value></data>
+</root>

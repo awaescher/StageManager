@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Common.Left" xml:space="preserve"><value>左侧</value></data>
+  <data name="Common.Right" xml:space="preserve"><value>右侧</value></data>
+  <data name="Key.Ctrl" xml:space="preserve"><value>Ctrl</value></data>
+  <data name="Key.Alt" xml:space="preserve"><value>Alt</value></data>
+  <data name="Key.Shift" xml:space="preserve"><value>Shift</value></data>
+  <data name="Key.Win" xml:space="preserve"><value>Win</value></data>
+  <data name="Key.Tab" xml:space="preserve"><value>Tab</value></data>
+  <data name="Key.Esc" xml:space="preserve"><value>Esc</value></data>
+  <data name="Tray.Settings" xml:space="preserve"><value>设置...</value></data>
+  <data name="Tray.StartWithWindows" xml:space="preserve"><value>随 Windows 启动</value></data>
+  <data name="Tray.SidebarPosition" xml:space="preserve"><value>侧边栏位置</value></data>
+  <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>侧边栏中的场景数</value></data>
+  <data name="Tray.DesktopIcons" xml:space="preserve"><value>桌面图标</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>自动（场景处于活动状态时隐藏）</value></data>
+  <data name="Tray.IconsHidden" xml:space="preserve"><value>始终隐藏</value></data>
+  <data name="Tray.IconsUntouched" xml:space="preserve"><value>从不更改</value></data>
+  <data name="Tray.Rescue" xml:space="preserve"><value>找回屏幕外的窗口</value></data>
+  <data name="Tray.ProjectPage" xml:space="preserve"><value>项目主页</value></data>
+  <data name="Tray.Quit" xml:space="preserve"><value>退出</value></data>
+  <data name="Card.AddToStage" xml:space="preserve"><value>添加到舞台</value></data>
+  <data name="Card.Separate" xml:space="preserve"><value>从分组中分离</value></data>
+  <data name="Card.Close" xml:space="preserve"><value>关闭</value></data>
+  <data name="Settings.Title" xml:space="preserve"><value>StageManager 设置</value></data>
+  <data name="Settings.Applied" xml:space="preserve"><value>更改会立即生效。</value></data>
+  <data name="Settings.Reset" xml:space="preserve"><value>恢复默认设置</value></data>
+  <data name="Nav.General" xml:space="preserve"><value>常规</value></data>
+  <data name="Nav.Sidebar" xml:space="preserve"><value>侧边栏</value></data>
+  <data name="Nav.Animations" xml:space="preserve"><value>动画</value></data>
+  <data name="Nav.Keyboard" xml:space="preserve"><value>键盘</value></data>
+  <data name="Nav.DesktopIcons" xml:space="preserve"><value>桌面图标</value></data>
+  <data name="General.Language" xml:space="preserve"><value>语言</value></data>
+  <data name="General.LanguageDesc" xml:space="preserve"><value>菜单和设置所用的语言。</value></data>
+  <data name="Language.System" xml:space="preserve"><value>与 Windows 相同</value></data>
+  <data name="General.Autostart" xml:space="preserve"><value>随 Windows 启动</value></data>
+  <data name="General.AutostartDesc" xml:space="preserve"><value>登录时启动 StageManager。</value></data>
+  <data name="General.Hide" xml:space="preserve"><value>隐藏其他窗口的方式</value></data>
+  <data name="General.HideDesc" xml:space="preserve"><value>将窗口移出屏幕后，侧边栏仍会保留其画面。浏览器和 WebView 应用的最小化窗口会丢失画面。</value></data>
+  <data name="Hide.Park" xml:space="preserve"><value>移出屏幕（推荐）</value></data>
+  <data name="Hide.Minimize" xml:space="preserve"><value>最小化</value></data>
+  <data name="Sidebar.Preview" xml:space="preserve"><value>预览</value></data>
+  <data name="Sidebar.Position" xml:space="preserve"><value>位置</value></data>
+  <data name="Sidebar.PositionDesc" xml:space="preserve"><value>侧边栏所在的屏幕边缘。</value></data>
+  <data name="Sidebar.Scenes" xml:space="preserve"><value>侧边栏中的场景数</value></data>
+  <data name="Sidebar.ScenesDesc" xml:space="preserve"><value>同时显示的场景数量。</value></data>
+  <data name="Sidebar.WindowsPerScene" xml:space="preserve"><value>每个场景的窗口数</value></data>
+  <data name="Sidebar.WindowsPerSceneDesc" xml:space="preserve"><value>场景中以堆叠缩略图显示的窗口数。其余窗口只显示为图标。</value></data>
+  <data name="Sidebar.NoStack" xml:space="preserve"><value>1（不堆叠）</value></data>
+  <data name="Sidebar.ThumbnailSize" xml:space="preserve"><value>缩略图大小</value></data>
+  <data name="Sidebar.ThumbnailSizeDesc" xml:space="preserve"><value>选择“自动”时，缩略图会根据场景数量调整。</value></data>
+  <data name="Sidebar.AutoThumbnail" xml:space="preserve"><value>自动（适应场景数量）</value></data>
+  <data name="Sidebar.Width" xml:space="preserve"><value>侧边栏宽度</value></data>
+  <data name="Sidebar.WidthDesc" xml:space="preserve"><value>选择“自动”时，宽度会根据缩略图调整。</value></data>
+  <data name="Sidebar.AutoWidth" xml:space="preserve"><value>自动（适应缩略图）</value></data>
+  <data name="Sidebar.DragToStage" xml:space="preserve"><value>将卡片拖到舞台</value></data>
+  <data name="Sidebar.DragToStageDesc" xml:space="preserve"><value>将卡片拖到舞台上，即可添加其中的应用。</value></data>
+  <data name="Sidebar.PreviewInfo" xml:space="preserve"><value>缩略图 {0} x {1}，侧边栏宽度 {2}，按屏幕高度 {3} 计算。</value></data>
+  <data name="Sidebar.Limited" xml:space="preserve"><value>按此大小，该屏幕只能容纳 {1} 个场景中的 {0} 个。其余场景仍受管理，但不会显示在侧边栏中。</value></data>
+  <data name="Anim.Mode" xml:space="preserve"><value>切换场景时显示动画</value></data>
+  <data name="Anim.ModeDesc" xml:space="preserve"><value>切换场景时窗口的移动方式。</value></data>
+  <data name="Anim.Follow" xml:space="preserve"><value>跟随 Windows（默认）</value></data>
+  <data name="Anim.Always" xml:space="preserve"><value>始终</value></data>
+  <data name="Anim.Never" xml:space="preserve"><value>从不</value></data>
+  <data name="Anim.Speed" xml:space="preserve"><value>速度</value></data>
+  <data name="Anim.SpeedDesc" xml:space="preserve"><value>窗口移动的快慢。</value></data>
+  <data name="Anim.Normal" xml:space="preserve"><value>正常</value></data>
+  <data name="Anim.Frames" xml:space="preserve"><value>移动边框而不是窗口</value></data>
+  <data name="Anim.FramesDesc" xml:space="preserve"><value>仅当 Windows 在拖动窗口时只显示边框时适用。</value></data>
+  <data name="Anim.Info" xml:space="preserve"><value>Windows：动画{0}，拖动时的窗口内容{1}。</value></data>
+  <data name="Anim.On" xml:space="preserve"><value>已开启</value></data>
+  <data name="Anim.Off" xml:space="preserve"><value>已关闭</value></data>
+  <data name="Anim.Shown" xml:space="preserve"><value>显示</value></data>
+  <data name="Anim.HiddenFrame" xml:space="preserve"><value>隐藏（仅边框）</value></data>
+  <data name="Anim.EffectWindows" xml:space="preserve"><value>窗口会在侧边栏和舞台之间飞行。</value></data>
+  <data name="Anim.EffectFrames" xml:space="preserve"><value>由边框代替窗口飞行。</value></data>
+  <data name="Anim.EffectNone" xml:space="preserve"><value>场景切换时不显示动画。</value></data>
+  <data name="Keyboard.Enable" xml:space="preserve"><value>用键盘切换场景</value></data>
+  <data name="Keyboard.EnableDesc" xml:space="preserve"><value>按住下面的按键，再按 Tab 或数字键。</value></data>
+  <data name="Keyboard.Keys" xml:space="preserve"><value>按住的按键</value></data>
+  <data name="Keyboard.KeysDesc" xml:space="preserve"><value>单击此框，然后按住你想要的按键。</value></data>
+  <data name="Keyboard.Capture" xml:space="preserve"><value>请按住按键...</value></data>
+  <data name="Keyboard.OnlyModifiers" xml:space="preserve"><value>只能按住 {0}、{1} 或 {2}。{3} 和 1...9 由 StageManager 添加。</value></data>
+  <data name="Keyboard.Next" xml:space="preserve"><value>下一个场景</value></data>
+  <data name="Keyboard.Previous" xml:space="preserve"><value>上一个场景</value></data>
+  <data name="Keyboard.Card" xml:space="preserve"><value>该位置的卡片</value></data>
+  <data name="Keyboard.Release" xml:space="preserve"><value>松开按键时打开该场景。</value></data>
+  <data name="Keyboard.Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Keyboard.Off" xml:space="preserve"><value>键盘快捷键已关闭。</value></data>
+  <data name="Keyboard.Conflict" xml:space="preserve"><value>已被占用：{0}（{1}）</value></data>
+  <data name="Owner.Unknown" xml:space="preserve"><value>Windows 或其他应用</value></data>
+  <data name="Owner.WindowSwitcher" xml:space="preserve"><value>Windows 窗口切换</value></data>
+  <data name="Owner.TaskView" xml:space="preserve"><value>Windows 任务视图</value></data>
+  <data name="Owner.Taskbar" xml:space="preserve"><value>Windows 任务栏上的应用</value></data>
+  <data name="Owner.TaskbarJumpLists" xml:space="preserve"><value>Windows 任务栏的跳转列表</value></data>
+  <data name="Warn.CtrlAlone" xml:space="preserve"><value>仅使用 Ctrl 会占用浏览器和编辑器的 Ctrl+Tab 与 Ctrl+1...9。请再添加一个按键。</value></data>
+  <data name="Warn.AltAlone" xml:space="preserve"><value>仅使用 Alt 会占用许多应用的 Alt+1...9。请再添加一个按键。</value></data>
+  <data name="Warn.CtrlAlt" xml:space="preserve"><value>在许多键盘上，Ctrl+Alt 就是 AltGr：此时 Ctrl+Alt+数字会输入 { [ ] } 之类的字符。</value></data>
+  <data name="Icons.Mode" xml:space="preserve"><value>桌面图标</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>StageManager 何时隐藏桌面上的图标。</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>自动：场景处于活动状态时隐藏，在桌面视图中显示</value></data>
+  <data name="Icons.Hidden" xml:space="preserve"><value>始终隐藏</value></data>
+  <data name="Icons.Untouched" xml:space="preserve"><value>从不更改</value></data>
+  <data name="Icons.Restore" xml:space="preserve"><value>退出 StageManager 时恢复图标</value></data>
+  <data name="Icons.RestoreDesc" xml:space="preserve"><value>将图标恢复到 StageManager 启动前的状态。</value></data>
+</root>

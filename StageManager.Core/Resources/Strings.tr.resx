@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Common.Left" xml:space="preserve"><value>Sol</value></data>
+  <data name="Common.Right" xml:space="preserve"><value>Sağ</value></data>
+  <data name="Key.Ctrl" xml:space="preserve"><value>Ctrl</value></data>
+  <data name="Key.Alt" xml:space="preserve"><value>Alt</value></data>
+  <data name="Key.Shift" xml:space="preserve"><value>Shift</value></data>
+  <data name="Key.Win" xml:space="preserve"><value>Win</value></data>
+  <data name="Key.Tab" xml:space="preserve"><value>Tab</value></data>
+  <data name="Key.Esc" xml:space="preserve"><value>Esc</value></data>
+  <data name="Tray.Settings" xml:space="preserve"><value>Ayarlar...</value></data>
+  <data name="Tray.StartWithWindows" xml:space="preserve"><value>Windows ile başlat</value></data>
+  <data name="Tray.SidebarPosition" xml:space="preserve"><value>Kenar çubuğu konumu</value></data>
+  <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>Kenar çubuğundaki sahneler</value></data>
+  <data name="Tray.DesktopIcons" xml:space="preserve"><value>Masaüstü simgeleri</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Otomatik (bir sahne etkinken gizle)</value></data>
+  <data name="Tray.IconsHidden" xml:space="preserve"><value>Her zaman gizli</value></data>
+  <data name="Tray.IconsUntouched" xml:space="preserve"><value>Hiç değiştirme</value></data>
+  <data name="Tray.Rescue" xml:space="preserve"><value>Ekran dışındaki pencereleri geri getir</value></data>
+  <data name="Tray.ProjectPage" xml:space="preserve"><value>Proje sayfası</value></data>
+  <data name="Tray.Quit" xml:space="preserve"><value>Çıkış</value></data>
+  <data name="Card.AddToStage" xml:space="preserve"><value>Sahneye ekle</value></data>
+  <data name="Card.Separate" xml:space="preserve"><value>Gruptan ayır</value></data>
+  <data name="Card.Close" xml:space="preserve"><value>Kapat</value></data>
+  <data name="Settings.Title" xml:space="preserve"><value>StageManager ayarları</value></data>
+  <data name="Settings.Applied" xml:space="preserve"><value>Değişiklikler hemen uygulanır.</value></data>
+  <data name="Settings.Reset" xml:space="preserve"><value>Varsayılanlara sıfırla</value></data>
+  <data name="Nav.General" xml:space="preserve"><value>Genel</value></data>
+  <data name="Nav.Sidebar" xml:space="preserve"><value>Kenar çubuğu</value></data>
+  <data name="Nav.Animations" xml:space="preserve"><value>Animasyonlar</value></data>
+  <data name="Nav.Keyboard" xml:space="preserve"><value>Klavye</value></data>
+  <data name="Nav.DesktopIcons" xml:space="preserve"><value>Masaüstü simgeleri</value></data>
+  <data name="General.Language" xml:space="preserve"><value>Dil</value></data>
+  <data name="General.LanguageDesc" xml:space="preserve"><value>Menülerin ve ayarların dili.</value></data>
+  <data name="Language.System" xml:space="preserve"><value>Windows ile aynı</value></data>
+  <data name="General.Autostart" xml:space="preserve"><value>Windows ile başlat</value></data>
+  <data name="General.AutostartDesc" xml:space="preserve"><value>StageManager oturum açtığınızda başlar.</value></data>
+  <data name="General.Hide" xml:space="preserve"><value>Diğer pencereleri gizleme yöntemi</value></data>
+  <data name="General.HideDesc" xml:space="preserve"><value>Bir pencereyi ekran dışına taşımak, görüntüsünü kenar çubuğunda korur. Tarayıcıların ve WebView uygulamalarının simge durumuna küçültülmüş pencereleri görüntülerini kaybeder.</value></data>
+  <data name="Hide.Park" xml:space="preserve"><value>Ekran dışına taşıyarak (önerilir)</value></data>
+  <data name="Hide.Minimize" xml:space="preserve"><value>Simge durumuna küçülterek</value></data>
+  <data name="Sidebar.Preview" xml:space="preserve"><value>Önizleme</value></data>
+  <data name="Sidebar.Position" xml:space="preserve"><value>Konum</value></data>
+  <data name="Sidebar.PositionDesc" xml:space="preserve"><value>Kenar çubuğunun bulunduğu ekran kenarı.</value></data>
+  <data name="Sidebar.Scenes" xml:space="preserve"><value>Kenar çubuğundaki sahneler</value></data>
+  <data name="Sidebar.ScenesDesc" xml:space="preserve"><value>Aynı anda kaç sahnenin gösterileceği.</value></data>
+  <data name="Sidebar.WindowsPerScene" xml:space="preserve"><value>Sahne başına pencere</value></data>
+  <data name="Sidebar.WindowsPerSceneDesc" xml:space="preserve"><value>Bir sahnenin üst üste dizilmiş küçük resim olarak gösterilen pencereleri. Diğerleri yalnızca simge olarak görünür.</value></data>
+  <data name="Sidebar.NoStack" xml:space="preserve"><value>1 (yığın yok)</value></data>
+  <data name="Sidebar.ThumbnailSize" xml:space="preserve"><value>Küçük resim boyutu</value></data>
+  <data name="Sidebar.ThumbnailSizeDesc" xml:space="preserve"><value>Otomatik, küçük resimleri sahne sayısına göre ayarlar.</value></data>
+  <data name="Sidebar.AutoThumbnail" xml:space="preserve"><value>Otomatik (sahne sayısına göre)</value></data>
+  <data name="Sidebar.Width" xml:space="preserve"><value>Kenar çubuğu genişliği</value></data>
+  <data name="Sidebar.WidthDesc" xml:space="preserve"><value>Otomatik, kenar çubuğunu küçük resimlere göre ayarlar.</value></data>
+  <data name="Sidebar.AutoWidth" xml:space="preserve"><value>Otomatik (küçük resimlere göre)</value></data>
+  <data name="Sidebar.DragToStage" xml:space="preserve"><value>Kartları sahneye sürükle</value></data>
+  <data name="Sidebar.DragToStageDesc" xml:space="preserve"><value>Uygulamalarını eklemek için bir kartı sahneye sürükleyin.</value></data>
+  <data name="Sidebar.PreviewInfo" xml:space="preserve"><value>Küçük resimler {0} x {1}, kenar çubuğu {2} genişliğinde, {3} ekran yüksekliğine göre hesaplandı.</value></data>
+  <data name="Sidebar.Limited" xml:space="preserve"><value>Bu boyutta bu ekrana {1} sahneden yalnızca {0} tanesi sığıyor. Diğerleri yönetilmeye devam eder ancak kenar çubuğunda gösterilmez.</value></data>
+  <data name="Anim.Mode" xml:space="preserve"><value>Sahne değişimlerini canlandır</value></data>
+  <data name="Anim.ModeDesc" xml:space="preserve"><value>Sahne değiştirirken pencerelerin nasıl hareket edeceği.</value></data>
+  <data name="Anim.Follow" xml:space="preserve"><value>Windows&apos;u izle (varsayılan)</value></data>
+  <data name="Anim.Always" xml:space="preserve"><value>Her zaman</value></data>
+  <data name="Anim.Never" xml:space="preserve"><value>Hiçbir zaman</value></data>
+  <data name="Anim.Speed" xml:space="preserve"><value>Hız</value></data>
+  <data name="Anim.SpeedDesc" xml:space="preserve"><value>Pencerelerin ne kadar hızlı uçacağı.</value></data>
+  <data name="Anim.Normal" xml:space="preserve"><value>Normal</value></data>
+  <data name="Anim.Frames" xml:space="preserve"><value>Pencereler yerine bir çerçeve uçur</value></data>
+  <data name="Anim.FramesDesc" xml:space="preserve"><value>Yalnızca Windows pencereler sürüklenirken sadece bir çerçeve gösteriyorsa.</value></data>
+  <data name="Anim.Info" xml:space="preserve"><value>Windows: animasyonlar {0}, sürüklerken pencere içeriği {1}.</value></data>
+  <data name="Anim.On" xml:space="preserve"><value>açık</value></data>
+  <data name="Anim.Off" xml:space="preserve"><value>kapalı</value></data>
+  <data name="Anim.Shown" xml:space="preserve"><value>gösteriliyor</value></data>
+  <data name="Anim.HiddenFrame" xml:space="preserve"><value>gizli (yalnızca çerçeve)</value></data>
+  <data name="Anim.EffectWindows" xml:space="preserve"><value>Pencereler kenar çubuğu ile sahne arasında uçar.</value></data>
+  <data name="Anim.EffectFrames" xml:space="preserve"><value>Pencereler yerine bir çerçeve uçar.</value></data>
+  <data name="Anim.EffectNone" xml:space="preserve"><value>Sahneler animasyonsuz değişir.</value></data>
+  <data name="Keyboard.Enable" xml:space="preserve"><value>Sahneleri klavyeyle değiştir</value></data>
+  <data name="Keyboard.EnableDesc" xml:space="preserve"><value>Aşağıdaki tuşları basılı tutup Tab veya bir rakama basın.</value></data>
+  <data name="Keyboard.Keys" xml:space="preserve"><value>Basılı tutulacak tuşlar</value></data>
+  <data name="Keyboard.KeysDesc" xml:space="preserve"><value>Alana tıklayın, ardından istediğiniz tuşları basılı tutun.</value></data>
+  <data name="Keyboard.Capture" xml:space="preserve"><value>Tuşlara basıp basılı tutun...</value></data>
+  <data name="Keyboard.OnlyModifiers" xml:space="preserve"><value>Yalnızca {0}, {1} veya {2} tuşunu basılı tutun. {3} ve 1...9 tuşlarını StageManager ekler.</value></data>
+  <data name="Keyboard.Next" xml:space="preserve"><value>Sonraki sahne</value></data>
+  <data name="Keyboard.Previous" xml:space="preserve"><value>Önceki sahne</value></data>
+  <data name="Keyboard.Card" xml:space="preserve"><value>O konumdaki kart</value></data>
+  <data name="Keyboard.Release" xml:space="preserve"><value>Tuşları bıraktığınızda sahne açılır.</value></data>
+  <data name="Keyboard.Cancel" xml:space="preserve"><value>İptal</value></data>
+  <data name="Keyboard.Off" xml:space="preserve"><value>Klavye kısayolları kapalı.</value></data>
+  <data name="Keyboard.Conflict" xml:space="preserve"><value>Zaten kullanımda: {0} ({1})</value></data>
+  <data name="Owner.Unknown" xml:space="preserve"><value>Windows veya başka bir uygulama</value></data>
+  <data name="Owner.WindowSwitcher" xml:space="preserve"><value>Windows pencere değiştirici</value></data>
+  <data name="Owner.TaskView" xml:space="preserve"><value>Windows görev görünümü</value></data>
+  <data name="Owner.Taskbar" xml:space="preserve"><value>Windows görev çubuğundaki uygulamalar</value></data>
+  <data name="Owner.TaskbarJumpLists" xml:space="preserve"><value>Windows görev çubuğunun atlama listeleri</value></data>
+  <data name="Warn.CtrlAlone" xml:space="preserve"><value>Tek başına Ctrl, tarayıcılardan ve düzenleyicilerden Ctrl+Tab ile Ctrl+1...9 kısayollarını alır. Bir tuş daha ekleyin.</value></data>
+  <data name="Warn.AltAlone" xml:space="preserve"><value>Tek başına Alt, birçok uygulamadan Alt+1...9 kısayollarını alır. Bir tuş daha ekleyin.</value></data>
+  <data name="Warn.CtrlAlt" xml:space="preserve"><value>Birçok klavyede Ctrl+Alt, AltGr tuşudur: Ctrl+Alt+rakamlar bu durumda { [ ] } gibi karakterler yazar.</value></data>
+  <data name="Icons.Mode" xml:space="preserve"><value>Masaüstü simgeleri</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>StageManager&apos;ın masaüstündeki simgeleri ne zaman gizleyeceği.</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>Otomatik: bir sahne etkinken gizle, masaüstü görünümünde göster</value></data>
+  <data name="Icons.Hidden" xml:space="preserve"><value>Her zaman gizli</value></data>
+  <data name="Icons.Untouched" xml:space="preserve"><value>Hiç değiştirme</value></data>
+  <data name="Icons.Restore" xml:space="preserve"><value>StageManager&apos;dan çıkarken simgeleri geri yükle</value></data>
+  <data name="Icons.RestoreDesc" xml:space="preserve"><value>Simgeleri StageManager başlamadan önceki durumlarına döndürür.</value></data>
+</root>

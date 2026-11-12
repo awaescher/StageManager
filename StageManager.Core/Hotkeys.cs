@@ -57,8 +57,9 @@ public static class HotkeyText
 	public static bool IsUsable(HotkeyModifiers modifiers) =>
 		modifiers != HotkeyModifiers.None && !modifiers.HasFlag(HotkeyModifiers.Shift);
 
-	public static string Format(HotkeyModifiers modifiers) =>
-		string.Join("+", Names.Where(n => modifiers.HasFlag(n.Flag)).Select(n => n.Name));
+	/// <param name="name">Gives the name of a key ("Ctrl", "Alt", "Shift", "Win", "Tab") on the keyboard of the user. Null writes the invariant names, which is what the settings file holds.</param>
+	public static string Format(HotkeyModifiers modifiers, Func<string, string>? name = null) =>
+		string.Join("+", Names.Where(n => modifiers.HasFlag(n.Flag)).Select(n => name?.Invoke(n.Name) ?? n.Name));
 
 	/// <summary>Reads "Ctrl+Alt+Win" in any order and case. "Control" and "Windows" are accepted as well.</summary>
 	public static bool TryParse(string? text, out HotkeyModifiers modifiers)
@@ -95,82 +96,95 @@ public static class HotkeyText
 		return false;
 	}
 
-	public static string Describe(HotkeyModifiers modifiers, HotkeyAction action) => action.Kind switch
+	public static string Describe(HotkeyModifiers modifiers, HotkeyAction action, Func<string, string>? name = null)
 	{
-		HotkeyActionKind.Next => Format(modifiers) + "+Tab",
-		HotkeyActionKind.Previous => Format(modifiers) + "+Shift+Tab",
-		_ => Format(modifiers) + "+" + action.Number
-	};
+		var shift = name?.Invoke("Shift") ?? "Shift";
+		var tab = name?.Invoke("Tab") ?? "Tab";
+
+		return action.Kind switch
+		{
+			HotkeyActionKind.Next => $"{Format(modifiers, name)}+{tab}",
+			HotkeyActionKind.Previous => $"{Format(modifiers, name)}+{shift}+{tab}",
+			_ => $"{Format(modifiers, name)}+{action.Number}"
+		};
+	}
 }
 
-/// <summary>What is known about key combinations that Windows and common apps use. Windows only says "taken", not by whom.</summary>
+/// <summary>Who is known to use a key combination. Windows only says "taken", not by whom.</summary>
+public enum HotkeyOwner
+{
+	Unknown,
+	WindowSwitcher,
+	TaskView,
+	Taskbar,
+	TaskbarJumpLists
+}
+
+/// <summary>A hint for keys that work but get in the way of other apps.</summary>
+public enum HotkeyWarning
+{
+	None,
+	CtrlAlone,
+	AltAlone,
+	CtrlAlt
+}
+
+/// <param name="Keys">The keys, e.g. "Win+1...9" when several digits are taken.</param>
+public readonly record struct HotkeyConflict(string Keys, HotkeyOwner Owner);
+
+/// <summary>What is known about key combinations that Windows and common apps use. Returns codes, the texts are up to the UI.</summary>
 public static class HotkeyAdvice
 {
-	/// <summary>Who is known to use the combination, or null.</summary>
-	public static string? KnownOwner(HotkeyModifiers modifiers, HotkeyAction action)
+	public static HotkeyOwner KnownOwner(HotkeyModifiers modifiers, HotkeyAction action)
 	{
 		var tab = action.Kind != HotkeyActionKind.Number;
 
 		return (modifiers, tab) switch
 		{
-			(HotkeyModifiers.Alt, true) => "the Windows window switcher",
-			(HotkeyModifiers.Win, true) => "the Windows task view",
-			(HotkeyModifiers.Alt | HotkeyModifiers.Ctrl, true) => "the Windows window switcher",
-			(HotkeyModifiers.Alt | HotkeyModifiers.Win, true) => "Windows",
-			(HotkeyModifiers.Win, false) => "the apps on the Windows taskbar",
-			(HotkeyModifiers.Alt | HotkeyModifiers.Win, false) => "the jump lists of the Windows taskbar",
-			(HotkeyModifiers.Win | HotkeyModifiers.Ctrl, false) => "the apps on the Windows taskbar",
-			_ => null
+			(HotkeyModifiers.Alt, true) => HotkeyOwner.WindowSwitcher,
+			(HotkeyModifiers.Win, true) => HotkeyOwner.TaskView,
+			(HotkeyModifiers.Alt | HotkeyModifiers.Ctrl, true) => HotkeyOwner.WindowSwitcher,
+			(HotkeyModifiers.Win, false) => HotkeyOwner.Taskbar,
+			(HotkeyModifiers.Alt | HotkeyModifiers.Win, false) => HotkeyOwner.TaskbarJumpLists,
+			(HotkeyModifiers.Win | HotkeyModifiers.Ctrl, false) => HotkeyOwner.Taskbar,
+			_ => HotkeyOwner.Unknown
 		};
 	}
 
-	/// <summary>One line for each key combination that could not be taken.</summary>
-	public static IReadOnlyList<string> Conflicts(HotkeyModifiers modifiers, IEnumerable<HotkeyAction> failed)
+	/// <summary>One entry for each key combination that could not be taken. All digits that failed are summed up in one entry.</summary>
+	/// <param name="name">Gives the name of a key on the keyboard of the user, see <see cref="HotkeyText.Format"/>.</param>
+	public static IReadOnlyList<HotkeyConflict> Conflicts(HotkeyModifiers modifiers, IEnumerable<HotkeyAction> failed, Func<string, string>? name = null)
 	{
 		var list = failed.ToList();
-		var lines = new List<string>();
+		var conflicts = new List<HotkeyConflict>();
 
 		foreach (var action in list.Where(a => a.Kind != HotkeyActionKind.Number))
-			lines.Add(Line(HotkeyText.Describe(modifiers, action), KnownOwner(modifiers, action)));
+			conflicts.Add(new HotkeyConflict(HotkeyText.Describe(modifiers, action, name), KnownOwner(modifiers, action)));
 
 		var numbers = list.Where(a => a.Kind == HotkeyActionKind.Number).Select(a => a.Number).OrderBy(n => n).ToList();
 		if (numbers.Count > 0)
-		{
-			var keys = Format(modifiers, numbers);
-			lines.Add(Line(keys, KnownOwner(modifiers, HotkeyAction.Card(numbers[0]))));
-		}
+			conflicts.Add(new HotkeyConflict(Format(modifiers, numbers, name), KnownOwner(modifiers, HotkeyAction.Card(numbers[0]))));
 
-		return lines;
+		return conflicts;
 	}
 
-	/// <summary>A hint for keys that work but get in the way of other apps, or null.</summary>
-	public static string? Warning(HotkeyModifiers modifiers)
+	public static HotkeyWarning Warning(HotkeyModifiers modifiers) => modifiers switch
 	{
-		if (modifiers == HotkeyModifiers.Ctrl)
-			return "Ctrl alone takes Ctrl+Tab and Ctrl+1...9 from browsers and editors. Add another key.";
+		HotkeyModifiers.Ctrl => HotkeyWarning.CtrlAlone,
+		HotkeyModifiers.Alt => HotkeyWarning.AltAlone,
+		HotkeyModifiers.Ctrl | HotkeyModifiers.Alt => HotkeyWarning.CtrlAlt,
+		_ => HotkeyWarning.None
+	};
 
-		if (modifiers == HotkeyModifiers.Alt)
-			return "Alt alone takes Alt+1...9 from many apps. Add another key.";
-
-		if (modifiers == (HotkeyModifiers.Ctrl | HotkeyModifiers.Alt))
-			return "Ctrl+Alt is AltGr on many keyboards (e.g. German): Ctrl+Alt+digits types characters such as { [ ] }.";
-
-		return null;
-	}
-
-	private static string Format(HotkeyModifiers modifiers, List<int> numbers)
+	private static string Format(HotkeyModifiers modifiers, List<int> numbers, Func<string, string>? name)
 	{
-		var prefix = HotkeyText.Format(modifiers) + "+";
+		var prefix = HotkeyText.Format(modifiers, name) + "+";
 		var consecutive = numbers.Count > 2 && numbers.Zip(numbers.Skip(1), (a, b) => b - a).All(d => d == 1);
 		return consecutive
 			? $"{prefix}{numbers[0]}...{numbers[^1]}"
 			: prefix + string.Join(", ", numbers);
 	}
-
-	private static string Line(string keys, string? owner) =>
-		$"{keys} is already used by {owner ?? "Windows or another app"}.";
 }
-
 /// <summary>
 /// The scene a held hotkey has picked while Tab is pressed again and again. Pure logic: the list is frozen when picking starts, so the
 /// order does not jump while the sidebar changes under it.

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace StageManager
 {
@@ -21,6 +22,7 @@ namespace StageManager
 		private static readonly int[] SceneCounts = { 1, 2, 3, 4, 5, 6, 7, 8, 10, 12 };
 		private static readonly int[] SidebarWidths = { 180, 200, 240, 280, 320, 400, 480 };
 		private static readonly (int Width, int Height)[] ThumbnailSizes = { (128, 80), (160, 100), (192, 120), (240, 150), (288, 180) };
+		private static readonly double[] Speeds = { 0.5, 0.75, 1.0, 1.5, 2.0, 3.0 };
 
 		private static SettingsWindow? _instance;
 
@@ -32,38 +34,10 @@ namespace StageManager
 		{
 			InitializeComponent();
 
-			Fill(side, new[]
-			{
-				new Choice<SidebarSide>("Left", SidebarSide.Left),
-				new Choice<SidebarSide>("Right", SidebarSide.Right)
-			});
-
-			Fill(hideStrategy, new[]
-			{
-				new Choice<HideStrategy>("Moving them out of the screen (recommended)", HideStrategy.Park),
-				new Choice<HideStrategy>("Minimizing them", HideStrategy.Minimize)
-			});
-
-			Fill(iconsMode, new[]
-			{
-				new Choice<DesktopIconsMode>("Automatic: hide while a scene is active, show in the desktop view", DesktopIconsMode.Manage),
-				new Choice<DesktopIconsMode>("Always hidden", DesktopIconsMode.AlwaysHidden),
-				new Choice<DesktopIconsMode>("Never change", DesktopIconsMode.Untouched)
-			});
-
-			Fill(animationMode, new[]
-			{
-				new Choice<AnimationMode>("Follow Windows (default)", AnimationMode.System),
-				new Choice<AnimationMode>("Always", AnimationMode.On),
-				new Choice<AnimationMode>("Never", AnimationMode.Off)
-			});
-
-			Fill(animationSpeed, new[] { 0.5, 0.75, 1.0, 1.5, 2.0, 3.0 }
-				.Select(s => new Choice<double>(s == 1.0 ? "Normal" : $"{s:0.##}x", s)));
-
 			Loaded += (_, _) =>
 			{
 				Settings.Changed += Settings_Changed;
+				Loc.LanguageChanged += Loc_LanguageChanged;
 
 				if (App.Hotkeys is object)
 					App.Hotkeys.ConflictsChanged += Hotkeys_ConflictsChanged;
@@ -71,6 +45,7 @@ namespace StageManager
 			Closed += (_, _) =>
 			{
 				Settings.Changed -= Settings_Changed;
+				Loc.LanguageChanged -= Loc_LanguageChanged;
 
 				if (App.Hotkeys is object)
 				{
@@ -81,6 +56,7 @@ namespace StageManager
 				_instance = null;
 			};
 
+			nav.SelectedIndex = 0;
 			LoadFromSettings();
 		}
 
@@ -96,6 +72,17 @@ namespace StageManager
 				_instance.WindowState = WindowState.Normal;
 
 			_instance.Activate();
+		}
+
+		private void Nav_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			var tag = (nav.SelectedItem as ListBoxItem)?.Tag as string;
+
+			pageGeneral.Visibility = tag == "general" ? Visibility.Visible : Visibility.Collapsed;
+			pageSidebar.Visibility = tag == "sidebar" ? Visibility.Visible : Visibility.Collapsed;
+			pageAnimations.Visibility = tag == "animations" ? Visibility.Visible : Visibility.Collapsed;
+			pageKeyboard.Visibility = tag == "keyboard" ? Visibility.Visible : Visibility.Collapsed;
+			pageIcons.Visibility = tag == "icons" ? Visibility.Visible : Visibility.Collapsed;
 		}
 
 		private static void Fill<T>(ComboBox box, IEnumerable<Choice<T>> choices)
@@ -115,6 +102,11 @@ namespace StageManager
 			Dispatcher.BeginInvoke(LoadFromSettings);
 		}
 
+		private void Loc_LanguageChanged(object? sender, EventArgs e)
+		{
+			Dispatcher.BeginInvoke(LoadFromSettings);
+		}
+
 		private void LoadFromSettings()
 		{
 			_loading = true;
@@ -123,8 +115,25 @@ namespace StageManager
 				var current = Settings.Current;
 				var sidebar = current.Sidebar;
 
+				var languages = new List<Choice<string>> { new(Loc.Get("Language.System"), "") };
+				languages.AddRange(Languages.All.Select(l => new Choice<string>(l.NativeName, l.Code)));
+				Fill(language, languages);
+				Select(language, current.Language);
+
 				autostart.IsChecked = MainWindow.StartsWithWindows;
+
+				Fill(hideStrategy, new[]
+				{
+					new Choice<HideStrategy>(Loc.Get("Hide.Park"), HideStrategy.Park),
+					new Choice<HideStrategy>(Loc.Get("Hide.Minimize"), HideStrategy.Minimize)
+				});
 				Select(hideStrategy, current.HideStrategy);
+
+				Fill(side, new[]
+				{
+					new Choice<SidebarSide>(Loc.Get("Common.Left"), SidebarSide.Left),
+					new Choice<SidebarSide>(Loc.Get("Common.Right"), SidebarSide.Right)
+				});
 				Select(side, sidebar.Side);
 
 				// the values the user can choose from, plus the current one if it was set by hand in settings.json
@@ -133,10 +142,10 @@ namespace StageManager
 				Select(sceneCount, sidebar.MaxScenes);
 
 				Fill(windowsPerScene, Enumerable.Range(SidebarSettings.MinWindowsPerScene, SidebarSettings.MaxWindowsPerSceneLimit)
-					.Select(c => new Choice<int>(c == 1 ? "1 (no stack)" : c.ToString(), c)));
+					.Select(c => new Choice<int>(c == 1 ? Loc.Get("Sidebar.NoStack") : c.ToString(), c)));
 				Select(windowsPerScene, sidebar.MaxWindowsPerScene);
 
-				var sizes = new List<Choice<(int, int)>> { new("Automatic (fit the number of scenes)", (0, 0)) };
+				var sizes = new List<Choice<(int, int)>> { new(Loc.Get("Sidebar.AutoThumbnail"), (0, 0)) };
 				sizes.AddRange(ThumbnailSizes.Select(s => new Choice<(int, int)>($"{s.Width} x {s.Height}", (s.Width, s.Height))));
 				var currentSize = (sidebar.ThumbnailWidth, sidebar.ThumbnailHeight);
 				if (currentSize != (0, 0) && !sizes.Any(s => s.Value == currentSize))
@@ -144,22 +153,33 @@ namespace StageManager
 				Fill(thumbnailSize, sizes);
 				Select(thumbnailSize, currentSize);
 
-				var widths = new List<Choice<int>> { new("Automatic (fit the thumbnails)", 0) };
+				var widths = new List<Choice<int>> { new(Loc.Get("Sidebar.AutoWidth"), 0) };
 				widths.AddRange(SidebarWidths.Append(sidebar.Width).Where(w => w > 0).Distinct().OrderBy(w => w)
 					.Select(w => new Choice<int>($"{w}", w)));
 				Fill(sidebarWidth, widths);
 				Select(sidebarWidth, sidebar.Width);
 				dragToStage.IsChecked = sidebar.DragToStage;
 
+				Fill(iconsMode, new[]
+				{
+					new Choice<DesktopIconsMode>(Loc.Get("Icons.Manage"), DesktopIconsMode.Manage),
+					new Choice<DesktopIconsMode>(Loc.Get("Icons.Hidden"), DesktopIconsMode.AlwaysHidden),
+					new Choice<DesktopIconsMode>(Loc.Get("Icons.Untouched"), DesktopIconsMode.Untouched)
+				});
 				Select(iconsMode, current.DesktopIcons.Mode);
 				iconsRestore.IsChecked = current.DesktopIcons.RestoreOnExit;
 
+				Fill(animationMode, new[]
+				{
+					new Choice<AnimationMode>(Loc.Get("Anim.Follow"), AnimationMode.System),
+					new Choice<AnimationMode>(Loc.Get("Anim.Always"), AnimationMode.On),
+					new Choice<AnimationMode>(Loc.Get("Anim.Never"), AnimationMode.Off)
+				});
 				Select(animationMode, current.Animations.Mode);
 
 				// a speed set by hand in settings.json stays selectable
-				var speeds = new[] { 0.5, 0.75, 1.0, 1.5, 2.0, 3.0 }.Append(current.Animations.Speed).Distinct().OrderBy(s => s)
-					.Select(s => new Choice<double>(s == 1.0 ? "Normal" : $"{s:0.##}x", s));
-				Fill(animationSpeed, speeds);
+				Fill(animationSpeed, Speeds.Append(current.Animations.Speed).Distinct().OrderBy(s => s)
+					.Select(s => new Choice<double>(s == 1.0 ? Loc.Get("Anim.Normal") : $"{s:0.##}x", s)));
 				Select(animationSpeed, current.Animations.Speed);
 				animationFrames.IsChecked = current.Animations.FrameIfWindowContentIsOff;
 
@@ -167,11 +187,10 @@ namespace StageManager
 				hotkeyKeys.IsEnabled = current.Hotkeys.Enabled;
 				if (HotkeyText.TryParse(current.Hotkeys.Keys, out var keys))
 					hotkeyKeys.Keys = keys;
-				UpdateHotkeyInfo();
 
 				UpdateAnimationInfo();
-
 				UpdateLayoutInfo();
+				UpdateHotkeyInfo();
 			}
 			finally
 			{
@@ -183,15 +202,91 @@ namespace StageManager
 		{
 			var sidebar = Settings.Current.Sidebar;
 			var dpi = VisualTreeHelper.GetDpi(this).DpiScaleY;
-			var areaHeight = System.Windows.Forms.Screen.PrimaryScreen!.WorkingArea.Height / dpi;
+			var screen = System.Windows.Forms.Screen.PrimaryScreen!.WorkingArea;
+			var areaHeight = screen.Height / dpi;
 			var layout = SidebarLayout.Calculate(sidebar, areaHeight);
 
-			layoutInfo.Text = $"Preview: thumbnails {layout.ThumbnailWidth:0} x {layout.ThumbnailHeight:0}, sidebar {layout.SidebarWidth:0} wide, calculated for a screen height of {areaHeight:0}.";
+			layoutInfo.Text = Loc.Format("Sidebar.PreviewInfo", layout.ThumbnailWidth.ToString("0"), layout.ThumbnailHeight.ToString("0"),
+				layout.SidebarWidth.ToString("0"), areaHeight.ToString("0"));
 
-			layoutWarning.Visibility = layout.IsLimited ? Visibility.Visible : Visibility.Collapsed;
+			layoutWarningBox.Visibility = layout.IsLimited ? Visibility.Visible : Visibility.Collapsed;
 			layoutWarning.Text = layout.IsLimited
-				? $"With this size only {layout.EffectiveMaxScenes} of {sidebar.MaxScenes} scenes fit on this screen. The others stay managed but are not shown in the sidebar."
+				? Loc.Format("Sidebar.Limited", layout.EffectiveMaxScenes, sidebar.MaxScenes)
 				: "";
+
+			DrawPreview(sidebar, layout, screen.Width / dpi, areaHeight);
+		}
+
+		/// <summary>A small picture of the screen with the sidebar, drawn to scale from the same numbers the real sidebar uses.</summary>
+		private void DrawPreview(SidebarSettings sidebar, SidebarLayoutResult layout, double screenWidth, double screenHeight)
+		{
+			// as large as the page allows, the shape of the screen stays
+			var scale = Math.Min(150 / screenHeight, 360 / screenWidth);
+			var height = Math.Round(screenHeight * scale);
+			var width = Math.Round(screenWidth * scale);
+
+			previewCanvas.Children.Clear();
+			previewCanvas.Width = width;
+			previewCanvas.Height = height;
+
+			var accent = (Brush)FindResource("AccentFillColorDefaultBrush");
+			var stroke = (Brush)FindResource("ControlStrongStrokeColorDefaultBrush");
+			var fill = (Brush)FindResource("ControlFillColorDefaultBrush");
+			var muted = (Brush)FindResource("ControlStrongFillColorDefaultBrush");
+
+			var right = sidebar.Side == SidebarSide.Right;
+			var barWidth = layout.SidebarWidth * scale;
+
+			void Add(UIElement element, double x, double y)
+			{
+				Canvas.SetLeft(element, x);
+				Canvas.SetTop(element, y);
+				previewCanvas.Children.Add(element);
+			}
+
+			// the window of the stage
+			var margin = 14 * scale * 4;
+			var stageLeft = (right ? 0 : barWidth) + margin;
+			var stageWidth = width - barWidth - 2 * margin;
+			Add(new Rectangle { Width = Math.Max(4, stageWidth), Height = height - 2 * margin, RadiusX = 3, RadiusY = 3, Fill = fill, Stroke = stroke, StrokeThickness = 1 }, stageLeft, margin);
+			Add(new Rectangle { Width = Math.Max(4, stageWidth), Height = Math.Min(6, height / 10), RadiusX = 3, RadiusY = 3, Fill = muted, Opacity = 0.5 }, stageLeft, margin);
+
+			// the cards
+			var shown = Math.Min(sidebar.MaxScenes, layout.EffectiveMaxScenes);
+			var cardWidth = layout.ThumbnailWidth * scale;
+			var cardHeight = layout.ThumbnailHeight * scale;
+			var step = (layout.ThumbnailHeight + SidebarLayout.IconRowHeight + SidebarLayout.CardGap) * scale;
+			var total = shown * step - SidebarLayout.CardGap * scale;
+			var top = Math.Max(2, (height - total) / 2);
+			var cardLeft = right
+				? width - (SidebarLayout.EdgePadding * scale) - cardWidth
+				: SidebarLayout.EdgePadding * scale;
+			var stack = Math.Min(sidebar.MaxWindowsPerScene, 3);
+
+			for (var i = 0; i < shown; i++)
+			{
+				var y = top + i * step;
+
+				for (var s = stack - 1; s >= 0; s--)
+				{
+					var offset = s * 2.2;
+					Add(new Rectangle
+					{
+						Width = Math.Max(3, cardWidth - (stack - 1) * 2.2),
+						Height = Math.Max(3, cardHeight - (stack - 1) * 2.2),
+						RadiusX = 2,
+						RadiusY = 2,
+						Fill = fill,
+						Stroke = i == 0 ? accent : stroke,
+						StrokeThickness = i == 0 ? 1.5 : 1
+					}, cardLeft + (right ? -offset : offset), y + (stack - 1) * 2.2 - offset);
+				}
+
+				Add(new Ellipse { Width = 4, Height = 4, Fill = muted }, cardLeft + (right ? cardWidth - 5 : 1), y + cardHeight + 3);
+			}
+
+			previewFrame.Width = width + 2;
+			previewFrame.Height = height + 2;
 		}
 
 		private void Change(Action<AppSettings> change)
@@ -200,6 +295,12 @@ namespace StageManager
 				return;
 
 			Settings.Update(change);
+		}
+
+		private void Language_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (language.SelectedItem is Choice<string> c)
+				Change(s => s.Language = c.Value);
 		}
 
 		private void Autostart_Click(object sender, RoutedEventArgs e)
@@ -272,12 +373,16 @@ namespace StageManager
 
 			var effect = style switch
 			{
-				FlightStyle.Windows => "The windows fly between the sidebar and the stage.",
-				FlightStyle.Frames => "A frame flies in place of the windows.",
-				_ => "Scenes switch without animation."
+				FlightStyle.Windows => Loc.Get("Anim.EffectWindows"),
+				FlightStyle.Frames => Loc.Get("Anim.EffectFrames"),
+				_ => Loc.Get("Anim.EffectNone")
 			};
 
-			animationInfo.Text = $"Windows: animations {(system.AnimationsEnabled ? "on" : "off")}, window content while dragging {(system.DragFullWindows ? "shown" : "hidden (frame only)")}. {effect}";
+			var info = Loc.Format("Anim.Info",
+				Loc.Get(system.AnimationsEnabled ? "Anim.On" : "Anim.Off"),
+				Loc.Get(system.DragFullWindows ? "Anim.Shown" : "Anim.HiddenFrame"));
+
+			animationInfo.Text = $"{info} {effect}";
 		}
 
 		private void AnimationMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -307,7 +412,6 @@ namespace StageManager
 		private void HotkeyKeys_KeysChosen(object? sender, HotkeyModifiers keys)
 		{
 			Change(s => s.Hotkeys.Keys = HotkeyText.Format(keys));
-			UpdateHotkeyInfo();
 		}
 
 		// the registered keys would swallow the combination the user is about to press
@@ -337,23 +441,75 @@ namespace StageManager
 			if (!HotkeyText.TryParse(settings.Keys, out var keys))
 				keys = HotkeyText.Default;
 
-			var text = HotkeyText.Format(keys);
-			hotkeyInfo.Text = settings.Enabled
-				? $"Hold {text} and press Tab for the next scene, Shift+Tab for the previous one, or 1...9 for the card at that position. The scene opens when you let go, Esc cancels."
-				: "The keyboard shortcuts are off.";
+			BuildCheatSheet(settings.Enabled, keys);
 
 			var lines = new List<string>();
 
 			if (settings.Enabled)
 			{
-				lines.AddRange(App.Hotkeys?.Conflicts ?? Array.Empty<string>());
+				var failed = App.Hotkeys?.Failed ?? Array.Empty<HotkeyAction>();
+				foreach (var conflict in HotkeyAdvice.Conflicts(keys, failed, Loc.KeyName))
+					lines.Add(Loc.Format("Keyboard.Conflict", conflict.Keys, Loc.Get("Owner." + conflict.Owner)));
 
-				if (HotkeyAdvice.Warning(keys) is string warning)
-					lines.Add(warning);
+				var warning = HotkeyAdvice.Warning(keys);
+				if (warning != HotkeyWarning.None)
+					lines.Add(Loc.Get("Warn." + warning));
 			}
 
-			hotkeyWarning.Visibility = lines.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+			hotkeyWarningBox.Visibility = lines.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 			hotkeyWarning.Text = string.Join(Environment.NewLine, lines);
+		}
+
+		/// <summary>The keys of every action, written with the names on the keyboard of the user.</summary>
+		private void BuildCheatSheet(bool enabled, HotkeyModifiers keys)
+		{
+			cheatSheet.Children.Clear();
+			cheatSheet.Opacity = enabled ? 1 : 0.5;
+
+			if (!enabled)
+			{
+				cheatSheet.Children.Add(new TextBlock { Text = Loc.Get("Keyboard.Off"), TextWrapping = TextWrapping.Wrap });
+				return;
+			}
+
+			var rows = new (string Keys, string Text)[]
+			{
+				(HotkeyText.Describe(keys, HotkeyAction.Next, Loc.KeyName), Loc.Get("Keyboard.Next")),
+				(HotkeyText.Describe(keys, HotkeyAction.Previous, Loc.KeyName), Loc.Get("Keyboard.Previous")),
+				(HotkeyText.Format(keys, Loc.KeyName) + "+1...9", Loc.Get("Keyboard.Card")),
+				(Loc.KeyName("Esc"), Loc.Get("Keyboard.Cancel"))
+			};
+
+			foreach (var (text, description) in rows)
+			{
+				var row = new Grid { Margin = new Thickness(0, 4, 0, 4) };
+				row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+				row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+				row.Children.Add(new TextBlock { Text = description, VerticalAlignment = VerticalAlignment.Center, TextWrapping = TextWrapping.Wrap });
+
+				var cap = new Border
+				{
+					Padding = new Thickness(10, 3, 10, 3),
+					CornerRadius = new CornerRadius(4),
+					BorderThickness = new Thickness(1),
+					BorderBrush = (Brush)FindResource("ControlStrongStrokeColorDefaultBrush"),
+					Background = (Brush)FindResource("ControlFillColorDefaultBrush"),
+					Child = new TextBlock { Text = text, FontFamily = new FontFamily("Consolas, Cascadia Mono"), FontSize = 13 }
+				};
+				Grid.SetColumn(cap, 1);
+				row.Children.Add(cap);
+
+				cheatSheet.Children.Add(row);
+			}
+
+			cheatSheet.Children.Add(new TextBlock
+			{
+				Text = Loc.Get("Keyboard.Release"),
+				TextWrapping = TextWrapping.Wrap,
+				Margin = new Thickness(0, 10, 0, 0),
+				Foreground = (Brush)FindResource("TextFillColorSecondaryBrush")
+			});
 		}
 
 		private void Reset_Click(object sender, RoutedEventArgs e)

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Common.Left" xml:space="preserve"><value>Слева</value></data>
+  <data name="Common.Right" xml:space="preserve"><value>Справа</value></data>
+  <data name="Key.Ctrl" xml:space="preserve"><value>Ctrl</value></data>
+  <data name="Key.Alt" xml:space="preserve"><value>Alt</value></data>
+  <data name="Key.Shift" xml:space="preserve"><value>Shift</value></data>
+  <data name="Key.Win" xml:space="preserve"><value>Win</value></data>
+  <data name="Key.Tab" xml:space="preserve"><value>Tab</value></data>
+  <data name="Key.Esc" xml:space="preserve"><value>Esc</value></data>
+  <data name="Tray.Settings" xml:space="preserve"><value>Параметры...</value></data>
+  <data name="Tray.StartWithWindows" xml:space="preserve"><value>Запускать вместе с Windows</value></data>
+  <data name="Tray.SidebarPosition" xml:space="preserve"><value>Положение боковой панели</value></data>
+  <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>Сцен на боковой панели</value></data>
+  <data name="Tray.DesktopIcons" xml:space="preserve"><value>Значки рабочего стола</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Автоматически (скрывать, пока активна сцена)</value></data>
+  <data name="Tray.IconsHidden" xml:space="preserve"><value>Всегда скрыты</value></data>
+  <data name="Tray.IconsUntouched" xml:space="preserve"><value>Не изменять</value></data>
+  <data name="Tray.Rescue" xml:space="preserve"><value>Вернуть окна, оказавшиеся за пределами экрана</value></data>
+  <data name="Tray.ProjectPage" xml:space="preserve"><value>Страница проекта</value></data>
+  <data name="Tray.Quit" xml:space="preserve"><value>Выход</value></data>
+  <data name="Card.AddToStage" xml:space="preserve"><value>Добавить на сцену</value></data>
+  <data name="Card.Separate" xml:space="preserve"><value>Отделить от группы</value></data>
+  <data name="Card.Close" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="Settings.Title" xml:space="preserve"><value>Параметры StageManager</value></data>
+  <data name="Settings.Applied" xml:space="preserve"><value>Изменения применяются сразу.</value></data>
+  <data name="Settings.Reset" xml:space="preserve"><value>Сбросить параметры</value></data>
+  <data name="Nav.General" xml:space="preserve"><value>Общие</value></data>
+  <data name="Nav.Sidebar" xml:space="preserve"><value>Боковая панель</value></data>
+  <data name="Nav.Animations" xml:space="preserve"><value>Анимация</value></data>
+  <data name="Nav.Keyboard" xml:space="preserve"><value>Клавиатура</value></data>
+  <data name="Nav.DesktopIcons" xml:space="preserve"><value>Значки рабочего стола</value></data>
+  <data name="General.Language" xml:space="preserve"><value>Язык</value></data>
+  <data name="General.LanguageDesc" xml:space="preserve"><value>Язык меню и параметров.</value></data>
+  <data name="Language.System" xml:space="preserve"><value>Как в Windows</value></data>
+  <data name="General.Autostart" xml:space="preserve"><value>Запускать вместе с Windows</value></data>
+  <data name="General.AutostartDesc" xml:space="preserve"><value>StageManager запускается при входе в систему.</value></data>
+  <data name="General.Hide" xml:space="preserve"><value>Скрывать остальные окна</value></data>
+  <data name="General.HideDesc" xml:space="preserve"><value>Окно, перемещённое за пределы экрана, сохраняет своё изображение на боковой панели. Свёрнутые окна браузеров и приложений WebView его теряют.</value></data>
+  <data name="Hide.Park" xml:space="preserve"><value>Перемещением за пределы экрана (рекомендуется)</value></data>
+  <data name="Hide.Minimize" xml:space="preserve"><value>Сворачиванием</value></data>
+  <data name="Sidebar.Preview" xml:space="preserve"><value>Предварительный просмотр</value></data>
+  <data name="Sidebar.Position" xml:space="preserve"><value>Положение</value></data>
+  <data name="Sidebar.PositionDesc" xml:space="preserve"><value>Край экрана, у которого находится боковая панель.</value></data>
+  <data name="Sidebar.Scenes" xml:space="preserve"><value>Сцен на боковой панели</value></data>
+  <data name="Sidebar.ScenesDesc" xml:space="preserve"><value>Сколько сцен показывается одновременно.</value></data>
+  <data name="Sidebar.WindowsPerScene" xml:space="preserve"><value>Окон на сцену</value></data>
+  <data name="Sidebar.WindowsPerSceneDesc" xml:space="preserve"><value>Окна сцены, которые показываются стопкой миниатюр. Остальные видны только как значки.</value></data>
+  <data name="Sidebar.NoStack" xml:space="preserve"><value>1 (без стопки)</value></data>
+  <data name="Sidebar.ThumbnailSize" xml:space="preserve"><value>Размер миниатюр</value></data>
+  <data name="Sidebar.ThumbnailSizeDesc" xml:space="preserve"><value>При автоматическом выборе размер зависит от числа сцен.</value></data>
+  <data name="Sidebar.AutoThumbnail" xml:space="preserve"><value>Автоматически (по числу сцен)</value></data>
+  <data name="Sidebar.Width" xml:space="preserve"><value>Ширина боковой панели</value></data>
+  <data name="Sidebar.WidthDesc" xml:space="preserve"><value>При автоматическом выборе ширина зависит от миниатюр.</value></data>
+  <data name="Sidebar.AutoWidth" xml:space="preserve"><value>Автоматически (по миниатюрам)</value></data>
+  <data name="Sidebar.DragToStage" xml:space="preserve"><value>Перетаскивать карточки на сцену</value></data>
+  <data name="Sidebar.DragToStageDesc" xml:space="preserve"><value>Перетащите карточку на сцену, чтобы добавить её приложения.</value></data>
+  <data name="Sidebar.PreviewInfo" xml:space="preserve"><value>Миниатюры {0} x {1}, ширина боковой панели {2}, расчёт для высоты экрана {3}.</value></data>
+  <data name="Sidebar.Limited" xml:space="preserve"><value>При таком размере на этом экране помещается только {0} из {1} сцен. Остальные остаются под управлением, но не показываются на боковой панели.</value></data>
+  <data name="Anim.Mode" xml:space="preserve"><value>Анимировать смену сцен</value></data>
+  <data name="Anim.ModeDesc" xml:space="preserve"><value>Как движутся окна при смене сцены.</value></data>
+  <data name="Anim.Follow" xml:space="preserve"><value>Как в Windows (по умолчанию)</value></data>
+  <data name="Anim.Always" xml:space="preserve"><value>Всегда</value></data>
+  <data name="Anim.Never" xml:space="preserve"><value>Никогда</value></data>
+  <data name="Anim.Speed" xml:space="preserve"><value>Скорость</value></data>
+  <data name="Anim.SpeedDesc" xml:space="preserve"><value>Как быстро летят окна.</value></data>
+  <data name="Anim.Normal" xml:space="preserve"><value>Обычная</value></data>
+  <data name="Anim.Frames" xml:space="preserve"><value>Перемещать рамку вместо окон</value></data>
+  <data name="Anim.FramesDesc" xml:space="preserve"><value>Только если Windows при перетаскивании показывает лишь рамку окна.</value></data>
+  <data name="Anim.Info" xml:space="preserve"><value>Windows: анимация {0}, содержимое окна при перетаскивании {1}.</value></data>
+  <data name="Anim.On" xml:space="preserve"><value>включена</value></data>
+  <data name="Anim.Off" xml:space="preserve"><value>выключена</value></data>
+  <data name="Anim.Shown" xml:space="preserve"><value>показывается</value></data>
+  <data name="Anim.HiddenFrame" xml:space="preserve"><value>скрыто (только рамка)</value></data>
+  <data name="Anim.EffectWindows" xml:space="preserve"><value>Окна перелетают между боковой панелью и сценой.</value></data>
+  <data name="Anim.EffectFrames" xml:space="preserve"><value>Вместо окон летит рамка.</value></data>
+  <data name="Anim.EffectNone" xml:space="preserve"><value>Сцены меняются без анимации.</value></data>
+  <data name="Keyboard.Enable" xml:space="preserve"><value>Переключать сцены с клавиатуры</value></data>
+  <data name="Keyboard.EnableDesc" xml:space="preserve"><value>Удерживайте указанные ниже клавиши и нажимайте Tab или цифру.</value></data>
+  <data name="Keyboard.Keys" xml:space="preserve"><value>Удерживаемые клавиши</value></data>
+  <data name="Keyboard.KeysDesc" xml:space="preserve"><value>Щёлкните поле и зажмите нужные клавиши.</value></data>
+  <data name="Keyboard.Capture" xml:space="preserve"><value>Нажмите и удерживайте клавиши...</value></data>
+  <data name="Keyboard.OnlyModifiers" xml:space="preserve"><value>Удерживайте только {0}, {1} или {2}. {3} и 1...9 добавит StageManager.</value></data>
+  <data name="Keyboard.Next" xml:space="preserve"><value>Следующая сцена</value></data>
+  <data name="Keyboard.Previous" xml:space="preserve"><value>Предыдущая сцена</value></data>
+  <data name="Keyboard.Card" xml:space="preserve"><value>Карточка в этой позиции</value></data>
+  <data name="Keyboard.Release" xml:space="preserve"><value>Сцена открывается, когда вы отпускаете клавиши.</value></data>
+  <data name="Keyboard.Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Keyboard.Off" xml:space="preserve"><value>Сочетания клавиш выключены.</value></data>
+  <data name="Keyboard.Conflict" xml:space="preserve"><value>Уже занято: {0} ({1})</value></data>
+  <data name="Owner.Unknown" xml:space="preserve"><value>Windows или другое приложение</value></data>
+  <data name="Owner.WindowSwitcher" xml:space="preserve"><value>переключатель окон Windows</value></data>
+  <data name="Owner.TaskView" xml:space="preserve"><value>представление задач Windows</value></data>
+  <data name="Owner.Taskbar" xml:space="preserve"><value>приложения на панели задач Windows</value></data>
+  <data name="Owner.TaskbarJumpLists" xml:space="preserve"><value>списки переходов панели задач Windows</value></data>
+  <data name="Warn.CtrlAlone" xml:space="preserve"><value>Один Ctrl отнимает Ctrl+Tab и Ctrl+1...9 у браузеров и редакторов. Добавьте ещё одну клавишу.</value></data>
+  <data name="Warn.AltAlone" xml:space="preserve"><value>Один Alt отнимает Alt+1...9 у многих приложений. Добавьте ещё одну клавишу.</value></data>
+  <data name="Warn.CtrlAlt" xml:space="preserve"><value>Ctrl+Alt на многих клавиатурах — это AltGr: Ctrl+Alt+цифры тогда вводят символы вроде { [ ] }.</value></data>
+  <data name="Icons.Mode" xml:space="preserve"><value>Значки рабочего стола</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>Когда StageManager скрывает значки на рабочем столе.</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>Автоматически: скрывать, пока активна сцена, и показывать в режиме рабочего стола</value></data>
+  <data name="Icons.Hidden" xml:space="preserve"><value>Всегда скрыты</value></data>
+  <data name="Icons.Untouched" xml:space="preserve"><value>Не изменять</value></data>
+  <data name="Icons.Restore" xml:space="preserve"><value>Восстанавливать значки при выходе из StageManager</value></data>
+  <data name="Icons.RestoreDesc" xml:space="preserve"><value>Возвращает значки в состояние, в котором они были до запуска StageManager.</value></data>
+</root>

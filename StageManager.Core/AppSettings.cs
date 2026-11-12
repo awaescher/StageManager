@@ -160,6 +160,9 @@ public sealed class AppSettings
 
 	public int Version { get; set; } = CurrentVersion;
 
+	/// <summary>The language of the user interface: a code like "de", or empty to follow Windows.</summary>
+	public string Language { get; set; } = "";
+
 	public HideStrategy HideStrategy { get; set; } = HideStrategy.Park;
 
 	public SidebarSettings Sidebar { get; set; } = new();
@@ -178,6 +181,7 @@ public sealed class AppSettings
 	public AppSettings Normalize()
 	{
 		Version = CurrentVersion;
+		Language = Languages.Normalize(Language);
 		Sidebar ??= new SidebarSettings();
 		DesktopIcons ??= new DesktopIconsSettings();
 		Stage ??= new StageSettings();

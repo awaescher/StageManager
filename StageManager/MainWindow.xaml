@@ -124,15 +124,15 @@
                                 Closed="CardMenu_Closed">
                                 <MenuItem
                                     Tag="add"
-                                    Header="Add to stage"
+                                    Header="{local:Loc Card.AddToStage}"
                                     Click="CardMenu_Click" />
                                 <MenuItem
                                     Tag="split"
-                                    Header="Separate from group" />
+                                    Header="{local:Loc Card.Separate}" />
                                 <Separator />
                                 <MenuItem
                                     Tag="close"
-                                    Header="Close"
+                                    Header="{local:Loc Card.Close}"
                                     Click="CardMenu_Click" />
                             </ContextMenu>
                         </StackPanel.ContextMenu>
@@ -255,7 +255,7 @@
                                 Style="{StaticResource CloseButton}"
                                 HorizontalAlignment="{Binding CloseButtonAlignment, ElementName=thisWindow}"
                                 VerticalAlignment="Center"
-                                ToolTip="Close"
+                                ToolTip="{local:Loc Card.Close}"
                                 Click="CloseScene_Click" />
                         </Grid>
                     </StackPanel>
@@ -273,54 +273,54 @@
                     Opened="ContextMenu_Opened"
                     Closed="ContextMenu_Closed">
                     <MenuItem
-                        Header="Settings..."
+                        Header="{local:Loc Tray.Settings}"
                         Click="MenuItem_Settings_Click" />
                     <Separator />
                     <MenuItem
-                        Header="Start with Windows"
+                        Header="{local:Loc Tray.StartWithWindows}"
                         IsCheckable="True"
                         IsChecked="{Binding StartsWithWindows}" />
                     <MenuItem
-                        Header="Sidebar position">
+                        Header="{local:Loc Tray.SidebarPosition}">
                         <MenuItem
                             x:Name="menuSideLeft"
-                            Header="Left"
+                            Header="{local:Loc Common.Left}"
                             Click="MenuItem_SideLeft_Click" />
                         <MenuItem
                             x:Name="menuSideRight"
-                            Header="Right"
+                            Header="{local:Loc Common.Right}"
                             Click="MenuItem_SideRight_Click" />
                     </MenuItem>
                     <MenuItem
                         x:Name="menuSceneCount"
-                        Header="Scenes in sidebar" />
+                        Header="{local:Loc Tray.ScenesInSidebar}" />
                     <MenuItem
-                        Header="Desktop icons">
+                        Header="{local:Loc Tray.DesktopIcons}">
                         <MenuItem
                             x:Name="menuIconsManage"
-                            Header="Automatic (hide while a scene is active)"
+                            Header="{local:Loc Tray.IconsAutomatic}"
                             Tag="Manage"
                             Click="MenuItem_Icons_Click" />
                         <MenuItem
                             x:Name="menuIconsHidden"
-                            Header="Always hidden"
+                            Header="{local:Loc Tray.IconsHidden}"
                             Tag="AlwaysHidden"
                             Click="MenuItem_Icons_Click" />
                         <MenuItem
                             x:Name="menuIconsUntouched"
-                            Header="Never change"
+                            Header="{local:Loc Tray.IconsUntouched}"
                             Tag="Untouched"
                             Click="MenuItem_Icons_Click" />
                     </MenuItem>
                     <MenuItem
-                        Header="Bring back windows out of the screen"
+                        Header="{local:Loc Tray.Rescue}"
                         Click="MenuItem_Rescue_Click" />
                     <MenuItem
-                        Header="Project page"
+                        Header="{local:Loc Tray.ProjectPage}"
                         Click="MenuItem_ProjectPage_Click" />
                     <Separator />
                     <MenuItem
-                        Header="Quit"
+                        Header="{local:Loc Tray.Quit}"
                         Click="MenuItem_Quit_Click" />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>

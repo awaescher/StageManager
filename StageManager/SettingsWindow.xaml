@@ -2,289 +2,603 @@
     x:Class="StageManager.SettingsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="StageManager settings"
-    Width="460"
-    SizeToContent="Height"
-    ResizeMode="NoResize"
+    xmlns:local="clr-namespace:StageManager"
+    Title="{local:Loc Settings.Title}"
+    Icon="StageManager.ico"
+    Width="880"
+    Height="660"
+    MinWidth="720"
+    MinHeight="480"
+    ThemeMode="System"
+    UseLayoutRounding="True"
     WindowStartupLocation="CenterScreen"
-    ShowInTaskbar="True"
-    xmlns:local="clr-namespace:StageManager">
+    ShowInTaskbar="True">
     <Window.Resources>
         <Style
-            x:Key="Heading"
+            x:Key="PageTitle"
             TargetType="TextBlock">
+            <Setter
+                Property="FontSize"
+                Value="26" />
             <Setter
                 Property="FontWeight"
                 Value="SemiBold" />
             <Setter
-                Property="FontSize"
-                Value="14" />
-            <Setter
                 Property="Margin"
-                Value="0,16,0,6" />
+                Value="0,12,0,16" />
         </Style>
         <Style
-            x:Key="Label"
-            TargetType="TextBlock">
-            <Setter
-                Property="VerticalAlignment"
-                Value="Center" />
-            <Setter
-                Property="Margin"
-                Value="0,0,12,0" />
-        </Style>
-        <Style
-            x:Key="Hint"
+            x:Key="Muted"
             TargetType="TextBlock">
             <Setter
                 Property="Foreground"
-                Value="Gray" />
+                Value="{DynamicResource TextFillColorSecondaryBrush}" />
             <Setter
                 Property="TextWrapping"
                 Value="Wrap" />
-            <Setter
-                Property="Margin"
-                Value="0,4,0,0" />
         </Style>
         <Style
-            TargetType="ComboBox">
+            x:Key="NavIcon"
+            TargetType="TextBlock">
             <Setter
-                Property="Margin"
-                Value="0,3" />
+                Property="FontFamily"
+                Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+            <Setter
+                Property="FontSize"
+                Value="16" />
+            <Setter
+                Property="Width"
+                Value="26" />
+            <Setter
+                Property="VerticalAlignment"
+                Value="Center" />
+        </Style>
+        <Style
+            x:Key="Card"
+            TargetType="Border">
+            <Setter
+                Property="Background"
+                Value="{DynamicResource CardBackgroundFillColorDefaultBrush}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource CardStrokeColorDefaultBrush}" />
+            <Setter
+                Property="BorderThickness"
+                Value="1" />
+            <Setter
+                Property="CornerRadius"
+                Value="6" />
             <Setter
                 Property="Padding"
-                Value="6,3" />
-        </Style>
-        <Style
-            TargetType="CheckBox">
+                Value="16,12" />
             <Setter
                 Property="Margin"
-                Value="0,4" />
+                Value="0,0,0,4" />
+        </Style>
+        <Style
+            TargetType="local:SettingsRow">
+            <Setter
+                Property="Margin"
+                Value="0,0,0,4" />
+            <Setter
+                Property="Template">
+                <Setter.Value>
+                    <ControlTemplate
+                        TargetType="local:SettingsRow">
+                        <Border
+                            Style="{StaticResource Card}"
+                            Margin="0"
+                            MinHeight="48">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition
+                                        Width="*" />
+                                    <ColumnDefinition
+                                        Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel
+                                    VerticalAlignment="Center">
+                                    <TextBlock
+                                        Text="{TemplateBinding Title}"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        x:Name="description"
+                                        Style="{StaticResource Muted}"
+                                        FontSize="12"
+                                        Margin="0,2,0,0"
+                                        Text="{TemplateBinding Description}" />
+                                </StackPanel>
+                                <ContentPresenter
+                                    Grid.Column="1"
+                                    Margin="24,0,0,0"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Right" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger
+                                Property="Description"
+                                Value="">
+                                <Setter
+                                    TargetName="description"
+                                    Property="Visibility"
+                                    Value="Collapsed" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <DataTemplate
+            x:Key="ChoiceTemplate">
+            <TextBlock
+                Text="{Binding}"
+                TextWrapping="Wrap" />
+        </DataTemplate>
+        <Style
+            x:Key="Switch"
+            TargetType="ToggleButton">
+            <Setter
+                Property="Cursor"
+                Value="Hand" />
+            <Setter
+                Property="Focusable"
+                Value="True" />
+            <Setter
+                Property="Template">
+                <Setter.Value>
+                    <ControlTemplate
+                        TargetType="ToggleButton">
+                        <Border
+                            x:Name="track"
+                            Width="44"
+                            Height="22"
+                            CornerRadius="11"
+                            BorderThickness="1"
+                            Background="Transparent"
+                            BorderBrush="{DynamicResource ControlStrongStrokeColorDefaultBrush}">
+                            <Ellipse
+                                x:Name="knob"
+                                Width="12"
+                                Height="12"
+                                HorizontalAlignment="Left"
+                                Margin="4,0,0,0"
+                                Fill="{DynamicResource TextFillColorSecondaryBrush}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger
+                                Property="IsChecked"
+                                Value="True">
+                                <Setter
+                                    TargetName="track"
+                                    Property="Background"
+                                    Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                                <Setter
+                                    TargetName="track"
+                                    Property="BorderBrush"
+                                    Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                                <Setter
+                                    TargetName="knob"
+                                    Property="Fill"
+                                    Value="{DynamicResource TextOnAccentFillColorPrimaryBrush}" />
+                                <Setter
+                                    TargetName="knob"
+                                    Property="HorizontalAlignment"
+                                    Value="Right" />
+                                <Setter
+                                    TargetName="knob"
+                                    Property="Margin"
+                                    Value="0,0,4,0" />
+                            </Trigger>
+                            <Trigger
+                                Property="IsMouseOver"
+                                Value="True">
+                                <Setter
+                                    TargetName="track"
+                                    Property="Opacity"
+                                    Value="0.85" />
+                            </Trigger>
+                            <Trigger
+                                Property="IsEnabled"
+                                Value="False">
+                                <Setter
+                                    TargetName="track"
+                                    Property="Opacity"
+                                    Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
-    <StackPanel
-        Margin="20,4,20,16">
-
-        <TextBlock
-            Style="{StaticResource Heading}"
-            Text="General" />
-        <CheckBox
-            x:Name="autostart"
-            Content="Start with Windows"
-            Click="Autostart_Click" />
-        <Grid
-            Margin="0,4,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="170" />
-                <ColumnDefinition
-                    Width="*" />
-            </Grid.ColumnDefinitions>
-            <TextBlock
-                Style="{StaticResource Label}"
-                Text="Hide other windows by" />
-            <ComboBox
-                x:Name="hideStrategy"
-                Grid.Column="1"
-                SelectionChanged="HideStrategy_SelectionChanged" />
-        </Grid>
-        <TextBlock
-            Style="{StaticResource Hint}"
-            Text="Moving a window out of the screen keeps its picture in the sidebar. Minimized windows of browsers and WebView apps lose theirs." />
-
-        <TextBlock
-            Style="{StaticResource Heading}"
-            Text="Sidebar" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
+        </Grid.RowDefinitions>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition
-                    Width="170" />
+                    Width="220" />
                 <ColumnDefinition
                     Width="*" />
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
 
-            <TextBlock
-                Style="{StaticResource Label}"
-                Text="Position" />
-            <ComboBox
-                x:Name="side"
-                Grid.Column="1"
-                SelectionChanged="Side_SelectionChanged" />
+            <ListBox
+                x:Name="nav"
+                Margin="8,16,8,8"
+                BorderThickness="0"
+                Background="Transparent"
+                SelectionChanged="Nav_SelectionChanged">
+                <ListBoxItem
+                    Tag="general"
+                    Padding="10,9">
+                    <StackPanel
+                        Orientation="Horizontal">
+                        <TextBlock
+                            Style="{StaticResource NavIcon}"
+                            Text="&#xE713;" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Text="{local:Loc Nav.General}" />
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem
+                    Tag="sidebar"
+                    Padding="10,9">
+                    <StackPanel
+                        Orientation="Horizontal">
+                        <TextBlock
+                            Style="{StaticResource NavIcon}"
+                            Text="&#xE700;" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Text="{local:Loc Nav.Sidebar}" />
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem
+                    Tag="animations"
+                    Padding="10,9">
+                    <StackPanel
+                        Orientation="Horizontal">
+                        <TextBlock
+                            Style="{StaticResource NavIcon}"
+                            Text="&#xE768;" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Text="{local:Loc Nav.Animations}" />
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem
+                    Tag="keyboard"
+                    Padding="10,9">
+                    <StackPanel
+                        Orientation="Horizontal">
+                        <TextBlock
+                            Style="{StaticResource NavIcon}"
+                            Text="&#xE765;" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Text="{local:Loc Nav.Keyboard}" />
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem
+                    Tag="icons"
+                    Padding="10,9">
+                    <StackPanel
+                        Orientation="Horizontal">
+                        <TextBlock
+                            Style="{StaticResource NavIcon}"
+                            Text="&#xE7F4;" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Text="{local:Loc Nav.DesktopIcons}" />
+                    </StackPanel>
+                </ListBoxItem>
+            </ListBox>
 
-            <TextBlock
-                Grid.Row="1"
-                Style="{StaticResource Label}"
-                Text="Scenes in sidebar" />
-            <ComboBox
-                x:Name="sceneCount"
-                Grid.Row="1"
-                Grid.Column="1"
-                SelectionChanged="SceneCount_SelectionChanged" />
+            <Grid
+                Grid.Column="1">
 
-            <TextBlock
-                Grid.Row="2"
-                Style="{StaticResource Label}"
-                Text="Windows per scene" />
-            <ComboBox
-                x:Name="windowsPerScene"
-                Grid.Row="2"
-                Grid.Column="1"
-                SelectionChanged="WindowsPerScene_SelectionChanged" />
+                <ScrollViewer
+                    x:Name="pageGeneral"
+                    VerticalScrollBarVisibility="Auto">
+                    <StackPanel
+                        Margin="8,0,28,24"
+                        MaxWidth="660"
+                        HorizontalAlignment="Stretch">
+                        <TextBlock
+                            Style="{StaticResource PageTitle}"
+                            Text="{local:Loc Nav.General}" />
+                        <local:SettingsRow
+                            Title="{local:Loc General.Language}"
+                            Description="{local:Loc General.LanguageDesc}">
+                            <ComboBox
+                                x:Name="language"
+                                Width="260"
+                                ItemTemplate="{StaticResource ChoiceTemplate}"
+                                SelectionChanged="Language_SelectionChanged" />
+                        </local:SettingsRow>
+                        <local:SettingsRow
+                            Title="{local:Loc General.Autostart}"
+                            Description="{local:Loc General.AutostartDesc}">
+                            <ToggleButton
+                                x:Name="autostart"
+                                Style="{StaticResource Switch}"
+                                AutomationProperties.Name="{local:Loc General.Autostart}"
+                                Click="Autostart_Click" />
+                        </local:SettingsRow>
+                        <local:SettingsRow
+                            Title="{local:Loc General.Hide}"
+                            Description="{local:Loc General.HideDesc}">
+                            <ComboBox
+                                x:Name="hideStrategy"
+                                Width="260"
+                                ItemTemplate="{StaticResource ChoiceTemplate}"
+                                SelectionChanged="HideStrategy_SelectionChanged" />
+                        </local:SettingsRow>
+                    </StackPanel>
+                </ScrollViewer>
 
-            <TextBlock
-                Grid.Row="3"
-                Style="{StaticResource Label}"
-                Text="Thumbnail size" />
-            <ComboBox
-                x:Name="thumbnailSize"
-                Grid.Row="3"
-                Grid.Column="1"
-                SelectionChanged="ThumbnailSize_SelectionChanged" />
+                <ScrollViewer
+                    x:Name="pageSidebar"
+                    Visibility="Collapsed"
+                    VerticalScrollBarVisibility="Auto">
+                    <StackPanel
+                        Margin="8,0,28,24"
+                        MaxWidth="660"
+                        HorizontalAlignment="Stretch">
+                        <TextBlock
+                            Style="{StaticResource PageTitle}"
+                            Text="{local:Loc Nav.Sidebar}" />
+                        <Border
+                            Style="{StaticResource Card}"
+                            Margin="0,0,0,12">
+                            <StackPanel>
+                                <Border
+                                    x:Name="previewFrame"
+                                    HorizontalAlignment="Left"
+                                    CornerRadius="6"
+                                    BorderThickness="1"
+                                    BorderBrush="{DynamicResource ControlStrongStrokeColorDefaultBrush}"
+                                    Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+                                    ClipToBounds="True"
+                                    AutomationProperties.Name="{local:Loc Sidebar.Preview}">
+                                    <Canvas
+                                        x:Name="previewCanvas"
+                                        Width="240"
+                                        Height="150" />
+                                </Border>
+                                <TextBlock
+                                    x:Name="layoutInfo"
+                                    Style="{StaticResource Muted}"
+                                    Margin="0,10,0,0" />
+                                <Border
+                                    x:Name="layoutWarningBox"
+                                    Margin="0,10,0,0"
+                                    Padding="10,8"
+                                    CornerRadius="4"
+                                    Visibility="Collapsed"
+                                    Background="{DynamicResource SystemFillColorCautionBackgroundBrush}"
+                                    BorderBrush="{DynamicResource SystemFillColorCautionBrush}"
+                                    BorderThickness="1">
+                                    <TextBlock
+                                        x:Name="layoutWarning"
+                                        TextWrapping="Wrap" />
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                        <local:SettingsRow
+                            Title="{local:Loc Sidebar.Position}"
+                            Description="{local:Loc Sidebar.PositionDesc}">
+                            <ComboBox
+                                x:Name="side"
+                                Width="260"
+                                ItemTemplate="{StaticResource ChoiceTemplate}"
+                                SelectionChanged="Side_SelectionChanged" />
+                        </local:SettingsRow>
+                        <local:SettingsRow
+                            Title="{local:Loc Sidebar.Scenes}"
+                            Description="{local:Loc Sidebar.ScenesDesc}">
+                            <ComboBox
+                                x:Name="sceneCount"
+                                Width="260"
+                                ItemTemplate="{StaticResource ChoiceTemplate}"
+                                SelectionChanged="SceneCount_SelectionChanged" />
+                        </local:SettingsRow>
+                        <local:SettingsRow
+                            Title="{local:Loc Sidebar.WindowsPerScene}"
+                            Description="{local:Loc Sidebar.WindowsPerSceneDesc}">
+                            <ComboBox
+                                x:Name="windowsPerScene"
+                                Width="260"
+                                ItemTemplate="{StaticResource ChoiceTemplate}"
+                                SelectionChanged="WindowsPerScene_SelectionChanged" />
+                        </local:SettingsRow>
+                        <local:SettingsRow
+                            Title="{local:Loc Sidebar.ThumbnailSize}"
+                            Description="{local:Loc Sidebar.ThumbnailSizeDesc}">
+                            <ComboBox
+                                x:Name="thumbnailSize"
+                                Width="260"
+                                ItemTemplate="{StaticResource ChoiceTemplate}"
+                                SelectionChanged="ThumbnailSize_SelectionChanged" />
+                        </local:SettingsRow>
+                        <local:SettingsRow
+                            Title="{local:Loc Sidebar.Width}"
+                            Description="{local:Loc Sidebar.WidthDesc}">
+                            <ComboBox
+                                x:Name="sidebarWidth"
+                                Width="260"
+                                ItemTemplate="{StaticResource ChoiceTemplate}"
+                                SelectionChanged="SidebarWidth_SelectionChanged" />
+                        </local:SettingsRow>
+                        <local:SettingsRow
+                            Title="{local:Loc Sidebar.DragToStage}"
+                            Description="{local:Loc Sidebar.DragToStageDesc}">
+                            <ToggleButton
+                                x:Name="dragToStage"
+                                Style="{StaticResource Switch}"
+                                AutomationProperties.Name="{local:Loc Sidebar.DragToStage}"
+                                Click="DragToStage_Click" />
+                        </local:SettingsRow>
+                    </StackPanel>
+                </ScrollViewer>
 
-            <TextBlock
-                Grid.Row="4"
-                Style="{StaticResource Label}"
-                Text="Sidebar width" />
-            <ComboBox
-                x:Name="sidebarWidth"
-                Grid.Row="4"
-                Grid.Column="1"
-                SelectionChanged="SidebarWidth_SelectionChanged" />
+                <ScrollViewer
+                    x:Name="pageAnimations"
+                    Visibility="Collapsed"
+                    VerticalScrollBarVisibility="Auto">
+                    <StackPanel
+                        Margin="8,0,28,24"
+                        MaxWidth="660"
+                        HorizontalAlignment="Stretch">
+                        <TextBlock
+                            Style="{StaticResource PageTitle}"
+                            Text="{local:Loc Nav.Animations}" />
+                        <local:SettingsRow
+                            Title="{local:Loc Anim.Mode}"
+                            Description="{local:Loc Anim.ModeDesc}">
+                            <ComboBox
+                                x:Name="animationMode"
+                                Width="260"
+                                ItemTemplate="{StaticResource ChoiceTemplate}"
+                                SelectionChanged="AnimationMode_SelectionChanged" />
+                        </local:SettingsRow>
+                        <local:SettingsRow
+                            Title="{local:Loc Anim.Speed}"
+                            Description="{local:Loc Anim.SpeedDesc}">
+                            <ComboBox
+                                x:Name="animationSpeed"
+                                Width="260"
+                                ItemTemplate="{StaticResource ChoiceTemplate}"
+                                SelectionChanged="AnimationSpeed_SelectionChanged" />
+                        </local:SettingsRow>
+                        <local:SettingsRow
+                            Title="{local:Loc Anim.Frames}"
+                            Description="{local:Loc Anim.FramesDesc}">
+                            <ToggleButton
+                                x:Name="animationFrames"
+                                Style="{StaticResource Switch}"
+                                AutomationProperties.Name="{local:Loc Anim.Frames}"
+                                Click="AnimationFrames_Click" />
+                        </local:SettingsRow>
+                        <TextBlock
+                            x:Name="animationInfo"
+                            Style="{StaticResource Muted}"
+                            Margin="4,12,0,0" />
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer
+                    x:Name="pageKeyboard"
+                    Visibility="Collapsed"
+                    VerticalScrollBarVisibility="Auto">
+                    <StackPanel
+                        Margin="8,0,28,24"
+                        MaxWidth="660"
+                        HorizontalAlignment="Stretch">
+                        <TextBlock
+                            Style="{StaticResource PageTitle}"
+                            Text="{local:Loc Nav.Keyboard}" />
+                        <local:SettingsRow
+                            Title="{local:Loc Keyboard.Enable}"
+                            Description="{local:Loc Keyboard.EnableDesc}">
+                            <ToggleButton
+                                x:Name="hotkeysEnabled"
+                                Style="{StaticResource Switch}"
+                                AutomationProperties.Name="{local:Loc Keyboard.Enable}"
+                                Click="HotkeysEnabled_Click" />
+                        </local:SettingsRow>
+                        <local:SettingsRow
+                            Title="{local:Loc Keyboard.Keys}"
+                            Description="{local:Loc Keyboard.KeysDesc}">
+                            <local:HotkeyBox
+                                x:Name="hotkeyKeys"
+                                Width="220"
+                                KeysChosen="HotkeyKeys_KeysChosen"
+                                CaptureStarted="HotkeyKeys_CaptureStarted"
+                                CaptureEnded="HotkeyKeys_CaptureEnded" />
+                        </local:SettingsRow>
+                        <Border
+                            x:Name="hotkeyWarningBox"
+                            Style="{StaticResource Card}"
+                            Visibility="Collapsed"
+                            Background="{DynamicResource SystemFillColorCautionBackgroundBrush}"
+                            BorderBrush="{DynamicResource SystemFillColorCautionBrush}">
+                            <TextBlock
+                                x:Name="hotkeyWarning"
+                                TextWrapping="Wrap" />
+                        </Border>
+                        <Border
+                            Style="{StaticResource Card}"
+                            Margin="0,8,0,0">
+                            <StackPanel
+                                x:Name="cheatSheet" />
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer
+                    x:Name="pageIcons"
+                    Visibility="Collapsed"
+                    VerticalScrollBarVisibility="Auto">
+                    <StackPanel
+                        Margin="8,0,28,24"
+                        MaxWidth="660"
+                        HorizontalAlignment="Stretch">
+                        <TextBlock
+                            Style="{StaticResource PageTitle}"
+                            Text="{local:Loc Nav.DesktopIcons}" />
+                        <local:SettingsRow
+                            Title="{local:Loc Icons.Mode}"
+                            Description="{local:Loc Icons.ModeDesc}">
+                            <ComboBox
+                                x:Name="iconsMode"
+                                Width="340"
+                                ItemTemplate="{StaticResource ChoiceTemplate}"
+                                SelectionChanged="IconsMode_SelectionChanged" />
+                        </local:SettingsRow>
+                        <local:SettingsRow
+                            Title="{local:Loc Icons.Restore}"
+                            Description="{local:Loc Icons.RestoreDesc}">
+                            <ToggleButton
+                                x:Name="iconsRestore"
+                                Style="{StaticResource Switch}"
+                                AutomationProperties.Name="{local:Loc Icons.Restore}"
+                                Click="IconsRestore_Click" />
+                        </local:SettingsRow>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
         </Grid>
-        <TextBlock
-            x:Name="layoutInfo"
-            Style="{StaticResource Hint}" />
-        <TextBlock
-            x:Name="layoutWarning"
-            Style="{StaticResource Hint}"
-            Foreground="DarkOrange"
-            Visibility="Collapsed" />
-        <CheckBox
-            x:Name="dragToStage"
-            Margin="0,8,0,4"
-            Click="DragToStage_Click">
-            <TextBlock
-                TextWrapping="Wrap"
-                Text="Drag a card onto the stage to add its apps to it" />
-        </CheckBox>
 
-        <TextBlock
-            Style="{StaticResource Heading}"
-            Text="Animations" />
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="170" />
-                <ColumnDefinition
-                    Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <TextBlock
-                Style="{StaticResource Label}"
-                Text="Animate scene changes" />
-            <ComboBox
-                x:Name="animationMode"
-                Grid.Column="1"
-                SelectionChanged="AnimationMode_SelectionChanged" />
-            <TextBlock
-                Grid.Row="1"
-                Style="{StaticResource Label}"
-                Text="Speed" />
-            <ComboBox
-                x:Name="animationSpeed"
-                Grid.Row="1"
-                Grid.Column="1"
-                SelectionChanged="AnimationSpeed_SelectionChanged" />
-        </Grid>
-        <CheckBox
-            x:Name="animationFrames"
-            Click="AnimationFrames_Click">
-            <TextBlock
-                TextWrapping="Wrap"
-                Text="Fly a frame instead of the windows if Windows shows only a frame while dragging" />
-        </CheckBox>
-        <TextBlock
-            x:Name="animationInfo"
-            Style="{StaticResource Hint}" />
-
-        <TextBlock
-            Style="{StaticResource Heading}"
-            Text="Keyboard" />
-        <CheckBox
-            x:Name="hotkeysEnabled"
-            Click="HotkeysEnabled_Click">
-            <TextBlock
-                TextWrapping="Wrap"
-                Text="Switch scenes with the keyboard" />
-        </CheckBox>
-        <Grid
-            Margin="0,4,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="170" />
-                <ColumnDefinition
-                    Width="*" />
-            </Grid.ColumnDefinitions>
-            <TextBlock
-                Style="{StaticResource Label}"
-                Text="Hold these keys" />
-            <local:HotkeyBox
-                x:Name="hotkeyKeys"
-                Grid.Column="1"
-                KeysChosen="HotkeyKeys_KeysChosen"
-                CaptureStarted="HotkeyKeys_CaptureStarted"
-                CaptureEnded="HotkeyKeys_CaptureEnded" />
-        </Grid>
-        <TextBlock
-            x:Name="hotkeyInfo"
-            Style="{StaticResource Hint}" />
-        <TextBlock
-            x:Name="hotkeyWarning"
-            Style="{StaticResource Hint}"
-            Foreground="DarkOrange"
-            Visibility="Collapsed" />
-
-        <TextBlock
-            Style="{StaticResource Heading}"
-            Text="Desktop icons" />
-        <ComboBox
-            x:Name="iconsMode"
-            SelectionChanged="IconsMode_SelectionChanged" />
-        <CheckBox
-            x:Name="iconsRestore"
-            Click="IconsRestore_Click">
-            <TextBlock
-                TextWrapping="Wrap"
-                Text="Restore the icons to their previous state when StageManager exits" />
-        </CheckBox>
-
-        <Grid
-            Margin="0,20,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="*" />
-                <ColumnDefinition
-                    Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBlock
-                Style="{StaticResource Hint}"
-                VerticalAlignment="Center"
-                Text="Changes apply immediately." />
-            <Button
-                Grid.Column="1"
-                Padding="14,5"
-                Content="Reset to defaults"
-                Click="Reset_Click" />
-        </Grid>
-    </StackPanel>
+        <Border
+            Grid.Row="1"
+            Padding="24,12"
+            BorderThickness="0,1,0,0"
+            BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}"
+            Background="{DynamicResource LayerFillColorDefaultBrush}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Style="{StaticResource Muted}"
+                    VerticalAlignment="Center"
+                    Text="{local:Loc Settings.Applied}" />
+                <Button
+                    Grid.Column="1"
+                    Padding="16,6"
+                    Content="{local:Loc Settings.Reset}"
+                    Click="Reset_Click" />
+            </Grid>
+        </Border>
+    </Grid>
 </Window>

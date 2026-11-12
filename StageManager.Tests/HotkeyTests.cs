@@ -111,37 +111,49 @@ public class HotkeyTests
 	[Fact]
 	public void Known_owners_are_named()
 	{
-		Assert.Equal("the Windows window switcher", HotkeyAdvice.KnownOwner(Alt, HotkeyAction.Next));
-		Assert.Equal("the Windows task view", HotkeyAdvice.KnownOwner(Win, HotkeyAction.Next));
-		Assert.Equal("the apps on the Windows taskbar", HotkeyAdvice.KnownOwner(Win, HotkeyAction.Card(1)));
-		Assert.Null(HotkeyAdvice.KnownOwner(Ctrl | Alt | Win, HotkeyAction.Next));
+		Assert.Equal(HotkeyOwner.WindowSwitcher, HotkeyAdvice.KnownOwner(Alt, HotkeyAction.Next));
+		Assert.Equal(HotkeyOwner.TaskView, HotkeyAdvice.KnownOwner(Win, HotkeyAction.Next));
+		Assert.Equal(HotkeyOwner.Taskbar, HotkeyAdvice.KnownOwner(Win, HotkeyAction.Card(1)));
+		Assert.Equal(HotkeyOwner.Unknown, HotkeyAdvice.KnownOwner(Ctrl | Alt | Win, HotkeyAction.Next));
 	}
 
 	[Fact]
-	public void Conflicts_of_unknown_owners_name_Windows_or_another_app()
+	public void Conflicts_of_unknown_owners_are_reported_as_unknown()
 	{
-		var lines = HotkeyAdvice.Conflicts(Ctrl | Alt | Win, new[] { HotkeyAction.Next });
+		var conflicts = HotkeyAdvice.Conflicts(Ctrl | Alt | Win, new[] { HotkeyAction.Next });
 
-		Assert.Equal(new[] { "Ctrl+Alt+Win+Tab is already used by Windows or another app." }, lines);
+		Assert.Equal(new[] { new HotkeyConflict("Ctrl+Alt+Win+Tab", HotkeyOwner.Unknown) }, conflicts);
 	}
 
 	[Fact]
-	public void Conflicts_of_the_digits_are_one_line()
+	public void Conflicts_of_the_digits_are_one_entry()
 	{
 		var digits = Enumerable.Range(1, 9).Select(HotkeyAction.Card);
 
-		var lines = HotkeyAdvice.Conflicts(Win, digits);
+		var conflicts = HotkeyAdvice.Conflicts(Win, digits);
 
-		Assert.Equal(new[] { "Win+1...9 is already used by the apps on the Windows taskbar." }, lines);
+		Assert.Equal(new[] { new HotkeyConflict("Win+1...9", HotkeyOwner.Taskbar) }, conflicts);
 	}
 
 	[Fact]
 	public void Scattered_digits_are_listed()
 	{
-		var lines = HotkeyAdvice.Conflicts(Ctrl | Alt | Win, new[] { HotkeyAction.Card(2), HotkeyAction.Card(5) });
+		var conflicts = HotkeyAdvice.Conflicts(Ctrl | Alt | Win, new[] { HotkeyAction.Card(2), HotkeyAction.Card(5) });
 
-		Assert.Single(lines);
-		Assert.StartsWith("Ctrl+Alt+Win+2, 5 is already used", lines[0]);
+		Assert.Equal("Ctrl+Alt+Win+2, 5", Assert.Single(conflicts).Keys);
+	}
+
+	[Fact]
+	public void Conflicts_are_written_with_the_names_of_the_keyboard()
+	{
+		var german = new Dictionary<string, string> { ["Ctrl"] = "Strg", ["Shift"] = "Umschalt" };
+		string Name(string key) => german.GetValueOrDefault(key, key);
+
+		var conflicts = HotkeyAdvice.Conflicts(Ctrl | Alt, new[] { HotkeyAction.Previous }, Name);
+
+		Assert.Equal("Strg+Alt+Umschalt+Tab", Assert.Single(conflicts).Keys);
+		Assert.Equal("Strg+Alt", HotkeyText.Format(Ctrl | Alt, Name));
+		Assert.Equal("Ctrl+Alt", HotkeyText.Format(Ctrl | Alt));
 	}
 
 	[Fact]
@@ -151,16 +163,15 @@ public class HotkeyTests
 	}
 
 	[Theory]
-	[InlineData(HotkeyModifiers.Ctrl, true)]
-	[InlineData(HotkeyModifiers.Alt, true)]
-	[InlineData(HotkeyModifiers.Ctrl | HotkeyModifiers.Alt, true)]
-	[InlineData(HotkeyModifiers.Ctrl | HotkeyModifiers.Alt | HotkeyModifiers.Win, false)]
-	[InlineData(HotkeyModifiers.Win, false)]
-	public void Keys_that_take_shortcuts_from_apps_get_a_warning(HotkeyModifiers keys, bool warns)
+	[InlineData(HotkeyModifiers.Ctrl, HotkeyWarning.CtrlAlone)]
+	[InlineData(HotkeyModifiers.Alt, HotkeyWarning.AltAlone)]
+	[InlineData(HotkeyModifiers.Ctrl | HotkeyModifiers.Alt, HotkeyWarning.CtrlAlt)]
+	[InlineData(HotkeyModifiers.Ctrl | HotkeyModifiers.Alt | HotkeyModifiers.Win, HotkeyWarning.None)]
+	[InlineData(HotkeyModifiers.Win, HotkeyWarning.None)]
+	public void Keys_that_take_shortcuts_from_apps_get_a_warning(HotkeyModifiers keys, HotkeyWarning expected)
 	{
-		Assert.Equal(warns, HotkeyAdvice.Warning(keys) is not null);
+		Assert.Equal(expected, HotkeyAdvice.Warning(keys));
 	}
-
 	private static readonly Guid A = Guid.NewGuid();
 	private static readonly Guid B = Guid.NewGuid();
 	private static readonly Guid C = Guid.NewGuid();

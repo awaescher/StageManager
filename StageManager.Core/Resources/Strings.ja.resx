@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Common.Left" xml:space="preserve"><value>左</value></data>
+  <data name="Common.Right" xml:space="preserve"><value>右</value></data>
+  <data name="Key.Ctrl" xml:space="preserve"><value>Ctrl</value></data>
+  <data name="Key.Alt" xml:space="preserve"><value>Alt</value></data>
+  <data name="Key.Shift" xml:space="preserve"><value>Shift</value></data>
+  <data name="Key.Win" xml:space="preserve"><value>Win</value></data>
+  <data name="Key.Tab" xml:space="preserve"><value>Tab</value></data>
+  <data name="Key.Esc" xml:space="preserve"><value>Esc</value></data>
+  <data name="Tray.Settings" xml:space="preserve"><value>設定...</value></data>
+  <data name="Tray.StartWithWindows" xml:space="preserve"><value>Windows と同時に起動</value></data>
+  <data name="Tray.SidebarPosition" xml:space="preserve"><value>サイドバーの位置</value></data>
+  <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>サイドバーのシーン数</value></data>
+  <data name="Tray.DesktopIcons" xml:space="preserve"><value>デスクトップアイコン</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>自動 (シーンがアクティブな間は非表示)</value></data>
+  <data name="Tray.IconsHidden" xml:space="preserve"><value>常に非表示</value></data>
+  <data name="Tray.IconsUntouched" xml:space="preserve"><value>変更しない</value></data>
+  <data name="Tray.Rescue" xml:space="preserve"><value>画面外のウィンドウを戻す</value></data>
+  <data name="Tray.ProjectPage" xml:space="preserve"><value>プロジェクトのページ</value></data>
+  <data name="Tray.Quit" xml:space="preserve"><value>終了</value></data>
+  <data name="Card.AddToStage" xml:space="preserve"><value>ステージに追加</value></data>
+  <data name="Card.Separate" xml:space="preserve"><value>グループから分離</value></data>
+  <data name="Card.Close" xml:space="preserve"><value>閉じる</value></data>
+  <data name="Settings.Title" xml:space="preserve"><value>StageManager の設定</value></data>
+  <data name="Settings.Applied" xml:space="preserve"><value>変更はすぐに反映されます。</value></data>
+  <data name="Settings.Reset" xml:space="preserve"><value>既定値に戻す</value></data>
+  <data name="Nav.General" xml:space="preserve"><value>全般</value></data>
+  <data name="Nav.Sidebar" xml:space="preserve"><value>サイドバー</value></data>
+  <data name="Nav.Animations" xml:space="preserve"><value>アニメーション</value></data>
+  <data name="Nav.Keyboard" xml:space="preserve"><value>キーボード</value></data>
+  <data name="Nav.DesktopIcons" xml:space="preserve"><value>デスクトップアイコン</value></data>
+  <data name="General.Language" xml:space="preserve"><value>言語</value></data>
+  <data name="General.LanguageDesc" xml:space="preserve"><value>メニューと設定の言語です。</value></data>
+  <data name="Language.System" xml:space="preserve"><value>Windows に合わせる</value></data>
+  <data name="General.Autostart" xml:space="preserve"><value>Windows と同時に起動</value></data>
+  <data name="General.AutostartDesc" xml:space="preserve"><value>サインイン時に StageManager を起動します。</value></data>
+  <data name="General.Hide" xml:space="preserve"><value>他のウィンドウを隠す方法</value></data>
+  <data name="General.HideDesc" xml:space="preserve"><value>ウィンドウを画面外へ移動すると、サイドバーの画像はそのまま残ります。ブラウザーや WebView アプリの最小化されたウィンドウでは画像が失われます。</value></data>
+  <data name="Hide.Park" xml:space="preserve"><value>画面外へ移動する (推奨)</value></data>
+  <data name="Hide.Minimize" xml:space="preserve"><value>最小化する</value></data>
+  <data name="Sidebar.Preview" xml:space="preserve"><value>プレビュー</value></data>
+  <data name="Sidebar.Position" xml:space="preserve"><value>位置</value></data>
+  <data name="Sidebar.PositionDesc" xml:space="preserve"><value>サイドバーを置く画面の端です。</value></data>
+  <data name="Sidebar.Scenes" xml:space="preserve"><value>サイドバーのシーン数</value></data>
+  <data name="Sidebar.ScenesDesc" xml:space="preserve"><value>同時に表示するシーンの数です。</value></data>
+  <data name="Sidebar.WindowsPerScene" xml:space="preserve"><value>シーンあたりのウィンドウ数</value></data>
+  <data name="Sidebar.WindowsPerSceneDesc" xml:space="preserve"><value>重ねたサムネイルとして表示するシーン内のウィンドウ数です。それ以外はアイコンのみで表示されます。</value></data>
+  <data name="Sidebar.NoStack" xml:space="preserve"><value>1 (重ねない)</value></data>
+  <data name="Sidebar.ThumbnailSize" xml:space="preserve"><value>サムネイルのサイズ</value></data>
+  <data name="Sidebar.ThumbnailSizeDesc" xml:space="preserve"><value>自動にすると、シーン数に合わせてサムネイルの大きさが決まります。</value></data>
+  <data name="Sidebar.AutoThumbnail" xml:space="preserve"><value>自動 (シーン数に合わせる)</value></data>
+  <data name="Sidebar.Width" xml:space="preserve"><value>サイドバーの幅</value></data>
+  <data name="Sidebar.WidthDesc" xml:space="preserve"><value>自動にすると、サムネイルに合わせて幅が決まります。</value></data>
+  <data name="Sidebar.AutoWidth" xml:space="preserve"><value>自動 (サムネイルに合わせる)</value></data>
+  <data name="Sidebar.DragToStage" xml:space="preserve"><value>カードをステージへドラッグ</value></data>
+  <data name="Sidebar.DragToStageDesc" xml:space="preserve"><value>カードをステージへドラッグすると、そのアプリが追加されます。</value></data>
+  <data name="Sidebar.PreviewInfo" xml:space="preserve"><value>サムネイル {0} x {1}、サイドバーの幅 {2}、画面の高さ {3} で計算。</value></data>
+  <data name="Sidebar.Limited" xml:space="preserve"><value>このサイズでは、この画面に {1} 個中 {0} 個のシーンしか収まりません。残りは管理対象のままですが、サイドバーには表示されません。</value></data>
+  <data name="Anim.Mode" xml:space="preserve"><value>シーン切り替えをアニメーション表示</value></data>
+  <data name="Anim.ModeDesc" xml:space="preserve"><value>シーンを切り替えるときのウィンドウの動きです。</value></data>
+  <data name="Anim.Follow" xml:space="preserve"><value>Windows の設定に従う (既定)</value></data>
+  <data name="Anim.Always" xml:space="preserve"><value>常に</value></data>
+  <data name="Anim.Never" xml:space="preserve"><value>しない</value></data>
+  <data name="Anim.Speed" xml:space="preserve"><value>速度</value></data>
+  <data name="Anim.SpeedDesc" xml:space="preserve"><value>ウィンドウが移動する速さです。</value></data>
+  <data name="Anim.Normal" xml:space="preserve"><value>標準</value></data>
+  <data name="Anim.Frames" xml:space="preserve"><value>ウィンドウの代わりに枠を移動する</value></data>
+  <data name="Anim.FramesDesc" xml:space="preserve"><value>Windows がウィンドウのドラッグ中に枠しか表示しない場合のみ有効です。</value></data>
+  <data name="Anim.Info" xml:space="preserve"><value>Windows: アニメーション {0}、ドラッグ中のウィンドウの内容 {1}。</value></data>
+  <data name="Anim.On" xml:space="preserve"><value>オン</value></data>
+  <data name="Anim.Off" xml:space="preserve"><value>オフ</value></data>
+  <data name="Anim.Shown" xml:space="preserve"><value>表示</value></data>
+  <data name="Anim.HiddenFrame" xml:space="preserve"><value>非表示 (枠のみ)</value></data>
+  <data name="Anim.EffectWindows" xml:space="preserve"><value>ウィンドウがサイドバーとステージの間を移動します。</value></data>
+  <data name="Anim.EffectFrames" xml:space="preserve"><value>ウィンドウの代わりに枠が移動します。</value></data>
+  <data name="Anim.EffectNone" xml:space="preserve"><value>アニメーションなしでシーンが切り替わります。</value></data>
+  <data name="Keyboard.Enable" xml:space="preserve"><value>キーボードでシーンを切り替える</value></data>
+  <data name="Keyboard.EnableDesc" xml:space="preserve"><value>下のキーを押したまま、Tab または数字キーを押します。</value></data>
+  <data name="Keyboard.Keys" xml:space="preserve"><value>押し続けるキー</value></data>
+  <data name="Keyboard.KeysDesc" xml:space="preserve"><value>フィールドをクリックし、使いたいキーを押し続けてください。</value></data>
+  <data name="Keyboard.Capture" xml:space="preserve"><value>キーを押し続けてください...</value></data>
+  <data name="Keyboard.OnlyModifiers" xml:space="preserve"><value>{0}、{1}、{2} だけを押し続けてください。{3} と 1...9 は StageManager が追加します。</value></data>
+  <data name="Keyboard.Next" xml:space="preserve"><value>次のシーン</value></data>
+  <data name="Keyboard.Previous" xml:space="preserve"><value>前のシーン</value></data>
+  <data name="Keyboard.Card" xml:space="preserve"><value>その位置のカード</value></data>
+  <data name="Keyboard.Release" xml:space="preserve"><value>キーを離すとシーンが開きます。</value></data>
+  <data name="Keyboard.Cancel" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="Keyboard.Off" xml:space="preserve"><value>キーボードショートカットはオフです。</value></data>
+  <data name="Keyboard.Conflict" xml:space="preserve"><value>使用済み: {0} ({1})</value></data>
+  <data name="Owner.Unknown" xml:space="preserve"><value>Windows または他のアプリ</value></data>
+  <data name="Owner.WindowSwitcher" xml:space="preserve"><value>Windows のウィンドウ切り替え</value></data>
+  <data name="Owner.TaskView" xml:space="preserve"><value>Windows のタスクビュー</value></data>
+  <data name="Owner.Taskbar" xml:space="preserve"><value>Windows のタスクバーのアプリ</value></data>
+  <data name="Owner.TaskbarJumpLists" xml:space="preserve"><value>Windows のタスクバーのジャンプリスト</value></data>
+  <data name="Warn.CtrlAlone" xml:space="preserve"><value>Ctrl だけにすると、ブラウザーやエディターの Ctrl+Tab と Ctrl+1...9 を奪います。別のキーを追加してください。</value></data>
+  <data name="Warn.AltAlone" xml:space="preserve"><value>Alt だけにすると、多くのアプリの Alt+1...9 を奪います。別のキーを追加してください。</value></data>
+  <data name="Warn.CtrlAlt" xml:space="preserve"><value>多くのキーボードで Ctrl+Alt は AltGr です。Ctrl+Alt+数字で { [ ] } などの文字が入力されます。</value></data>
+  <data name="Icons.Mode" xml:space="preserve"><value>デスクトップアイコン</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>StageManager がデスクトップのアイコンを隠すタイミングです。</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>自動: シーンがアクティブな間は隠し、デスクトップ表示では表示する</value></data>
+  <data name="Icons.Hidden" xml:space="preserve"><value>常に非表示</value></data>
+  <data name="Icons.Untouched" xml:space="preserve"><value>変更しない</value></data>
+  <data name="Icons.Restore" xml:space="preserve"><value>StageManager の終了時にアイコンを元に戻す</value></data>
+  <data name="Icons.RestoreDesc" xml:space="preserve"><value>StageManager の起動前の状態にアイコンを戻します。</value></data>
+</root>

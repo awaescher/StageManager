@@ -18,6 +18,8 @@ namespace StageManager
 
 		public HotkeyBox()
 		{
+			// an implicit style is found by the exact type, so a box of its own type asks for the one of the theme for TextBox
+			SetResourceReference(StyleProperty, typeof(TextBox));
 			IsReadOnly = true;
 			IsReadOnlyCaretVisible = false;
 			IsUndoEnabled = false;
@@ -26,6 +28,12 @@ namespace StageManager
 			Margin = new System.Windows.Thickness(0, 3, 0, 3);
 			Cursor = Cursors.Hand;
 			ShowKeys();
+
+			Loc.LanguageChanged += (_, _) => Dispatcher.BeginInvoke(() =>
+			{
+				if (!_capturing)
+					ShowKeys();
+			});
 		}
 
 		/// <summary>The user chose new keys.</summary>
@@ -47,7 +55,7 @@ namespace StageManager
 			}
 		}
 
-		private void ShowKeys() => Text = HotkeyText.Format(_keys);
+		private void ShowKeys() => Text = HotkeyText.Format(_keys, Loc.KeyName);
 
 		protected override void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
 		{
@@ -55,7 +63,7 @@ namespace StageManager
 
 			_capturing = true;
 			_peak = HotkeyModifiers.None;
-			Text = "Press and hold the keys...";
+			Text = Loc.Get("Keyboard.Capture");
 			CaptureStarted?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -90,7 +98,7 @@ namespace StageManager
 					Win32.keybd_event(0xE8, 0, 2, UIntPtr.Zero);
 					break;
 				default:
-					Text = "Hold only Ctrl, Alt or Win. Tab and 1...9 are added by StageManager.";
+					Text = Loc.Format("Keyboard.OnlyModifiers", Loc.KeyName("Ctrl"), Loc.KeyName("Alt"), Loc.KeyName("Win"), Loc.KeyName("Tab"));
 					return;
 			}
 
@@ -114,7 +122,7 @@ namespace StageManager
 				if (Count(held) >= Count(_peak))
 					_peak = held;
 
-				Text = HotkeyText.Format(held) + "...";
+				Text = HotkeyText.Format(held, Loc.KeyName) + "...";
 				return;
 			}
 

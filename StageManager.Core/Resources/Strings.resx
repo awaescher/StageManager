@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Common.Left" xml:space="preserve"><value>Left</value></data>
+  <data name="Common.Right" xml:space="preserve"><value>Right</value></data>
+  <data name="Key.Ctrl" xml:space="preserve"><value>Ctrl</value></data>
+  <data name="Key.Alt" xml:space="preserve"><value>Alt</value></data>
+  <data name="Key.Shift" xml:space="preserve"><value>Shift</value></data>
+  <data name="Key.Win" xml:space="preserve"><value>Win</value></data>
+  <data name="Key.Tab" xml:space="preserve"><value>Tab</value></data>
+  <data name="Key.Esc" xml:space="preserve"><value>Esc</value></data>
+  <data name="Tray.Settings" xml:space="preserve"><value>Settings...</value></data>
+  <data name="Tray.StartWithWindows" xml:space="preserve"><value>Start with Windows</value></data>
+  <data name="Tray.SidebarPosition" xml:space="preserve"><value>Sidebar position</value></data>
+  <data name="Tray.ScenesInSidebar" xml:space="preserve"><value>Scenes in sidebar</value></data>
+  <data name="Tray.DesktopIcons" xml:space="preserve"><value>Desktop icons</value></data>
+  <data name="Tray.IconsAutomatic" xml:space="preserve"><value>Automatic (hide while a scene is active)</value></data>
+  <data name="Tray.IconsHidden" xml:space="preserve"><value>Always hidden</value></data>
+  <data name="Tray.IconsUntouched" xml:space="preserve"><value>Never change</value></data>
+  <data name="Tray.Rescue" xml:space="preserve"><value>Bring back windows out of the screen</value></data>
+  <data name="Tray.ProjectPage" xml:space="preserve"><value>Project page</value></data>
+  <data name="Tray.Quit" xml:space="preserve"><value>Quit</value></data>
+  <data name="Card.AddToStage" xml:space="preserve"><value>Add to stage</value></data>
+  <data name="Card.Separate" xml:space="preserve"><value>Separate from group</value></data>
+  <data name="Card.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Settings.Title" xml:space="preserve"><value>StageManager settings</value></data>
+  <data name="Settings.Applied" xml:space="preserve"><value>Changes apply immediately.</value></data>
+  <data name="Settings.Reset" xml:space="preserve"><value>Reset to defaults</value></data>
+  <data name="Nav.General" xml:space="preserve"><value>General</value></data>
+  <data name="Nav.Sidebar" xml:space="preserve"><value>Sidebar</value></data>
+  <data name="Nav.Animations" xml:space="preserve"><value>Animations</value></data>
+  <data name="Nav.Keyboard" xml:space="preserve"><value>Keyboard</value></data>
+  <data name="Nav.DesktopIcons" xml:space="preserve"><value>Desktop icons</value></data>
+  <data name="General.Language" xml:space="preserve"><value>Language</value></data>
+  <data name="General.LanguageDesc" xml:space="preserve"><value>The language of menus and settings.</value></data>
+  <data name="Language.System" xml:space="preserve"><value>Same as Windows</value></data>
+  <data name="General.Autostart" xml:space="preserve"><value>Start with Windows</value></data>
+  <data name="General.AutostartDesc" xml:space="preserve"><value>StageManager starts when you sign in.</value></data>
+  <data name="General.Hide" xml:space="preserve"><value>Hide other windows by</value></data>
+  <data name="General.HideDesc" xml:space="preserve"><value>Moving a window out of the screen keeps its picture in the sidebar. Minimized windows of browsers and WebView apps lose theirs.</value></data>
+  <data name="Hide.Park" xml:space="preserve"><value>Moving them out of the screen (recommended)</value></data>
+  <data name="Hide.Minimize" xml:space="preserve"><value>Minimizing them</value></data>
+  <data name="Sidebar.Preview" xml:space="preserve"><value>Preview</value></data>
+  <data name="Sidebar.Position" xml:space="preserve"><value>Position</value></data>
+  <data name="Sidebar.PositionDesc" xml:space="preserve"><value>The screen edge the sidebar sits at.</value></data>
+  <data name="Sidebar.Scenes" xml:space="preserve"><value>Scenes in sidebar</value></data>
+  <data name="Sidebar.ScenesDesc" xml:space="preserve"><value>How many scenes are shown at the same time.</value></data>
+  <data name="Sidebar.WindowsPerScene" xml:space="preserve"><value>Windows per scene</value></data>
+  <data name="Sidebar.WindowsPerSceneDesc" xml:space="preserve"><value>Windows of a scene that show as stacked thumbnails. All others only show as icons.</value></data>
+  <data name="Sidebar.NoStack" xml:space="preserve"><value>1 (no stack)</value></data>
+  <data name="Sidebar.ThumbnailSize" xml:space="preserve"><value>Thumbnail size</value></data>
+  <data name="Sidebar.ThumbnailSizeDesc" xml:space="preserve"><value>Automatic fits the thumbnails to the number of scenes.</value></data>
+  <data name="Sidebar.AutoThumbnail" xml:space="preserve"><value>Automatic (fit the number of scenes)</value></data>
+  <data name="Sidebar.Width" xml:space="preserve"><value>Sidebar width</value></data>
+  <data name="Sidebar.WidthDesc" xml:space="preserve"><value>Automatic fits the sidebar to the thumbnails.</value></data>
+  <data name="Sidebar.AutoWidth" xml:space="preserve"><value>Automatic (fit the thumbnails)</value></data>
+  <data name="Sidebar.DragToStage" xml:space="preserve"><value>Drag cards onto the stage</value></data>
+  <data name="Sidebar.DragToStageDesc" xml:space="preserve"><value>Drag a card onto the stage to add its apps to it.</value></data>
+  <data name="Sidebar.PreviewInfo" xml:space="preserve"><value>Thumbnails {0} x {1}, sidebar {2} wide, calculated for a screen height of {3}.</value></data>
+  <data name="Sidebar.Limited" xml:space="preserve"><value>With this size only {0} of {1} scenes fit on this screen. The others stay managed but are not shown in the sidebar.</value></data>
+  <data name="Anim.Mode" xml:space="preserve"><value>Animate scene changes</value></data>
+  <data name="Anim.ModeDesc" xml:space="preserve"><value>How the windows move when you switch scenes.</value></data>
+  <data name="Anim.Follow" xml:space="preserve"><value>Follow Windows (default)</value></data>
+  <data name="Anim.Always" xml:space="preserve"><value>Always</value></data>
+  <data name="Anim.Never" xml:space="preserve"><value>Never</value></data>
+  <data name="Anim.Speed" xml:space="preserve"><value>Speed</value></data>
+  <data name="Anim.SpeedDesc" xml:space="preserve"><value>How fast the windows fly.</value></data>
+  <data name="Anim.Normal" xml:space="preserve"><value>Normal</value></data>
+  <data name="Anim.Frames" xml:space="preserve"><value>Fly a frame instead of the windows</value></data>
+  <data name="Anim.FramesDesc" xml:space="preserve"><value>Only if Windows shows just a frame while windows are dragged.</value></data>
+  <data name="Anim.Info" xml:space="preserve"><value>Windows: animations {0}, window content while dragging {1}.</value></data>
+  <data name="Anim.On" xml:space="preserve"><value>on</value></data>
+  <data name="Anim.Off" xml:space="preserve"><value>off</value></data>
+  <data name="Anim.Shown" xml:space="preserve"><value>shown</value></data>
+  <data name="Anim.HiddenFrame" xml:space="preserve"><value>hidden (frame only)</value></data>
+  <data name="Anim.EffectWindows" xml:space="preserve"><value>The windows fly between the sidebar and the stage.</value></data>
+  <data name="Anim.EffectFrames" xml:space="preserve"><value>A frame flies in place of the windows.</value></data>
+  <data name="Anim.EffectNone" xml:space="preserve"><value>Scenes switch without animation.</value></data>
+  <data name="Keyboard.Enable" xml:space="preserve"><value>Switch scenes with the keyboard</value></data>
+  <data name="Keyboard.EnableDesc" xml:space="preserve"><value>Hold the keys below and press Tab or a digit.</value></data>
+  <data name="Keyboard.Keys" xml:space="preserve"><value>Hold these keys</value></data>
+  <data name="Keyboard.KeysDesc" xml:space="preserve"><value>Click the field, then press and hold the keys you want.</value></data>
+  <data name="Keyboard.Capture" xml:space="preserve"><value>Press and hold the keys...</value></data>
+  <data name="Keyboard.OnlyModifiers" xml:space="preserve"><value>Hold only {0}, {1} or {2}. {3} and 1...9 are added by StageManager.</value></data>
+  <data name="Keyboard.Next" xml:space="preserve"><value>Next scene</value></data>
+  <data name="Keyboard.Previous" xml:space="preserve"><value>Previous scene</value></data>
+  <data name="Keyboard.Card" xml:space="preserve"><value>Card at that position</value></data>
+  <data name="Keyboard.Release" xml:space="preserve"><value>The scene opens when you let go of the keys.</value></data>
+  <data name="Keyboard.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Keyboard.Off" xml:space="preserve"><value>The keyboard shortcuts are off.</value></data>
+  <data name="Keyboard.Conflict" xml:space="preserve"><value>Already in use: {0} ({1})</value></data>
+  <data name="Owner.Unknown" xml:space="preserve"><value>Windows or another app</value></data>
+  <data name="Owner.WindowSwitcher" xml:space="preserve"><value>Windows window switcher</value></data>
+  <data name="Owner.TaskView" xml:space="preserve"><value>Windows task view</value></data>
+  <data name="Owner.Taskbar" xml:space="preserve"><value>apps on the Windows taskbar</value></data>
+  <data name="Owner.TaskbarJumpLists" xml:space="preserve"><value>jump lists of the Windows taskbar</value></data>
+  <data name="Warn.CtrlAlone" xml:space="preserve"><value>Ctrl alone takes Ctrl+Tab and Ctrl+1...9 from browsers and editors. Add another key.</value></data>
+  <data name="Warn.AltAlone" xml:space="preserve"><value>Alt alone takes Alt+1...9 from many apps. Add another key.</value></data>
+  <data name="Warn.CtrlAlt" xml:space="preserve"><value>Ctrl+Alt is AltGr on many keyboards: Ctrl+Alt+digits then types characters such as { [ ] }.</value></data>
+  <data name="Icons.Mode" xml:space="preserve"><value>Desktop icons</value></data>
+  <data name="Icons.ModeDesc" xml:space="preserve"><value>When StageManager hides the icons on your desktop.</value></data>
+  <data name="Icons.Manage" xml:space="preserve"><value>Automatic: hide while a scene is active, show in the desktop view</value></data>
+  <data name="Icons.Hidden" xml:space="preserve"><value>Always hidden</value></data>
+  <data name="Icons.Untouched" xml:space="preserve"><value>Never change</value></data>
+  <data name="Icons.Restore" xml:space="preserve"><value>Restore the icons when StageManager exits</value></data>
+  <data name="Icons.RestoreDesc" xml:space="preserve"><value>Brings the icons back to the state they had before StageManager started.</value></data>
+</root>
