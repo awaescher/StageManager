@@ -79,7 +79,7 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: 11.0.x
+        dotnet-version: 10.0.x
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the solution
@@ -95,6 +95,24 @@ jobs:
       env:
         OutputDir: ./Artifacts
         Configuration: ${{ matrix.configuration }}
+
+    # The published exe has to be able to start at all. With STAGEMANAGER_SELFTEST it ends right after the WPF runtime came up, before it
+    # creates a window. A package that cannot start crashes before that. .NET 11 produced such packages for WPF single-file apps
+    # (https://github.com/dotnet/wpf/issues/11842), which is why the app stays on .NET 10. Nothing is released if this fails.
+    - name: Start the published app
+      shell: pwsh
+      run: |
+        $env:STAGEMANAGER_SELFTEST = '1'
+        $env:STAGEMANAGER_DATA_DIR = Join-Path $env:RUNNER_TEMP 'stagemanager-selftest'
+        $process = Start-Process -FilePath ./Artifacts/StageManager.exe -PassThru
+        if (-not $process.WaitForExit(120000)) {
+          $process.Kill()
+          throw 'The published app did not end within two minutes.'
+        }
+        if ($process.ExitCode -ne 0) {
+          throw "The published app ended with exit code $($process.ExitCode): it cannot start."
+        }
+        Write-Host 'The published app started.'
 
     # Upload the app: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts

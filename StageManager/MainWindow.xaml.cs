@@ -129,7 +129,8 @@ namespace StageManager
 
 			trayIcon.Dispose();
 
-			SceneManager.Stop();
+			// the scenes exist once the window has been drawn: closing it before that must not fail
+			SceneManager?.Stop();
 
 			base.OnClosed(e);
 

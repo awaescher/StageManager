@@ -21,6 +21,11 @@ namespace StageManager
 
 		public App()
 		{
+			// The build starts the published exe to see that it can start at all. This runs after the constructor of the base class, which
+			// is where the WPF runtime comes up and where a broken package crashes. It ends here, before any window exists.
+			if (Environment.GetEnvironmentVariable("STAGEMANAGER_SELFTEST") == "1")
+				Environment.Exit(0);
+
 			AppDomain.CurrentDomain.UnhandledException += (_, e) =>
 			{
 				Log.Error($"Unhandled exception (terminating: {e.IsTerminating})", e.ExceptionObject as Exception);
