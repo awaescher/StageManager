@@ -218,6 +218,12 @@ namespace StageManager.Native
 		public bool IsMaximized => Win32.IsZoomed(_handle);
 		public bool IsMouseMoving { get; internal set; }
 
+		/// <summary>
+		/// True if the window still exists and is either visible or minimized.
+		/// Windows that were hidden by their application (e.g. "close to tray") return false.
+		/// </summary>
+		public bool IsVisibleOrMinimized => Win32.IsWindow(_handle) && (Win32.IsWindowVisible(_handle) || Win32.IsIconic(_handle));
+
 		public void Focus()
 		{
 			if (!IsFocused)

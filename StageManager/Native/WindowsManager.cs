@@ -80,7 +80,7 @@ namespace StageManager.Native
 			_currentProcessId = currentProcess.Id;
 			_currentProcessWindowHandle = currentProcess.MainWindowHandle;
 
-			Win32.SetWinEventHook(Win32.EVENT_CONSTANTS.EVENT_OBJECT_DESTROY, Win32.EVENT_CONSTANTS.EVENT_OBJECT_SHOW, IntPtr.Zero, _hookDelegate, 0, 0, 0);
+			Win32.SetWinEventHook(Win32.EVENT_CONSTANTS.EVENT_OBJECT_DESTROY, Win32.EVENT_CONSTANTS.EVENT_OBJECT_HIDE, IntPtr.Zero, _hookDelegate, 0, 0, 0);
 			Win32.SetWinEventHook(Win32.EVENT_CONSTANTS.EVENT_OBJECT_CLOAKED, Win32.EVENT_CONSTANTS.EVENT_OBJECT_UNCLOAKED, IntPtr.Zero, _hookDelegate, 0, 0, 0);
 			Win32.SetWinEventHook(Win32.EVENT_CONSTANTS.EVENT_SYSTEM_MINIMIZESTART, Win32.EVENT_CONSTANTS.EVENT_SYSTEM_MINIMIZEEND, IntPtr.Zero, _hookDelegate, 0, 0, 0);
 			Win32.SetWinEventHook(Win32.EVENT_CONSTANTS.EVENT_SYSTEM_MOVESIZESTART, Win32.EVENT_CONSTANTS.EVENT_SYSTEM_MOVESIZEEND, IntPtr.Zero, _hookDelegate, 0, 0, 0);
@@ -160,6 +160,8 @@ namespace StageManager.Native
 
 			if (EventWindowIsValid(idChild, idObject, hwnd))
 			{
+				LogEvent(eventType, hwnd);
+
 				switch (eventType)
 				{
 					case Win32.EVENT_CONSTANTS.EVENT_OBJECT_SHOW:
@@ -167,6 +169,9 @@ namespace StageManager.Native
 						break;
 					case Win32.EVENT_CONSTANTS.EVENT_OBJECT_DESTROY:
 						UnregisterWindow(hwnd);
+						break;
+					case Win32.EVENT_CONSTANTS.EVENT_OBJECT_HIDE:
+						HandleWindowHidden(hwnd);
 						break;
 					case Win32.EVENT_CONSTANTS.EVENT_OBJECT_CLOAKED:
 						UpdateWindow(hwnd, WindowUpdateType.Hide);
@@ -193,6 +198,41 @@ namespace StageManager.Native
 						WindowMove(hwnd);
 						break;
 				}
+			}
+		}
+
+		// TEMPORARY: logging for snap group analysis
+		private readonly Dictionary<IntPtr, string> _lastLoggedState = new Dictionary<IntPtr, string>();
+
+		private void LogEvent(Win32.EVENT_CONSTANTS eventType, IntPtr hwnd)
+		{
+			var tracked = _windows.ContainsKey(hwnd);
+
+			switch (eventType)
+			{
+				case Win32.EVENT_CONSTANTS.EVENT_SYSTEM_FOREGROUND:
+					DebugLog.Write("FOREGROUND", $"{DebugLog.Describe(hwnd)} tracked={tracked} {DebugLog.State(hwnd)}");
+					break;
+				case Win32.EVENT_CONSTANTS.EVENT_OBJECT_HIDE:
+				case Win32.EVENT_CONSTANTS.EVENT_OBJECT_DESTROY:
+				case Win32.EVENT_CONSTANTS.EVENT_SYSTEM_MINIMIZESTART:
+				case Win32.EVENT_CONSTANTS.EVENT_SYSTEM_MINIMIZEEND:
+				case Win32.EVENT_CONSTANTS.EVENT_SYSTEM_MOVESIZESTART:
+				case Win32.EVENT_CONSTANTS.EVENT_SYSTEM_MOVESIZEEND:
+					if (tracked)
+						DebugLog.Write("EVENT", $"{eventType} {DebugLog.Describe(hwnd)} {DebugLog.State(hwnd)}");
+					break;
+				case Win32.EVENT_CONSTANTS.EVENT_OBJECT_LOCATIONCHANGE:
+					if (tracked)
+					{
+						var state = DebugLog.State(hwnd);
+						if (!_lastLoggedState.TryGetValue(hwnd, out var last) || last != state)
+						{
+							_lastLoggedState[hwnd] = state;
+							DebugLog.Write("LOCATION", $"{DebugLog.Describe(hwnd)} {state}");
+						}
+					}
+					break;
 			}
 		}
 
@@ -223,6 +263,7 @@ namespace StageManager.Native
 					window.WindowClosed += (sender) => HandleWindowClosed(sender);
 
 					_windows[handle] = window;
+					DebugLog.Write("REGISTER", $"{DebugLog.Describe(handle)} process={window.ProcessName} emit={emitEvent}");
 
 					if (emitEvent)
 					{
@@ -241,6 +282,8 @@ namespace StageManager.Native
 			{
 				var window = _windows[handle];
 				_windows.Remove(handle);
+				_lastLoggedState.Remove(handle);
+				DebugLog.Write("UNREGISTER", $"0x{handle.ToInt64():X} process={window.ProcessName}");
 				HandleWindowRemove(window);
 			}
 		}
@@ -316,13 +359,45 @@ namespace StageManager.Native
 			if (!_active)
 				return;
 
-			if (_mouseMoveWindow != null && _windows.ContainsKey(handle))
-			{
-				var window = _windows[handle];
-				if (_mouseMoveWindow == window)
-					WindowUpdated?.Invoke(window, WindowUpdateType.Move);
-			}
+			if (!_windows.TryGetValue(handle, out var window))
+				return;
+
+			if (_mouseMoveWindow != null && _mouseMoveWindow == window)
+				WindowUpdated?.Invoke(window, WindowUpdateType.Move);
+
+			// reported for every tracked window, also for keyboard snapping (Win+Arrow) and
+			// for windows that get resized together with a snapped neighbour
+			WindowUpdated?.Invoke(window, WindowUpdateType.LocationChanged);
 		}
+
+		/// <summary>
+		/// Applications that "close to tray" only hide their window instead of destroying it.
+		/// Such windows have to be removed, otherwise they would be shown again on scene switches.
+		/// </summary>
+		private void HandleWindowHidden(IntPtr handle)
+		{
+			if (!_active)
+				return;
+
+			if (!_windows.TryGetValue(handle, out var window))
+				return;
+
+			// the event is delivered asynchronously, so check the current state
+			if (window.DidManualHide || Win32.IsWindowVisible(handle))
+			{
+				DebugLog.Write("HIDDEN", $"ignored {DebugLog.Describe(handle)} manualHide={window.DidManualHide} visible={Win32.IsWindowVisible(handle)}");
+				return;
+			}
+
+			DebugLog.Write("HIDDEN", $"unregister {DebugLog.Describe(handle)}");
+			UnregisterWindow(handle);
+		}
+
+		/// <summary>
+		/// Removes a window from the tracked windows, for example if it turned out to be hidden or destroyed
+		/// without the corresponding event being received.
+		/// </summary>
+		public void Forget(IntPtr handle) => UnregisterWindow(handle);
 
 		private void HandleWindowFocused(IWindow window)
 		{

@@ -37,8 +37,19 @@ namespace StageManager
 		private SceneModel _removedCurrentScene;
 		private SceneModel _mouseDownScene;
 
+		/// <summary>
+		/// Minimum distance in pixels a scene has to be dragged out of the sidebar to pull its window into the current scene.
+		/// </summary>
+		private const int PULL_MIN_DISTANCE = 50;
+		private Point _mouseDownPoint;
+
 		public bool EnableWindowDropToScene = false;
-		public bool EnableWindowPullToScene = true;
+
+		/// <summary>
+		/// Dragging a scene out of the sidebar pulls its last window into the current scene.
+		/// Disabled by default because it mixes windows of different processes in a scene.
+		/// </summary>
+		public bool EnableWindowPullToScene = false;
 
 		public MainWindow()
 		{
@@ -59,6 +70,18 @@ namespace StageManager
 			_lastWidth = Width;
 
 			StartHook();	
+		}
+
+		protected override void OnSourceInitialized(EventArgs e)
+		{
+			base.OnSourceInitialized(e);
+
+			// a tool window does not appear in Alt+Tab and Win+Tab and is not treated as an app window by Windows
+			var handle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+			var exStyle = Win32.GetWindowExStyleLongPtr(handle);
+			exStyle = (exStyle | Win32.WS_EX.WS_EX_TOOLWINDOW) & ~Win32.WS_EX.WS_EX_APPWINDOW;
+			Win32.SetWindowStyleExLongPtr(handle, exStyle);
+			DebugLog.Write("SIDEBAR", $"ex style set to 0x{(long)Win32.GetWindowExStyleLongPtr(handle):X}");
 		}
 
 		protected override void OnClosed(EventArgs e)
@@ -172,18 +195,25 @@ namespace StageManager
 			if (EnableWindowDropToScene)
 				_overlapCheckTimer.Change(TimeSpan.Zero, TimeSpan.Zero);
 
+			// a press outside of a scene in the sidebar must never pull a window later
+			_mouseDownScene = null;
+
+			if (!EnableWindowPullToScene)
+				return;
+
 			var foregroundWindow = Win32.GetForegroundWindow();
 			if (foregroundWindow != _thisHandle)
 				return;
 
-			if (EnableWindowPullToScene)
+			if (e.Data.X > _lastWidth)
+				return;
+
+			var screenPoint = new Point(e.Data.X, e.Data.Y);
+			this.Dispatcher.Invoke(() =>
 			{
-				var screenPoint = new Point(e.Data.X, e.Data.Y);
-				this.Dispatcher.Invoke(() =>
-				{
-					_mouseDownScene = FindSceneByPoint(screenPoint);
-				});
-			}
+				_mouseDownScene = FindSceneByPoint(screenPoint);
+				_mouseDownPoint = screenPoint;
+			});
 		}
 
 		private void OnMouseReleased(object? sender, MouseHookEventArgs e)
@@ -208,13 +238,20 @@ namespace StageManager
 				});
 			}
 
-			if (EnableWindowPullToScene)
+			// reset on every release, the pull only applies to the press that started on a scene
+			var pullScene = _mouseDownScene;
+			_mouseDownScene = null;
+
+			if (EnableWindowPullToScene && pullScene is object)
 			{
-				if (e.Data.X > _lastWidth && _mouseDownScene is object)
+				var distance = (new Point(e.Data.X, e.Data.Y) - _mouseDownPoint).Length;
+
+				if (e.Data.X > _lastWidth && distance >= PULL_MIN_DISTANCE)
 				{
+					DebugLog.Write("PULL", $"scene dragged out of the sidebar, distance={distance:0}");
 					this.Dispatcher.Invoke(() =>
 					{
-						SceneManager.PopWindowFrom(_mouseDownScene.Scene).SafeFireAndForget();
+						SceneManager.PopWindowFrom(pullScene.Scene).SafeFireAndForget();
 					});
 				}
 			}
@@ -272,6 +309,7 @@ namespace StageManager
 				if (value == _mode)
 					return;
 
+				DebugLog.Write("SIDEBAR", $"mode {_mode} -> {value}, Left={Left} hookMouse=({_mouse.X},{_mouse.Y})");
 				_mode = value;
 
 				this.Topmost = value == WindowMode.Flyover;
@@ -329,14 +367,36 @@ namespace StageManager
 			_mouse.X = e.Data.X;
 			_mouse.Y = e.Data.Y;
 
+			// TEMPORARY: log entering the left edge
+			var atEdge = e.Data.X <= 44;
+			if (atEdge != _hookMouseAtEdge)
+			{
+				_hookMouseAtEdge = atEdge;
+				if (atEdge)
+					DebugLog.Write("MOUSE", $"hook: mouse at left edge ({e.Data.X},{e.Data.Y}), mode={Mode}");
+			}
+
 			if (Mode == WindowMode.OffScreen && e.Data.X <= 44)
 			{
+				var stopwatch = Stopwatch.StartNew();
 				Dispatcher.Invoke(() => Mode = WindowMode.Flyover);
+				DebugLog.Write("MOUSE", $"flyover requested, dispatcher took {stopwatch.ElapsedMilliseconds} ms");
 			}
 		}
 
+		// TEMPORARY: logging state
+		private bool _hookMouseAtEdge;
+		private bool _cursorAtEdgeLogged;
+
 		private void OverlapCheck(object? _)
 		{
+			// TEMPORARY: detect a dead mouse hook, the real cursor is at the edge but the hook did not report it
+			var cursor = System.Windows.Forms.Cursor.Position;
+			var cursorAtEdge = cursor.X <= 44;
+			if (cursorAtEdge && !_cursorAtEdgeLogged)
+				DebugLog.Write("MOUSE", $"timer: cursor at left edge ({cursor.X},{cursor.Y}), hookMouse=({_mouse.X},{_mouse.Y}), mode={_mode}");
+			_cursorAtEdgeLogged = cursorAtEdge;
+
 			var currentWindows = SceneManager.GetCurrentWindows().ToArray(); // in case the enumeration changes
 			UpdateModeByWindows(currentWindows);
 		}
@@ -354,10 +414,18 @@ namespace StageManager
 
 			if (setMode)
 			{
+				var newMode = anyOverlappingWindows ? WindowMode.OffScreen : WindowMode.OnScreen;
+				if (newMode != Mode)
+					DebugLog.Write("SIDEBAR", $"overlap check: overlapping={anyOverlappingWindows} containsMouse={containsMouse} current windows: {string.Join("; ", windows.Select(w => DebugLog.Describe(w.Handle) + " " + w.Location.State))}");
+
+				var stopwatch = Stopwatch.StartNew();
 				Dispatcher.Invoke(() =>
 				{
-					Mode = anyOverlappingWindows ? WindowMode.OffScreen : WindowMode.OnScreen;
+					Mode = newMode;
 				});
+
+				if (stopwatch.ElapsedMilliseconds > 200)
+					DebugLog.Write("SIDEBAR", $"overlap check: dispatcher took {stopwatch.ElapsedMilliseconds} ms");
 			}
 		}
 
@@ -378,6 +446,12 @@ namespace StageManager
 		private void MenuItem_ProjectPage_Click(object sender, RoutedEventArgs e)
 		{
 			NavigateToProjectPage();
+		}
+
+		private void MenuItem_DetachWindow_Click(object sender, RoutedEventArgs e)
+		{
+			if (sender is FrameworkElement { DataContext: WindowModel model })
+				SceneManager.DetachWindow(model.Window).SafeFireAndForget();
 		}
 
 		private void MenuItem_Quit_Click(object sender, RoutedEventArgs e)

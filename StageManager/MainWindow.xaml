@@ -97,7 +97,19 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border>
+                                    <Border
+                                        Background="Transparent"
+                                        ToolTip="{Binding Title}">
+                                        <Border.ContextMenu>
+                                            <ContextMenu
+                                                Opened="ContextMenu_Opened"
+                                                Closed="ContextMenu_Closed">
+                                                <MenuItem
+                                                    Header="{Binding Title}"
+                                                    HeaderStringFormat="Aus Scene lösen: {0}"
+                                                    Click="MenuItem_DetachWindow_Click" />
+                                            </ContextMenu>
+                                        </Border.ContextMenu>
                                         <Border.Effect>
                                             <DropShadowEffect
                                                 BlurRadius="20" />

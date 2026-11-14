@@ -43,6 +43,44 @@ namespace StageManager.Native.PInvoke
         public static extern bool IsWindowVisible(IntPtr hWnd);
 
         [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool IsWindow(IntPtr hWnd);
+
+        /// <summary>
+        /// Determines whether the window is arranged (snapped). Available since Windows 7 in user32.
+        /// </summary>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool IsWindowArranged(IntPtr hWnd);
+
+        public const uint MONITOR_DEFAULTTONEAREST = 2;
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr MonitorFromWindow(IntPtr hWnd, uint dwFlags);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X;
+            public int Y;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct WINDOWPLACEMENT
+        {
+            public int length;
+            public int flags;
+            public int showCmd;
+            public POINT ptMinPosition;
+            public POINT ptMaxPosition;
+            public Rect rcNormalPosition;
+        }
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+
+        [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
 
         [Flags()]
